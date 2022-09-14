@@ -12,8 +12,17 @@
 #include <stdio.h>
 
 #include "fib.h"
+#include "thread_util.h"
 
-int main() {
+int main(int argc, char **argv) {
+    int threads = 0;
+    int deadline = 0;
+    int size = 0;
+
+    if (!parse_args(argc, argv, &threads, &deadline, &size)) {
+        return -1;
+    }
+
     printf("Calling fib with valid parameter...\n");
     fib(15);
     printf("Calling fib with invalid parameter...\n");
