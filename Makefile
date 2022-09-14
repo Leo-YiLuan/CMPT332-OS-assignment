@@ -9,7 +9,7 @@
 
 CC=gcc
 CLAGS=-g
-CPPFLAGS=-std=gnu90 -Wall -pedantics
+CPPFLAGS=-std=gnu90 -Wall -pedantic
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
