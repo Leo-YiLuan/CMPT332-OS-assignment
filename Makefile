@@ -14,11 +14,13 @@ CPPFLAGS=-std=gnu90 -Wall -pedantics
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
 # assignment.
-partA1: partA1.c
-	$(CC) -o partA1 partA1.c
+partA1: partA1.c fib.o
+	$(CC) -o partA1 partA1.c fib.o
 else 
 # We are on Unix, build Unix specific stuff.
 
 endif
 
 # Build common stuff for A1.
+fib.o: fib.c fib.h
+	$(CC) -o fib.o -c $(CPPFLAGS) fib.c 

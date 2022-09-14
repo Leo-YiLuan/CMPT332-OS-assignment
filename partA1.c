@@ -9,7 +9,12 @@
 
 #include <stdio.h>
 
+#include "fib.h"
+
 int main() {
-    printf("Test");
+    printf("Calling fib with valid parameter...\n");
+    fib(15);
+    printf("Calling fib with invalid parameter...\n");
+    fib(-15);
     return 0;
 }
