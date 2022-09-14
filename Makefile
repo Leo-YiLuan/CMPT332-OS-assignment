@@ -8,14 +8,14 @@
 # A1 Phase 1
 
 CC=gcc
-CLAGS=-g
+CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
 # assignment.
 partA1: partA1.c fib.o thread_util.o
-	$(CC) -o partA1 partA1.c fib.o thread_util.o
+	$(CC) $(CFLAGS) -o partA1 partA1.c fib.o thread_util.o
 else 
 # We are on Unix, build Unix specific stuff.
 
@@ -23,7 +23,7 @@ endif
 
 # Build common stuff for A1.
 fib.o: fib.c fib.h
-	$(CC) -o fib.o -c $(CPPFLAGS) fib.c 
+	$(CC) -o fib.o -c $(CFLAGS) $(CPPFLAGS) fib.c 
 
 thread_util.o: thread_util.c thread_util.h
-	$(CC) -o thread_util.o -c $(CPPFLAGS) thread_util.c
+	$(CC) -o thread_util.o -c $(CFLAGS) $(CPPFLAGS) thread_util.c
