@@ -10,9 +10,22 @@
 */
 
 #include <stdio.h>
+#include <processthreadsapi.h>
+#include <synchapi.h>
 
 #include "fib.h"
 #include "thread_util.h"
+
+unsigned int thread_start(void *fibData) {
+    /* Skeleton thread... would normally call fib */
+    printf("Start thread with value: %d\n", *(unsigned int*)fibData);
+}
+
+LPDWORD create_thread(unsigned int size) {
+    LPDWORD id = NULL;
+    id = CreateThread(NULL, 0, thread_start, &size, 0, id);
+    return id;
+}
 
 int main(int argc, char **argv) {
     int threads = 0;
@@ -23,9 +36,12 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    printf("Calling fib with valid parameter...\n");
+    /* Test skeleton functions... */
     fib(15);
-    printf("Calling fib with invalid parameter...\n");
-    fib(-15);
+    create_thread(size);
+
+    /* Convert seconds to ms */
+    Sleep(deadline * 1000);
+
     return 0;
 }
