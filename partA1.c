@@ -18,13 +18,7 @@
 
 unsigned int thread_start(void *fibData) {
     /* Skeleton thread... would normally call fib */
-    printf("Start thread with value: %d\n", *(unsigned int*)fibData);
-}
-
-LPDWORD create_thread(unsigned int size) {
-    LPDWORD id = NULL;
-    id = CreateThread(NULL, 0, thread_start, &size, 0, id);
-    return id;
+    printf("Started thread with value: %d\n", *(unsigned int*)fibData);
 }
 
 int main(int argc, char **argv) {
@@ -38,7 +32,7 @@ int main(int argc, char **argv) {
 
     /* Test skeleton functions... */
     fib(15);
-    create_thread(size);
+    LPDWORD id = CreateThread(NULL, 0, thread_start, &size, 0, id);
 
     /* Convert seconds to ms */
     Sleep(deadline * 1000);
