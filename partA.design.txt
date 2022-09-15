@@ -1,0 +1,26 @@
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Li Yuan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A1 Phase 1
+
+The main function parses the arguments passed in through argv via a seperate
+function parse_args. This is done because args between the different executables
+will not change, so we can reuse this function in every executable for 
+Part A.
+
+CreateThread is called, passing the fibonacci size parameter into a function
+where the child thread will live for the duration of its lifetime. The
+signature is unsigned int (*)(void*) as is required by the CreateThread 
+api call. main will need to use GetLastError() in the future in order
+to perform api error checking. 
+
+fib(), as specified in the assignment documentation, is also moved to a seperate
+c file in order to facilitate code reuse. It is a simple recursive function that
+accepts as a parameter the nth fibonacci number to calculate, where n >= 0.
+
+Considerations: It may be a good idea to wrap our isRunning global variable in
+a Win32 mutex.
