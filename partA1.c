@@ -16,6 +16,12 @@
 #include "fib.h"
 #include "thread_util.h"
 
+/*
+ * The entry point for all of our child threads. 
+ * param void *fibData: Pointer to data supplied to the child thread via 
+ *                      the Win32 API.
+ * return: Unused, but required by the function signature to satisfy Win32.
+ */
 unsigned int thread_start(void *fibData) {
     /* Skeleton thread... would normally call fib */
     printf("Started thread with value: %d\n", *(unsigned int*)fibData);

@@ -10,7 +10,8 @@
 The main function parses the arguments passed in through argv via a seperate
 function parse_args. This is done because args between the different executables
 will not change, so we can reuse this function in every executable for 
-Part A.
+Part A. Return type can be checked to determine whether argument parsing
+was successful.
 
 CreateThread is called, passing the fibonacci size parameter into a function
 where the child thread will live for the duration of its lifetime. The
@@ -22,5 +23,7 @@ fib(), as specified in the assignment documentation, is also moved to a seperate
 c file in order to facilitate code reuse. It is a simple recursive function that
 accepts as a parameter the nth fibonacci number to calculate, where n >= 0.
 
-Considerations: It may be a good idea to wrap our isRunning global variable in
-a Win32 mutex.
+Considerations for Part B & C: 
+* It may be a good idea to wrap our isRunning global variable in a Win32 mutex.
+* How to index threads by ID. The number of threads isn't known until run-time.
+  Can malloc be used?
