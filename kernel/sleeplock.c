@@ -1,4 +1,4 @@
-// Sleeping locks
+/* Sleeping locks */
 
 #include "types.h"
 #include "riscv.h"

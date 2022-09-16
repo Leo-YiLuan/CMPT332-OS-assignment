@@ -1,6 +1,6 @@
-//
-// run random system calls in parallel forever.
-//
+/* */
+/* run random system calls in parallel forever. */
+/* */
 
 #include "kernel/param.h"
 #include "kernel/types.h"
@@ -12,7 +12,7 @@
 #include "kernel/memlayout.h"
 #include "kernel/riscv.h"
 
-// from FreeBSD.
+/* from FreeBSD. */
 int
 do_rand(unsigned long *ctx)
 {
@@ -194,8 +194,8 @@ go(int which_child)
       wait(0);
     } else if(what == 21){
       unlink("c");
-      // should always succeed. check that there are free i-nodes,
-      // file descriptors, blocks.
+      /* should always succeed. check that there are free i-nodes, */
+      /* file descriptors, blocks. */
       int fd1 = open("c", O_CREATE|O_RDWR);
       if(fd1 < 0){
         printf("grind: create c failed\n");
@@ -221,7 +221,7 @@ go(int which_child)
       close(fd1);
       unlink("c");
     } else if(what == 22){
-      // echo hi | cat
+      /* echo hi | cat */
       int aa[2], bb[2];
       if(pipe(aa) < 0){
         fprintf(2, "grind: pipe failed\n");

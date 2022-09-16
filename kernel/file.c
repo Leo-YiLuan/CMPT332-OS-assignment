@@ -1,6 +1,6 @@
-//
-// Support functions for system calls that involve file descriptors.
-//
+/* */
+/* Support functions for system calls that involve file descriptors. */
+/* */
 
 #include "types.h"
 #include "riscv.h"
@@ -25,7 +25,7 @@ fileinit(void)
   initlock(&ftable.lock, "ftable");
 }
 
-// Allocate a file structure.
+/* Allocate a file structure. */
 struct file*
 filealloc(void)
 {
@@ -43,7 +43,7 @@ filealloc(void)
   return 0;
 }
 
-// Increment ref count for file f.
+/* Increment ref count for file f. */
 struct file*
 filedup(struct file *f)
 {
@@ -55,7 +55,7 @@ filedup(struct file *f)
   return f;
 }
 
-// Close file f.  (Decrement ref count, close when reaches 0.)
+/* Close file f.  (Decrement ref count, close when reaches 0.) */
 void
 fileclose(struct file *f)
 {
@@ -82,8 +82,8 @@ fileclose(struct file *f)
   }
 }
 
-// Get metadata about file f.
-// addr is a user virtual address, pointing to a struct stat.
+/* Get metadata about file f. */
+/* addr is a user virtual address, pointing to a struct stat. */
 int
 filestat(struct file *f, uint64 addr)
 {
@@ -101,8 +101,8 @@ filestat(struct file *f, uint64 addr)
   return -1;
 }
 
-// Read from file f.
-// addr is a user virtual address.
+/* Read from file f. */
+/* addr is a user virtual address. */
 int
 fileread(struct file *f, uint64 addr, int n)
 {
@@ -129,8 +129,8 @@ fileread(struct file *f, uint64 addr, int n)
   return r;
 }
 
-// Write to file f.
-// addr is a user virtual address.
+/* Write to file f. */
+/* addr is a user virtual address. */
 int
 filewrite(struct file *f, uint64 addr, int n)
 {
@@ -146,12 +146,12 @@ filewrite(struct file *f, uint64 addr, int n)
       return -1;
     ret = devsw[f->major].write(1, addr, n);
   } else if(f->type == FD_INODE){
-    // write a few blocks at a time to avoid exceeding
-    // the maximum log transaction size, including
-    // i-node, indirect block, allocation blocks,
-    // and 2 blocks of slop for non-aligned writes.
-    // this really belongs lower down, since writei()
-    // might be writing a device like the console.
+    /* write a few blocks at a time to avoid exceeding */
+    /* the maximum log transaction size, including */
+    /* i-node, indirect block, allocation blocks, */
+    /* and 2 blocks of slop for non-aligned writes. */
+    /* this really belongs lower down, since writei() */
+    /* might be writing a device like the console. */
     int max = ((MAXOPBLOCKS-1-1-2) / 2) * BSIZE;
     int i = 0;
     while(i < n){
@@ -167,7 +167,7 @@ filewrite(struct file *f, uint64 addr, int n)
       end_op();
 
       if(r != n1){
-        // error from writei
+        /* error from writei */
         break;
       }
       i += r;

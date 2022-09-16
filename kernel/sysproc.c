@@ -12,7 +12,7 @@ sys_exit(void)
   int n;
   argint(0, &n);
   exit(n);
-  return 0;  // not reached
+  return 0;  /* not reached */
 }
 
 uint64
@@ -77,8 +77,8 @@ sys_kill(void)
   return kill(pid);
 }
 
-// return how many clock tick interrupts have occurred
-// since start.
+/* return how many clock tick interrupts have occurred */
+/* since start. */
 uint64
 sys_uptime(void)
 {
