@@ -46,7 +46,7 @@ validate_arg() {
     err=$(test "$1" -lt 0 2>&1)
     if [ ! -z "$err" ] 
     then 
-        printf "Error: Could not understand non-nunmeric arg $1...\n"
+        printf "Error: Could not understand non-numeric arg $1...\n"
         return 1
     fi
 
@@ -94,6 +94,7 @@ do
         continue
     fi
     ./$binary $line
+    printf "Completed run of executable.\n"
     read line
 done
 

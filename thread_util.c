@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int parse_args(int argc, char **argv, int *outThreads, int *outDeadline, int *outSize) {
+int parse_args(int argc, char **argv, int *outThreads, int *outDeadline, 
+               int *outSize) {
     if (argc != 4) {
         fprintf(stderr, "Error: Incorrect number of arguments. Usage: " 
         "./partA1 <threads> <deadline> <size>\n");

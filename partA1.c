@@ -18,8 +18,7 @@
 
 /*
  * The entry point for all of our child threads. 
- * param void *fibData: Pointer to data supplied to the child thread via 
- *                      the Win32 API.
+ * fibData: Pointer to data supplied to the child thread via the Win32 API.
  * return: Unused, but required by the function signature to satisfy Win32.
  */
 unsigned int thread_start(void *fibData) {
@@ -37,7 +36,7 @@ int main(int argc, char **argv) {
     }
 
     /* Test skeleton functions... */
-    fib(15);
+    fib(size);
     LPDWORD id = CreateThread(NULL, 0, thread_start, &size, 0, id);
 
     /* Convert seconds to ms */
