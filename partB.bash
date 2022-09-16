@@ -60,11 +60,10 @@ validate_arg() {
 }
 
 printf "If executing interactively, please enter one set of "
-printf "arguments for each run. Enter quit or q to end the loop\n"
+printf "arguments for each run. \nEnter quit or q to end the loop\n"
 
-read line
 # Continue while we havent hit an eof
-while [ $? -eq 0 ]
+while read line
 do
     # Bail early if interactive user chooses to quit.
     if [ "$line" = "q" ] || [ "$line" = "quit" ]
@@ -88,14 +87,10 @@ do
     if [ $rc1 = 1 ] || [ $rc2 = 1 ] || [ $rc3 = 1 ]
     then
         printf "Error parsing input, skipping this input...\n"
-        # Don't forget to read a new line, or we end up
-        # in an infinite loop.
-        read line
         continue
     fi
     ./$binary $line
     printf "Completed run of executable.\n"
-    read line
 done
 
 # Do this one more time, because we hit a line with eof.
