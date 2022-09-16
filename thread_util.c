@@ -15,7 +15,7 @@ int parse_args(int argc, char **argv, int *outThreads, int *outDeadline,
     *outDeadline = (int)strtol(argv[2], NULL, 10);
     *outSize = (int)strtol(argv[3], NULL, 10);
 
-    if (*outThreads <= 0 || *outDeadline <= 0 || *outSize <= 0) {
+    if (*outThreads < 0 || *outDeadline < 0 || *outSize < 0) {
         fprintf(stderr, "Error: Arguments supplied must be non-negative.");
         return 0;
     }
