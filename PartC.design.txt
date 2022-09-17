@@ -186,3 +186,25 @@ functions:
 
 For memory allocation:
     check and update the memory space whenever changes the list. 
+
+    For handling of statically allocating memory for nodes and lists, we
+    can perform something like the following:
+    Create a file data.c that contains two statically allocated arrays, eg 
+    NODE nodes[MAX_NODE_COUNT];
+    LIST lists[MAX_LIST_COUNT];
+    We can then provide our library's .c files access to these variables 
+    via extern, for example:
+    extern NODE nodes[MAX_NODE_COUNT];
+    extern LIST lists[MAX_NODE_COUNT];
+    
+    Regarding tracking of free positions in our array:
+    It seems we will likely need a third/fourth array to track which 
+    nodes/lists are "in use" and which are "free" to be allocated. For example:
+    uint8_t freeNodes[MAX_NODE_COUNT];
+    We can iterate through this array to find a zero value, which we define 
+    to mean that entry in the nodes array is unused. For example, if we 
+    iterate through freeNodes and discover freeNodes[5] = 0, then 
+    we know that nodes[5] does not contain a valid NODE, and we can safely 
+    call nodes[5] = newNode; We would then set freeNodes[5] = 1, to 
+    signify that this slot is now allocated and in use. 
+    
