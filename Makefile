@@ -11,6 +11,9 @@ CC=gcc
 CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic
 
+.PHONY : all
+all: partA1
+
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
 # assignment.
