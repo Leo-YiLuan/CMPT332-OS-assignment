@@ -18,7 +18,9 @@ partA1: partA1.c fib.o thread_util.o
 	$(CC) $(CFLAGS) -o partA1 partA1.c fib.o thread_util.o
 else 
 # We are on Unix, build Unix specific stuff.
-
+# Dummy rule
+partA1: 
+	@echo "Not on Windows, skipping partA1..."
 endif
 
 # Build common stuff for A1.
