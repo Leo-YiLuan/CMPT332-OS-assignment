@@ -13,11 +13,11 @@
 
 void *ListRemove(LIST *list, void *item){
     if (list == NULL){
-        printf("Error in procedure ListRemove(): Invalid parameter list %s", list);
+        printf("Error in procedure ListRemove(): Invalid parameter list %s \n", list);
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListRemove(): Invalid parameter item %s", item);
+        printf("Error in procedure ListRemove(): Invalid parameter item %s \n", item);
     }
     
     return 0;
@@ -25,11 +25,11 @@ void *ListRemove(LIST *list, void *item){
 
 void ListFree(LIST *list, void (*itemFree)(void*)){
     if (list == NULL){
-        printf("Error in procedure ListFree(): Invalid parameter list %s", list);
+        printf("Error in procedure ListFree(): Invalid parameter list %s \n", list);
         return -1;
     }else if (itemFree == NULL)
     {
-        printf("Error in procedure ListFree(): Invalid parameter itemFree() %s", itemFree);
+        printf("Error in procedure ListFree(): Invalid parameter itemFree() %s \n", itemFree);
         return -1;
     }
     
@@ -38,7 +38,7 @@ void ListFree(LIST *list, void (*itemFree)(void*)){
 
 void *ListTrim(LIST *list){
     if (list == NULL){
-        printf("Error in procedure ListTrim(): Invalid parameter list %s", list);
+        printf("Error in procedure ListTrim(): Invalid parameter list %s \n", list);
         return -1;
     }
     return 0;

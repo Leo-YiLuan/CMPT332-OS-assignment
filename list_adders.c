@@ -12,18 +12,18 @@
 #include <stdio.h>
 
 LIST* ListCreate(){
-    printf("List created here");
+    printf("List created here\n");
     return NULL;
 }
 
 
 int ListAdd(LIST *list,void *item){
     if (list == NULL){
-        printf("Error in procedure ListAdd(): Invalid parameter list %s", list);
+        printf("Error in procedure ListAdd(): Invalid parameter list %s \n", list);
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListAdd(): Invalid parameter item %s", item);
+        printf("Error in procedure ListAdd(): Invalid parameter item %s \n", item);
         return -1;
     }
     
@@ -32,11 +32,11 @@ int ListAdd(LIST *list,void *item){
 
 int ListInsert(LIST *list, void *item){
     if (list == NULL){
-        printf("Error in procedure ListInsert(): Invalid parameter list %s", list);
+        printf("Error in procedure ListInsert(): Invalid parameter list %s \n", list);
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListInsert(): Invalid parameter item %s", item);
+        printf("Error in procedure ListInsert(): Invalid parameter item %s \n", item);
         return -1;
 
     }
@@ -46,11 +46,11 @@ int ListInsert(LIST *list, void *item){
 
 int ListAppend(LIST *list, void *item){
     if (list == NULL){
-        printf("Error in procedure ListAppend(): Invalid parameter list %s", list);
+        printf("Error in procedure ListAppend(): Invalid parameter list %s \n", list);
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListAppend(): Invalid parameter item %s", item);
+        printf("Error in procedure ListAppend(): Invalid parameter item %s \n", item);
         return -1;
     }
     return 0;
@@ -58,11 +58,11 @@ int ListAppend(LIST *list, void *item){
 
 int ListPrepend(LIST *list, void *item){
     if (list == NULL){
-        printf("Error in procedure ListPrepend(): Invalid parameter list %s", list);
+        printf("Error in procedure ListPrepend(): Invalid parameter list %s \n", list);
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListPrepend(): Invalid parameter item %s", item);
+        printf("Error in procedure ListPrepend(): Invalid parameter item %s \n", item);
         return -1;
     }
     return 0;
@@ -70,11 +70,11 @@ int ListPrepend(LIST *list, void *item){
 
 void ListConcat(LIST *list1, LIST *list2){
     if (list1 == NULL){
-        printf("Error in procedure ListConcat(): Invalid parameter list1 %s", list1);
+        printf("Error in procedure ListConcat(): Invalid parameter list1 %s \n", list1);
         return -1;
     }else if (list2 == NULL)
     {
-        printf("Error in procedure ListConcat(): Invalid parameter list2 %s", list2);
+        printf("Error in procedure ListConcat(): Invalid parameter list2 %s \n", list2);
         return -1;
     }
 
