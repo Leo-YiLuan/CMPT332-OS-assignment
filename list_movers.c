@@ -4,7 +4,7 @@
 
 int listCount(LIST *list){
     if (list == NULL){
-        printf("argument list has casue a null pointer exception");
+        printf("Error in procedure listCount(): Invalid parameter list %s", list);
         return -1;
     }
     return list->listCount;
@@ -12,7 +12,7 @@ int listCount(LIST *list){
 
 void *ListFirst(LIST *list){
     if (list == NULL){
-        printf("argument list has casue a null pointer exception");
+        printf("Error in procedure ListFirst(): Invalid parameter list %s", list);
         return -1;
     }
     return 0;
@@ -20,30 +20,45 @@ void *ListFirst(LIST *list){
 
 void *ListLast(LIST *list){
     if (list == NULL){
-        printf("argument list has casue a null pointer exception");
+        printf("Error in procedure ListLast(): Invalid parameter list %s", list);
         return -1;
     }
 };
 
 void *ListNext(LIST *list){
     if (list == NULL){
-        printf("argument list has casue a null pointer exception");
+        printf("Error in procedure ListNext(): Invalid parameter list %s", list);
         return -1;
     }
 };
 
 void *ListPrev(LIST *list){
     if (list == NULL){
-        printf("argument list has casue a null pointer exception");
+        printf("Error in procedure ListPrev(): Invalid parameter list %s", list);
         return -1;
     }
 };
 
 void *ListCurr(LIST *list){
     if (list == NULL){
-        printf("argument list shas casue a null pointer exception");
+        printf("Error in procedure ListCurr(): Invalid parameter list %s", list);
         return -1;
     }
 };
 
-void *ListSearch(LIST *list, int (*comparator)(void *, void *), void * comparisonArg);
+void *ListSearch(LIST *list, int (*comparator)(void *, void *), void * comparisonArg){
+        if (list == NULL){
+        printf("Error in procedure ListSearch(): Invalid parameter list %s", list);
+        return -1;
+    }else if (comparator == NULL)
+    {
+        printf("Error in procedure ListSearch(): Invalid parameter comparator() %s", comparator);
+        return -1;    
+    }else if (comparisonArg)
+    {
+        printf("Error in procedure ListSearch(): Invalid parameter comparisionArg %s", comparisonArg);
+        return -1; 
+    }
+    
+    
+};
