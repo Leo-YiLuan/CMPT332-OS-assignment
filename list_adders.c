@@ -19,63 +19,61 @@ LIST* ListCreate(){
 
 int ListAdd(LIST *list,void *item){
     if (list == NULL){
-        printf("Error in procedure ListAdd(): Invalid parameter list %s \n", list);
+        printf("Error in procedure ListAdd(): Invalid parameter list \n");
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListAdd(): Invalid parameter item %s \n", item);
+        printf("Error in procedure ListAdd(): Invalid parameter item \n");
         return -1;
     }
     
     return 0;
-};
+}
 
 int ListInsert(LIST *list, void *item){
     if (list == NULL){
-        printf("Error in procedure ListInsert(): Invalid parameter list %s \n", list);
+        printf("Error in procedure ListInsert(): Invalid parameter list \n");
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListInsert(): Invalid parameter item %s \n", item);
+        printf("Error in procedure ListInsert(): Invalid parameter item \n");
         return -1;
 
     }
     
     return 0;
-};
+}
 
 int ListAppend(LIST *list, void *item){
     if (list == NULL){
-        printf("Error in procedure ListAppend(): Invalid parameter list %s \n", list);
+        printf("Error in procedure ListAppend(): Invalid parameter list \n");
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListAppend(): Invalid parameter item %s \n", item);
+        printf("Error in procedure ListAppend(): Invalid parameter item \n");
         return -1;
     }
     return 0;
-};
+}
 
 int ListPrepend(LIST *list, void *item){
     if (list == NULL){
-        printf("Error in procedure ListPrepend(): Invalid parameter list %s \n", list);
+        printf("Error in procedure ListPrepend(): Invalid parameter list \n");
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListPrepend(): Invalid parameter item %s \n", item);
+        printf("Error in procedure ListPrepend(): Invalid parameter item \n");
         return -1;
     }
     return 0;
-};
+}
 
 void ListConcat(LIST *list1, LIST *list2){
     if (list1 == NULL){
-        printf("Error in procedure ListConcat(): Invalid parameter list1 %s \n", list1);
-        return -1;
+        printf("Error in procedure ListConcat(): Invalid parameter list1 \n");
     }else if (list2 == NULL)
     {
-        printf("Error in procedure ListConcat(): Invalid parameter list2 %s \n", list2);
-        return -1;
+        printf("Error in procedure ListConcat(): Invalid parameter list2 \n");
     }
 
-};
+}
