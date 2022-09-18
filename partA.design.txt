@@ -7,25 +7,66 @@
 # CMPT 332 2022
 # A1 Phase 1
 
+
+General Program Flow:
+
 The main function parses the arguments passed in through argv via a seperate
 function parse_args. This is done because args between the different 
 executables will not change, so we can reuse this function in every 
-executable for Part A. Return type can be checked to determine whether 
-argument parsing was successful.
+executable for Part A.
+We would then use a loop to construct the platform/library specific threads as 
+necessary for each part. We can wrap isRunning (as applicable) in a platform
+specific mutex to ensure race conditions can't cause a thread to run one 
+extra time when it shouldn't. For Part A2, we will of course need to use Kill
+as opposed to a shared global. For Part A3 returning to the use of a shard 
+global seems reasonable. 
 
-CreateThread is called, passing the fibonacci size parameter into a function
-where the child thread will live for the duration of its lifetime. The
-signature is unsigned int (*)(void*) as is required by the CreateThread 
-api call. main will need to use GetLastError() in the future in order
-to perform api error checking. 
 
-fib(), as specified in the assignment documentation, is also moved to a 
-seperate c file in order to facilitate code reuse. It is a simple recursive 
-function that accepts as a parameter the nth fibonacci number to calculate,
-where n >= 0. The function will return -1 to indicate an error in the
-parameter supplied. 
+Functions:
+
+parse_args:
+    Tests user-supplied arguments for correctness. Ensures the correct number 
+    of arguments are supplied and that they are in a valid range. 
+
+    PRECONDITIONS: none
+    POSTCONDITIONS: 
+      If parsing arguments fails, a message is written to stderr.
+    PARAMS: 
+      argc: the number of arguments to parse.
+      argv: An array of char pointers each containing a null-terminated argument.
+      outThreads: a pointer to be filled with the desired number of threads. 
+      outDeadline: a pointer to be filled with the maximum time the process 
+                   should run, in seconds.
+      outSize: a pointer to be filled with the number of threads to create. 
+
+      RETURN:
+        1 on success, 0 on failure. 
+
+fib:
+      Calculates the nth fibonacci number. 
+
+      PRECONDITIONS: value >= 0
+      POSTCONDITIONS: none
+      PARAMS:
+        value: the nth fibonacci number to calculate. 
+      RETURN:
+        the nth fibonacci number. 
+
+thread_start (part A1):
+      The entry point for a Win32 child thread. 
+
+      PRECONDITIONS: none
+      POSTCONDITIONS: 
+        a global array of counters is modified to denote the number of executions 
+        of fib by a specific child thread identified by some thread id.
+      PARAMS: 
+        fibData: a void pointer to the nth fibonacci number to calculate.
+      RETURNS:
+        Unused, but returns an unsigned integer to comply with the 
+        Win32 API requirements. 
+
 
 Considerations for Part B & C: 
 * It may be a good idea to wrap our isRunning global variable in a Win32 mutex.
 * How to index threads by ID. The number of threads isn't known until run-time.
-  Should probably define a constant, MAX_THREADS, that will be allowed.
+  Should probably define a reasonable constant, MAX_THREADS, that will be allowed.
