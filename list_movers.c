@@ -12,7 +12,7 @@
 #include "list.h" 
 
 
-int listCount(LIST *list){
+int ListCount(LIST *list){
     if (list == NULL){
         printf("Error in procedure listCount(): Invalid parameter list \n");
         return -1;

@@ -54,7 +54,7 @@ LIST *ListCreate();
  *      list: a pointer to a LIST
  * return: The number of nodes in the list if success.
  */
-int listCount(LIST *list);
+int ListCount(LIST *list);
 
 /*
  * get the first node in the list, and make first node the current one
