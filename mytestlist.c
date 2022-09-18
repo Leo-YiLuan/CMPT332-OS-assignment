@@ -14,10 +14,23 @@
 int comparator(void *item1, void *item2){
     if (item1==NULL||item2==NULL)
     {
+        printf("Error in procedure comparator(): "
+    "Invalid parameter item1 or item2 \n");
+
         return -1;
     }
     printf("Got to procedure comparator()\n");
     return 1;
+}
+
+void itemFree(void *item){
+    if (item == NULL){
+        printf("Error in procedure itemFree(): "
+    "Invalid parameter item \n");
+        return;
+
+    }
+    printf("Got to procedure itemFree()\n");
 }
 
 int main(int argc, char **argv){
@@ -129,6 +142,18 @@ int main(int argc, char **argv){
     printf("Error: return value of comparator() is not correct");
 
     }
+
+     /* call all the functions in list_removers.c*/
+
+    ListRemove(List1p);
+    ListRemove(NULL);
+
+    ListFree(List1p,itemFree);
+    ListFree(NULL, itemFree);
+    ListFree(List1p,NULL);
+
+    ListTrim(List1p);
+    ListTrim(NULL);
 
     return 0;
 }

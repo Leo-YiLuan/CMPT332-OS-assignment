@@ -11,27 +11,38 @@
 #include "list.h"
 #include <stdio.h>
 
+/**
+ *  These function just test parameters, no functional implemented
+ *  All the comments or designs are in list.h and partC.design.txt
+ */
 void *ListRemove(LIST *list){
     if (list == NULL){
         printf("Error in procedure ListRemove(): Invalid parameter list \n");
+        return NULL;
     }
-    
+    printf("Got to procedure ListRemove()\n"); 
     return NULL;
 }
 
 void ListFree(LIST *list, void (*itemFree)(void*)){
     if (list == NULL){
         printf("Error in procedure ListFree(): Invalid parameter list \n");
-    }else if (itemFree == NULL)
+        return;
+   }else if (itemFree == NULL)
     {
-        printf("Error in procedure ListFree(): Invalid parameter itemFree() \n");
+        printf("Error in procedure ListFree(): "
+        "Invalid parameter itemFree() \n");
+        return;
     }
-    
+    printf("Got to procedure ListFree()\n");
+
 }
 
 void *ListTrim(LIST *list){
     if (list == NULL){
         printf("Error in procedure ListTrim(): Invalid parameter list \n");
+        return NULL;
     }
     return NULL;
+    printf("Got to procedure ListTrim()\n");
 }

@@ -74,17 +74,20 @@ void *ListCurr(LIST *list){
     return NULL;
 }
 
-void *ListSearch(LIST *list, int (*comparator)(void *, void *), void * comparisonArg){
+void *ListSearch(LIST *list, int (*comparator)(void *, void *),
+ void * comparisonArg){
         if (list == NULL){
         printf("Error in procedure ListSearch(): Invalid parameter list \n");
         return NULL;
     }else if (comparator == NULL)
     {
-        printf("Error in procedure ListSearch(): Invalid parameter comparator() \n");
+        printf("Error in procedure ListSearch(): "
+        "Invalid parameter comparator() \n");
         return NULL;
     }else if (comparisonArg == NULL)
     {
-        printf("Error in procedure ListSearch(): Invalid parameter comparisionArg \n");
+        printf("Error in procedure ListSearch(): "
+        "Invalid parameter comparisionArg \n");
         return NULL;
     }
     printf("Got to procedure ListSearch()\n");
