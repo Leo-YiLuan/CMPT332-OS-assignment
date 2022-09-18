@@ -13,6 +13,7 @@
 
 int main(int argc, char **argv){
     
-    LIST *newList = ListCreate();
+    LIST *newlist = ListCreate();
 
+    return 0;
 }

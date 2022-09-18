@@ -18,7 +18,7 @@ struct NODE {
 	void *item;
 	NODE *next;
     NODE *prev;
-    int nodeSize
+    int nodeSize;
 };
 
 typedef struct _list
@@ -30,10 +30,22 @@ typedef struct _list
     int listSize;
 }LIST;
 
+/*
+ * Create an empty list
+ * return: The address of the list 
+ */
 LIST *ListCreate();
 
-int listCount();
+/*
+ * get the number of nodes in the list
+ * return: The number of nodes in the list if success. -1 if faliure
+ */
+int listCount(LIST *list);
 
+/*
+ * get the first node in the list
+ * return: The number of nodes in the list if success. -1 if faliure
+ */
 void *ListFirst(LIST *list);
 
 void *ListLast(LIST *list);
