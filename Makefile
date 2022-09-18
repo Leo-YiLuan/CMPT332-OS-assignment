@@ -12,7 +12,7 @@ CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic
 
 .PHONY : all
-all: partA1
+all: mytestlist partA1 
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
@@ -29,9 +29,6 @@ endif
 # Build common stuff for A1.
 fib.o: fib.c fib.h
 	$(CC) -o fib.o -c $(CFLAGS) $(CPPFLAGS) fib.c 
-
-thread_util.o: thread_util.c thread_util.h
-	$(CC) -o thread_util.o -c $(CFLAGS) $(CPPFLAGS) thread_util.c
 
 thread_util.o: thread_util.c thread_util.h
 	$(CC) -o thread_util.o -c $(CFLAGS) $(CPPFLAGS) thread_util.c
