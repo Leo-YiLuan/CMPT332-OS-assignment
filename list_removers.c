@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 /**
- *  These function just test parameters, no functional implemented
+ *  These functions just test parameters, no functional implemented
  *  All the comments or designs are in list.h and partC.design.txt
  */
 void *ListRemove(LIST *list){
@@ -43,6 +43,7 @@ void *ListTrim(LIST *list){
         printf("Error in procedure ListTrim(): Invalid parameter list \n");
         return NULL;
     }
-    return NULL;
     printf("Got to procedure ListTrim()\n");
+    return NULL;
+
 }

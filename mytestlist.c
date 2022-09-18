@@ -8,9 +8,17 @@
 # CMPT 332 2022
 # A1 Phase 1
 */
-#include "list.h"
 #include <stdio.h>
+#include "list.h"
 
+/**
+ * compare two items, check if they match
+ * 
+ * Parameters: 
+ *      item1: pointer to an item
+ *      item2: pointer to an item
+ * Return: 1 on success, 0 on failure, -1 means error
+ */
 int comparator(void *item1, void *item2){
     if (item1==NULL||item2==NULL)
     {
@@ -23,6 +31,14 @@ int comparator(void *item1, void *item2){
     return 1;
 }
 
+/**
+ * free a space of a pointer points to an item
+ * 
+ * Parameters: 
+ *      item: pointer to an item
+ * 
+ * Return: none
+ */
 void itemFree(void *item){
     if (item == NULL){
         printf("Error in procedure itemFree(): "
@@ -42,7 +58,7 @@ int main(int argc, char **argv){
     int num = 5;
     int *item = &num;
 
-    /* call all the functions in list_adders.c*/
+    /* call all the functions defines in list_adders.c*/
     ListCreate();    
 
     if (ListAdd(List1p,item)!=0)
@@ -103,7 +119,7 @@ int main(int argc, char **argv){
     ListConcat(NULL,List2p);
     ListConcat(List1p,NULL);
     
-     /* call all the functions in list_movers.c*/
+     /* call all the functions defines in list_movers.c*/
 
     if (ListCount(List1p)!=0)
     {
@@ -139,21 +155,23 @@ int main(int argc, char **argv){
         printf("Error: return value of comparator() is not correct");
     }
     if(comparator(NULL,NULL) != -1){
-    printf("Error: return value of comparator() is not correct");
+        printf("Error: return value of comparator() is not correct");
 
     }
 
-     /* call all the functions in list_removers.c*/
+     /* call all the functions define in list_removers.c*/
 
     ListRemove(List1p);
     ListRemove(NULL);
+
+    ListTrim(List1p);
+    ListTrim(NULL);
 
     ListFree(List1p,itemFree);
     ListFree(NULL, itemFree);
     ListFree(List1p,NULL);
 
-    ListTrim(List1p);
-    ListTrim(NULL);
-
+    itemFree(item);
+    itemFree(NULL);
     return 0;
 }

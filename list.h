@@ -26,7 +26,7 @@ struct NODE {
 };
 
 /**
- *LIST structure that saves pointer to current node, pointer to the first node
+ * LIST structure that saves pointer to current node, pointer to the first node
  * and pointer to last node
  * listSize is used to check memory usage
  * listCount is tracking the number of nodes in LIST
@@ -189,6 +189,7 @@ void ListFree(LIST *list, void (*itemFree)(void*));
 /*
  * Return last item and take it out of list. 
  * The current pointer shall be the new last item in the list.
+ * 
  * parameters:
  *      list: a pointer to a list
  * return: none
