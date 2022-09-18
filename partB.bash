@@ -32,10 +32,10 @@ case $1 in
 esac 
 
 # Validate we are on correct platform for partA1
-if [ "$binary" = "partA1" ] & [ "$OS" != "Windows_NT" ]
+if [ "$binary" = "partA1" ] && [ "$OS" != "Windows_NT" ]
 then 
     printf "Error: Cannot run partA1 on Linux!\n"
-    #exit 1
+    exit 1
 fi
 
 # Used to confirm the user input for the executable is valid.
