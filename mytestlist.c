@@ -11,6 +11,15 @@
 #include "list.h"
 #include <stdio.h>
 
+int comparator(void *item1, void *item2){
+    if (item1==NULL||item2==NULL)
+    {
+        return -1;
+    }
+    printf("Got to procedure comparator()\n");
+    return 1;
+}
+
 int main(int argc, char **argv){
     
     LIST List1[10];
@@ -81,6 +90,45 @@ int main(int argc, char **argv){
     ListConcat(NULL,List2p);
     ListConcat(List1p,NULL);
     
+     /* call all the functions in list_movers.c*/
+
+    if (ListCount(List1p)!=0)
+    {
+        printf("Error: return value of ListCount() is not correct");
+    }
+
+    if (ListCount(NULL)!=-1)
+    {
+        printf("Error: return value of ListCount() is not correct");
+    }
+
+    ListFirst(List1p);
+    ListFirst(NULL);
+
+    ListLast(List1p);
+    ListLast(NULL);
+
+    ListNext(List1p);
+    ListNext(NULL);
     
+    ListPrev(List1p);
+    ListPrev(NULL);
+
+    ListCurr(List1p);
+    ListCurr(NULL);
+
+    ListSearch(List1p,comparator,item);
+    ListSearch(NULL,comparator,item);
+    ListSearch(List1p,NULL,item);
+    ListSearch(List1p,comparator,NULL);
+
+    if(comparator(item,item) != 1){
+        printf("Error: return value of comparator() is not correct");
+    }
+    if(comparator(NULL,NULL) != -1){
+    printf("Error: return value of comparator() is not correct");
+
+    }
+
     return 0;
 }
