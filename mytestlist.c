@@ -49,7 +49,7 @@ void itemFree(void *item){
     printf("Got to procedure itemFree()\n");
 }
 
-int main(int argc, char **argv){
+int main(){
     
     LIST List1[10];
     LIST List2[10];

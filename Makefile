@@ -9,7 +9,7 @@
 
 CC=gcc
 CFLAGS=-g
-CPPFLAGS=-std=gnu90 -Wall -pedantic
+CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 
 .PHONY : all
 all: mytestlist partA1 
