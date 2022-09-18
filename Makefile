@@ -48,8 +48,13 @@ mytestlist.o: mytestlist.c list.h
 liblist.a : list_adders.o list_movers.o list_removers.o
 	ar -r liblist.a list_movers.o list_adders.o list_removers.o
 
+ifeq ($(OS), Windows_NT)
+mytestlist:
+	@echo "On Windows, but assignment spec says PartC is linux only, skipping..."
+else 
 mytestlist: mytestlist.o liblist.a list.h
 	$(CC) -o mytestlist $(CFLAGS) mytestlist.o -L. -llist
+endif
 
 clear:
 	rm -f *.o liblist.a mytestlist
