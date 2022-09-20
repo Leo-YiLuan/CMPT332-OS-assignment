@@ -50,128 +50,38 @@ void itemFree(void *item){
 }
 
 int main(){
-    
-    LIST List1[10];
-    LIST List2[10];
-    LIST *List1p = List1;
-    LIST *List2p = List2;
-    int num = 5;
-    int *item = &num;
+    LIST *list1 = NULL;
+    NODE *test = NULL;
+    int a = 42;
+    int b = 71;
+    int c = 44;
+    int d = 4;
+    list1 = ListCreate();
 
-    /* call all the functions defines in list_adders.c*/
-    ListCreate();    
 
-    if (ListAdd(List1p,item)!=0)
-    {
-        printf("Error: return value of ListAdd() is not correct");
-    }
-    if (ListAdd(NULL,item)!=-1)
-    {
-        printf("Error: return value of ListAdd() is not correct");
-    }
-    if (ListAdd(List1p,NULL)!=-1)
-    {
-        printf("Error: return value of ListAdd() is not correct");
-    }
-    
-    if (ListInsert(List1p,item)!=0)
-    {
-        printf("Error: return value of ListInsert() is not correct");
-    }
-    if (ListInsert(NULL,item)!=-1)
-    {
-        printf("Error: return value of ListInsert() is not correct");
-    }
-    if (ListInsert(List1p,NULL)!=-1)
-    {
-        printf("Error: return value of ListInsert() is not correct");
-    }
+    ListAdd(list1, &a);
+    ListAdd(list1, &b);
+    ListAdd(list1, &c);
+    ListAdd(list1, &d);
+
+    /*
+     Emulate setting the cursor back to the beginning f
+     for testing 
+    */
+    list1->currNodep = list1->firstNodep;
 
     
-    if (ListAppend(List1p,item)!=0)
-    {
-        printf("Error: return value of ListAppend() is not correct");
-    }
-    if (ListAppend(NULL,item)!=-1)
-    {
-        printf("Error: return value of ListAppend() is not correct");
-    }
-    if (ListAppend(List1p,NULL)!=-1)
-    {
-        printf("Error: return value of ListAppend() is not correct");
-    }
-    
-    
-    if (ListPrepend(List1p,item)!=0)
-    {
-        printf("Error: return value of ListPrepend() is not correct");
-    }
-    if (ListPrepend(NULL,item)!=-1)
-    {
-        printf("Error: return value of ListPrepend() is not correct");
-    }
-    if (ListPrepend(List1p,NULL)!=-1)
-    {
-        printf("Error: return value of ListPrepend() is not correct");
-    }
-    
-    ListConcat(List1p,List2p);
-    ListConcat(NULL,List2p);
-    ListConcat(List1p,NULL);
-    
-     /* call all the functions defines in list_movers.c*/
-
-    if (ListCount(List1p)!=0)
-    {
-        printf("Error: return value of ListCount() is not correct");
-    }
-
-    if (ListCount(NULL)!=-1)
-    {
-        printf("Error: return value of ListCount() is not correct");
-    }
-
-    ListFirst(List1p);
-    ListFirst(NULL);
-
-    ListLast(List1p);
-    ListLast(NULL);
-
-    ListNext(List1p);
-    ListNext(NULL);
-    
-    ListPrev(List1p);
-    ListPrev(NULL);
-
-    ListCurr(List1p);
-    ListCurr(NULL);
-
-    ListSearch(List1p,comparator,item);
-    ListSearch(NULL,comparator,item);
-    ListSearch(List1p,NULL,item);
-    ListSearch(List1p,comparator,NULL);
-
-    if(comparator(item,item) != 1){
-        printf("Error: return value of comparator() is not correct");
-    }
-    if(comparator(NULL,NULL) != -1){
-        printf("Error: return value of comparator() is not correct");
-
-    }
-
-     /* call all the functions define in list_removers.c*/
-
-    ListRemove(List1p);
-    ListRemove(NULL);
-
-    ListTrim(List1p);
-    ListTrim(NULL);
-
-    ListFree(List1p,itemFree);
-    ListFree(NULL, itemFree);
-    ListFree(List1p,NULL);
-
-    itemFree(item);
-    itemFree(NULL);
+    test = list1->firstNodep;
+    printf("Node: %d\n", *((int*)test->item));
+    test = test->next;
+    printf("Node: %d\n", *((int*)test->item));
+    test = test->next;
+    printf("Node: %d\n", *((int*)test->item));
+    test = test->next;
+    printf("Node: %d\n", *((int*)test->item));
+    test = list1->firstNodep;
+    printf("Node: %d\n", *((int*)test->item));
+        test = list1->lastNodep;
+    printf("Node: %d\n", *((int*)test->item));
     return 0;
 }

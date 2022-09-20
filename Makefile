@@ -42,11 +42,14 @@ list_adders.o : list_adders.c list.h
 list_removers.o : list_removers.c list.h
 	$(CC) -o list_removers.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
 
+list_data.o: list_data.c
+	$(CC) -o list_data.o -c $(CFLAGS) $(CPPFLAGS) list_data.c
+
 mytestlist.o: mytestlist.c list.h
 	$(CC) -o mytestlist.o -c $(CFLAGS) $(CPPFLAGS) mytestlist.c
 
-liblist.a : list_adders.o list_movers.o list_removers.o
-	ar -r liblist.a list_movers.o list_adders.o list_removers.o
+liblist.a : list_adders.o list_movers.o list_removers.o list_data.o
+	ar -r liblist.a list_movers.o list_adders.o list_removers.o list_data.o
 
 ifeq ($(OS), Windows_NT)
 mytestlist:

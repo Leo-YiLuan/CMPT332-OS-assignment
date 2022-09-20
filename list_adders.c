@@ -11,26 +11,68 @@
 #include "list.h"
 #include <stdio.h>
 
-/**
- *  These function just test parameters, no functional implemented
- *  All the comments or designs are in list.h and partC.design.txt
- */
+#include "list_data.h"
+
 LIST* ListCreate(){
-    printf("Got to procedure ListCreated\n");
-    return NULL;
+    /* Take the next available position off our stack. */
+    LIST_ENTRY *entry = freeLists;
+    LIST *list = &(entry->list);
+
+    /* 
+     If the next entry is null, it is defined to mean that the next
+     index in the array is free, so we need to set that now. 
+     This avoids an O(n) initialization of the stack.
+    */
+    if (entry->next == NULL) {
+        entry->next = entry + 1;
+    } 
+    /* Remove the free pos we just utilized. */
+    freeLists = freeLists->next;
+
+    return list;
 }
 
 
 int ListAdd(LIST *list,void *item){
+    NODE_ENTRY *entry = NULL;
+    NODE *node = NULL;
     if (list == NULL){
-        printf("Error in procedure ListAdd(): Invalid parameter list \n");
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListAdd(): Invalid parameter item \n");
         return -1;
     }
-    printf("Got to procedure ListAdd\n");
+
+    /* Grab a free node. */
+    entry = freeNodes;
+    node = &(entry->node);
+    node->item = item;
+
+    /* Time to do book-keeping to update the free list correctly. */
+    if (entry->nextEntry == NULL) {
+        entry->nextEntry = entry + 1;
+    }
+    freeNodes = freeNodes->nextEntry;
+
+    /* List is empty, treat it as if we are at the end. */
+    if (list->listSize == 0) {
+        list->currNodep = node;
+        list->firstNodep = node;
+        list->lastNodep = node;
+    } else {
+        NODE *currNode = list->currNodep;
+        node->next = currNode->next;
+        node->prev = currNode;
+        currNode->next = node;
+        list->currNodep = node;
+
+        if (node->next == NULL) {
+            /* Just inserted at the end of the list, update lastNodep */
+            list->lastNodep = node;
+        }
+    }
+
+    list->listSize += 1;
 
     return 0;
 }

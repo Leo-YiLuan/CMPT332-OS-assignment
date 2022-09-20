@@ -17,7 +17,7 @@
  * NODE structure that saves item, pointer to next and pointer to prev
  * nodeSize is used to check memory usage
  */
-typedef struct _node NODE;
+typedef struct NODE NODE;
 struct NODE {
 	void *item;
 	NODE *next;
@@ -31,14 +31,30 @@ struct NODE {
  * listSize is used to check memory usage
  * listCount is tracking the number of nodes in LIST
  */
-typedef struct _list
+typedef struct LIST LIST;
+struct LIST
 {
     NODE *currNodep;
     NODE *firstNodep;
     NODE *lastNodep;
     int listCount;
     int listSize;
-}LIST;
+};
+
+typedef struct LIST_ENTRY LIST_ENTRY;
+struct LIST_ENTRY 
+{
+    LIST_ENTRY *next;
+    LIST list;
+};
+
+typedef struct NODE_ENTRY NODE_ENTRY;
+struct NODE_ENTRY
+{
+    NODE_ENTRY *nextEntry;
+    NODE node;
+};
+
 
 /*
  * Create an empty list

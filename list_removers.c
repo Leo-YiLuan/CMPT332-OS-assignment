@@ -11,6 +11,8 @@
 #include "list.h"
 #include <stdio.h>
 
+#include "list_data.h"
+
 /**
  *  These functions just test parameters, no functional implemented
  *  All the comments or designs are in list.h and partC.design.txt
@@ -25,6 +27,7 @@ void *ListRemove(LIST *list){
 }
 
 void ListFree(LIST *list, void (*itemFree)(void*)){
+    LIST_ENTRY *entryToFree = NULL;
     if (list == NULL){
         printf("Error in procedure ListFree(): Invalid parameter list \n");
         return;
@@ -34,8 +37,13 @@ void ListFree(LIST *list, void (*itemFree)(void*)){
         "Invalid parameter itemFree() \n");
         return;
     }
-    printf("Got to procedure ListFree()\n");
 
+    /* TODO: Call the provided function pointer to free everything. */
+
+    /* Add the list we were given to the beginning of our stack. */
+    entryToFree = (LIST_ENTRY*)((char*)list - sizeof(LIST*));
+    entryToFree->next = freeLists->next;
+    freeLists = entryToFree;
 }
 
 void *ListTrim(LIST *list){
