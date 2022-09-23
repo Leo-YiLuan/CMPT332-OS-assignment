@@ -16,7 +16,7 @@
 #include <inttypes.h>
 #include "fib.h"
 #include "thread_util.h"
-
+#include <windows.h>
 // struct threadParameters
 // {
 //     int threadID;
@@ -24,65 +24,102 @@
 // }TP;
 
 
-
+/* flag of deadline */
 int keepRunning = 1;
-uint64_t *arr;
-int indexO;
 
+/* global array stores the counts */
+uint64_t *arr;
+
+/* thread variable that fib use to find the index */
+__thread int threadIdx = -1;
+
+/* index counter, +1 when thread_start() calls */
+int threadIdxStart = -1;
 /*
  * The entry point for all of our child threads.
- * fibData: Pointer to data supplied to the child thread via the Win32 API.
+ * paramP: Pointer to data supplied to the child thread via the Win32 API.
  * return: Unused, but required by the function signature to satisfy Win32.
  */
 unsigned int thread_start(void *paramP) {
 
-    indexO = indexO+1;
+    /* system time start and end */
+    SYSTEMTIME st; 
+    SYSTEMTIME et;
 
-    // struct threadParameters *tp = paramP;
-    // int *index = paramP;
-    // printf("Started thread with value: %d\n", tp->size);
-    printf("ARRAY : %d \n", indexO);
-    // arr[tp->threadID] = 0;
-    fib(*(unsigned int *)paramP, indexO);
+    /* time cost, calculated by system time */
+    int timeCost;
+
+    /* set the start time */
+    GetSystemTime(&st); 
+
+    /* the index of the thread */
+    threadIdxStart ++ ;
+
+    /* save the index of the thread to a tread variable */
+    threadIdx = threadIdxStart;
+
+    /* track the number of size when fib() end */
+    int fibEnd;
+
+    /* loop to call fib(1), fib(2),...,fib(n) */
+    for(int i = 1; i <= *(int *)paramP; i++){
+        fib(i);
+        /* save fib() size, use to print */
+        fibEnd = i;
+        /* check the deadline flag for threads */
+        if (keepRunning == 0){
+            /* break the loop when deadline occurs */
+            break;
+        }
+    }
+    /* get the end time */
+    GetSystemTime(&et); 
+    /* calculate the time cost */
+    timeCost = et.wSecond-st.wSecond + 60*(et.wMinute-st.wMinute);
+    /* print information */
+    printf("thread ID: %d, up to fib(%d) count is %"PRIu64", Real time is %d\n",threadIdx, 
+            fibEnd,arr[threadIdx],timeCost);
 
 }
 
 int main(int argc, char **argv) {
+    /*  
+        threads: number of thread will created
+        deadline: the deadline in sec
+        size: the size of the fib()
+    */
     int threads = 0;
     int deadline = 0;
     int size = 0;
-    indexO=-1;
-    // struct threadParameters tp;
 
+    /* transfer input arguments to need data type */
     if (!parse_args(argc, argv, &threads, &deadline, &size)) {
         return -1;
     }
 
-    // sizeO = size;
+    /* allocate memories to array stores count number */
     arr = (uint64_t*) malloc(threads * sizeof(uint64_t));
 
-    /* Test skeleton functions... */
 
     for (int i=0; i<threads; i++){
-        // tp.threadID=i;
+        /* make sure all counts are 0 */
         arr[i] = (uint64_t)0;
-        // printf("threadID is %d\n",tp.threadID);
-        printf("ARRAY ENTRY: %"PRIu64" \n", arr[i]);
+
+        /* thread created and passing the size of fib() */
         CreateThread(NULL, 0, thread_start, &size, 0, NULL);
 
 	}
 
     /* Convert seconds to ms */    
-
     Sleep(deadline * 1000);
 
     keepRunning = 0;
 
-    // free(arr);
-    for (int i=0; i<threads;i++){
-        printf("%"PRIu64"\n",arr[i]);
+    /* make main sleep for 3 sec to print the things */
+    Sleep(3000);
 
-    }
+    free(arr);
+
 
     
     return 0;
