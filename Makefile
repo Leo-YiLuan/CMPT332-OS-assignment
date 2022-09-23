@@ -59,5 +59,5 @@ mytestlist: mytestlist.o liblist.a list.h
 	$(CC) -o mytestlist $(CFLAGS) mytestlist.o -L. -llist
 endif
 
-clear:
+clean:
 	rm -f *.o liblist.a mytestlist
