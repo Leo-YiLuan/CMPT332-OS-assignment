@@ -53,9 +53,9 @@ ListAppend: Insert 101 into empty list:
 ListAppend: insert -41 into list with one element:
 [101 -> -41* -> END]
 
-ListPrepend: Successfully received error -1 after passing a NULL list parameter.
+ListPrepend: Successfully received err -1 after passing a NULL list parameter.
 
-ListPrepend: Successfully received error -1 after passing a NULL item.
+ListPrepend: Successfully received err -1 after passing a NULL item.
 
 ListPrepend: Insert 5147 into list with many elems, cur at begin:
 [5147* -> 101 -> -41 -> END]

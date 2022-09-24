@@ -263,7 +263,7 @@ int main(){
         int third = 0;
         int fourth = -5;
         if (ListPrepend(NULL, &first) == -1) {
-            printf("ListPrepend: Successfully received error -1 after "
+            printf("ListPrepend: Successfully received err -1 after "
             "passing a NULL list parameter.\n");
         } else {
             fprintf(stderr, "Failed to receive err -1 from ListPrepend after "
@@ -271,7 +271,7 @@ int main(){
         }
         printf("\n");
         if (ListPrepend(list1, NULL) == -1) {
-            printf("ListPrepend: Successfully received error -1 after "
+            printf("ListPrepend: Successfully received err -1 after "
             "passing a NULL item.\n");
         } else {
             fprintf(stderr, "Failed to receive err -1 from ListPrepend after "
