@@ -12,7 +12,7 @@ CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 
 .PHONY : all
-all: mytestlist partA1 partA2
+all: mytestlist partA1 partA2 partA3
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
@@ -54,7 +54,8 @@ liblist.a : list_adders.o list_movers.o list_removers.o list_data.o
 partA2.o: partA2.c
 	$(CC) -o partA2.o -c $(CFLAGS) $(CPPFLAGS) partA2.c -I/student/cmpt332/pthreads/ -I./
 
-
+partA3.o: partA3.c
+	$(CC) -o partA3.o -c $(CFLAGS) $(CPPFLAGS) partA3.c
 
 ifeq ($(OS), Windows_NT)
 mytestlist:
@@ -68,8 +69,10 @@ mytestlist: mytestlist.o liblist.a list.h
 partA2: partA2.o fib.o thread_util.o
 	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib.o thread_util.o -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
 
+partA3: partA3.o fib.o thread_util.o
+	$(CC) -o partA3 $(CFLAGS) $(CPPFLAGS) partA3.o fib.o thread_util.o -lpthread
 
 endif
 
 clean:
-	rm -f *.o liblist.a mytestlist partA1 partA2
+	rm -f *.o liblist.a mytestlist partA1 partA2 partA3

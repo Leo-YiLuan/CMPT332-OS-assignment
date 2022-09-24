@@ -7,11 +7,7 @@
 #include "thread_util.h"
 #include <inttypes.h>
 
-/*typedef struct threadCounter{
-  unsigned long threadID;
-  uint64_t count;
-}TC;
-*/
+
 /* Array of PID */
 PID *idArr;
 /* Array of counter */
