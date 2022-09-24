@@ -12,7 +12,7 @@ CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 
 .PHONY : all
-all: mytestlist partA1 partA2 partA3
+all: mytestlist partA1 partA2 partA3 partA4
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
@@ -57,6 +57,9 @@ partA2.o: partA2.c
 partA3.o: partA3.c
 	$(CC) -o partA3.o -c $(CFLAGS) $(CPPFLAGS) partA3.c
 
+partA4.o: partA4.c
+	$(CC) -o partA4.o -c $(CFLAGS) $(CPPFLAGS) partA4.c
+
 ifeq ($(OS), Windows_NT)
 mytestlist:
 	@echo "On Windows, but assignment spec says PartC is linux only, skipping..."
@@ -72,7 +75,9 @@ partA2: partA2.o fib.o thread_util.o
 partA3: partA3.o fib.o thread_util.o
 	$(CC) -o partA3 $(CFLAGS) $(CPPFLAGS) partA3.o fib.o thread_util.o -lpthread
 
+partA4: partA4.o
+	$(CC) -o partA4 $(CFLAGS) $(CPPFLAGS) partA4.o fib.o thread_util.o
 endif
 
 clean:
-	rm -f *.o liblist.a mytestlist partA1 partA2 partA3
+	rm -f *.o liblist.a mytestlist partA1 partA2 partA3 partA4
