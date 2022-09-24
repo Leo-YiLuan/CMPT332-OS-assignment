@@ -34,12 +34,12 @@ void *ListFirst(LIST *list){
 
 void *ListLast(LIST *list){
     if (list == NULL){
-        printf("Error in procedure ListLast(): Invalid parameter list \n");
         return NULL;
     }
-    printf("Got to procedure ListLast()\n");
 
-    return NULL;
+    list->currNodep = list->lastNodep;
+
+    return list->currNodep->item;
 }
 
 void *ListNext(LIST *list){

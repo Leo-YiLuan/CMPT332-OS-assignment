@@ -149,29 +149,74 @@ int ListInsert(LIST *list, void *item){
 }
 
 int ListAppend(LIST *list, void *item){
+    NODE *node = NULL;
     if (list == NULL){
-        printf("Error in procedure ListAppend(): Invalid parameter list \n");
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListAppend(): Invalid parameter item \n");
         return -1;
     }
-    printf("Got to procedure ListAppend\n");
+    if (freeNodes == NULL) {
+        /* Out of memory! */
+        return -1;
+    }
+    /* Grab a new node */
+    node = freeNodes;
+    freeNodes = *(NODE**)freeNodes;
+    memset(node, 0, sizeof(NODE));
 
+    if (list->listCount == 0) {
+        /* Empty list, just add the node simply. 8*/
+        list->currNodep = node;
+        list->lastNodep = node;
+        list->firstNodep = node;
+    } else {
+        node->prev = list->lastNodep;
+        node->next = NULL;
+
+        list->lastNodep->next = node;
+        list->lastNodep = node;
+        list->currNodep = node;
+    }
+
+    list->listCount += 1;
+    node->item = item;
     return 0;
 }
 
 int ListPrepend(LIST *list, void *item){
+    NODE *node = NULL;
     if (list == NULL){
-        printf("Error in procedure ListPrepend(): Invalid parameter list \n");
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListPrepend(): Invalid parameter item \n");
         return -1;
     }
-    printf("Got to procedure ListPrepend\n");
+    if (freeNodes == NULL) {
+        /* Out of memory! */
+        return -1;
+    }
+    /* Grab a new node */
+    node = freeNodes;
+    freeNodes = *(NODE**)freeNodes;
+    memset(node, 0, sizeof(NODE));
+
+    if (list->listCount == 0) {
+        /* Empty list, just add the node simply. */
+        list->currNodep = node;
+        list->lastNodep = node;
+        list->firstNodep = node;
+    } else {
+        node->next = list->firstNodep;
+        list->firstNodep->prev = node;
+
+        list->firstNodep = node;
+        list->currNodep = node;
+    }
+
+    list->listCount += 1;
+    node->item = item;
+
     return 0;
 }
 

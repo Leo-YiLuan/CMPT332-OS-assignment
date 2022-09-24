@@ -36,3 +36,37 @@ ListInsert: Insert 22 to a list with multiple elements, cur at begin:
 
 ListInsert: insert 5000 to a list with multiple elements in the middle:
 [22 -> 5000* -> 1 -> 512 -> END]
+
+ListAppend: Successfully received error -1 after passing a NULL list parameter.
+
+ListAppend: Successfully received error -1 after passing a NULL item.
+
+ListAppend: Insert 2 into list with many elems, cur at end:
+[22 -> 5000 -> 1 -> 512 -> 2* -> END]
+
+ListAppend: Insert 60 into list with many elems, cur not at end:
+[22 -> 5000 -> 1 -> 512 -> 2 -> 60* -> END]
+
+ListAppend: Insert 101 into empty list:
+[101* -> END]
+
+ListAppend: insert -41 into list with one element:
+[101 -> -41* -> END]
+
+ListPrepend: Successfully received error -1 after passing a NULL list parameter.
+
+ListPrepend: Successfully received error -1 after passing a NULL item.
+
+ListPrepend: Insert 5147 into list with many elems, cur at begin:
+[5147* -> 101 -> -41 -> END]
+
+ListPrepend: Insert -2 into list with many elems, cur not at begin:
+[-2* -> 5147 -> 101 -> -41 -> END]
+
+ListPrepend: Insert 0 into list with no elems:
+[0* -> END]
+
+ListPrepend: Insert -5 into list with one elem:
+[-5* -> 0 -> END]
+
+Successfully received error when trying to add node after exhausting all nodes.
