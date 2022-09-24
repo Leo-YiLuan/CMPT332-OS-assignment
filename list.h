@@ -41,21 +41,6 @@ struct LIST
     int listSize;
 };
 
-typedef struct LIST_ENTRY LIST_ENTRY;
-struct LIST_ENTRY 
-{
-    LIST_ENTRY *next;
-    LIST list;
-};
-
-typedef struct NODE_ENTRY NODE_ENTRY;
-struct NODE_ENTRY
-{
-    NODE_ENTRY *nextEntry;
-    NODE node;
-};
-
-
 /*
  * Create an empty list
  *

@@ -6,9 +6,13 @@
 #define MAX_LISTS 10
 #define MAX_NODES 1000
 
-extern LIST_ENTRY lists[MAX_LISTS];
-extern LIST_ENTRY *freeLists;
-extern NODE_ENTRY nodes[MAX_NODES];
-extern NODE_ENTRY *freeNodes;
+/* 
+ For extended info on how our stacks of free lists/nodes works,
+ please see the partC documentation.
+*/
+extern LIST lists[MAX_LISTS];
+extern LIST *freeLists;
+extern NODE nodes[MAX_NODES];
+extern NODE *freeNodes;
 
 #endif /* __LIST_DATA_H__ */
