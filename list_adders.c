@@ -35,7 +35,7 @@ LIST* ListCreate(){
             /* Dereference and store the next entry in the chain */
             *next = &lists[i+1];
         }
-        for (j = 0; j < MAX_LISTS - 1; j++) {
+        for (j = 0; j < MAX_NODES - 1; j++) {
             /* Same as above. */
             NODE **next = (NODE**)&nodes[j];
             *next = &nodes[j+1];
