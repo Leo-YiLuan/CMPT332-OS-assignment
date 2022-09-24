@@ -5,11 +5,10 @@
 /*
  * Calculates the nth fibonacci number.
  * value: the fibonacci number to calculate. Value must be >= 0.
- * return: the nth fibonacci number. 
+ * return: the nth fibonacci number.
  */
 int fib(int value);
 extern int keepRunning;
-extern uint64_t *arr;
+extern uint64_t *countArr;
 extern __thread int threadIdx;
 #endif /* FIB_h */
-

@@ -10,7 +10,8 @@ int fib(int value){
     }
 
     /* add count to index */
-    arr[threadIdx] = arr[threadIdx] + (uint64_t)1;
+    countArr[threadIdx] = countArr[threadIdx] + (uint64_t)1;
+
 
     if (value == 0)
     {
