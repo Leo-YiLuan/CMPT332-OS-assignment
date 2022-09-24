@@ -23,13 +23,16 @@
 int keepRunning = 1;
 
 /* global array stores the counts */
-uint64_t *arr;
+uint64_t *countArr;
+
+DWORD *idArr;
 
 /* thread variable that fib use to find the index */
 __thread int threadIdx = -1;
 
 /* index counter, +1 when thread_start() calls */
-int threadIdxStart = -1;
+int threadCount = -1;
+
 /*
  * The entry point for all of our child threads.
  * paramP: Pointer to data supplied to the child thread via the Win32 API.
@@ -50,13 +53,14 @@ unsigned int thread_start(void *paramP) {
     /* set the start time */
     GetSystemTime(&st);
 
-    /* the index of the thread */
-    threadIdxStart ++ ;
+    /* the order this thread created */
+    threadCount ++ ;
 
-    /* save the index of the thread to a tread variable */
-    threadIdx = threadIdxStart;
+    /* save the order of the thread to a tread variable, use as index */
+    threadIdx = threadCount;
 
-
+    /* save current thread's id to idArr with it's index */
+    idArr[threadIdx] = GetCurrentThreadId();
 
     /* loop to call fib(1), fib(2),...,fib(n) */
     for(i = 1; i <= *(int *)paramP; i++){
@@ -74,8 +78,8 @@ unsigned int thread_start(void *paramP) {
     /* calculate the time cost */
     timeCost = et.wSecond-st.wSecond + 60*(et.wMinute-st.wMinute);
     /* print information */
-    printf("thread ID: %d, up to fib(%d) count is %"PRIu64", Real time is %ds\n",threadIdx,
-            fibEnd,arr[threadIdx],timeCost);
+    printf("thread ID: %u, up to fib(%d) count is %"PRIu64", Real time"
+    "is %ds\n",idArr[threadIdx], fibEnd,countArr[threadIdx],timeCost);
     return 0;
 }
 
@@ -99,12 +103,13 @@ int main(int argc, char **argv) {
         return 0;
     }
     /* allocate memories to array stores count number */
-    arr = (uint64_t*) malloc(threads * sizeof(uint64_t));
-
+    countArr = (uint64_t*) malloc(threads * sizeof(uint64_t));
+    /* allocate memories to array stores id of thread */
+    idArr = (DWORD *) malloc(threads * sizeof(DWORD));
 
     for (i=0; i<threads; i++){
         /* make sure all counts are 0 */
-        arr[i] = (uint64_t)0;
+        countArr[i] = (uint64_t)0;
 
         /* thread created and passing the size of fib() */
         CreateThread(NULL, 0, thread_start, &size, 0, NULL);
@@ -119,7 +124,7 @@ int main(int argc, char **argv) {
     /* make main sleep for 3 sec to print the things */
     Sleep(3000);
 
-    free(arr);
+    free(countArr);
 
 
 
