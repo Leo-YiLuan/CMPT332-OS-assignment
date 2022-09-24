@@ -12,23 +12,23 @@ CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 
 .PHONY : all
-all: mytestlist partA1 
+all: mytestlist partA1 partA2
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
 # assignment.
 partA1: partA1.c fib.o thread_util.o
-	$(CC) $(CFLAGS) -o partA1 partA1.c fib.o thread_util.o
-else 
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o partA1 partA1.c fib.o thread_util.o
+else
 # We are on Unix, build Unix specific stuff.
 # Dummy rule
-partA1: 
+partA1:
 	@echo "Not on Windows, skipping partA1..."
 endif
 
 # Build common stuff for A1.
 fib.o: fib.c fib.h
-	$(CC) -o fib.o -c $(CFLAGS) $(CPPFLAGS) fib.c 
+	$(CC) -o fib.o -c $(CFLAGS) $(CPPFLAGS) fib.c
 
 thread_util.o: thread_util.c thread_util.h
 	$(CC) -o thread_util.o -c $(CFLAGS) $(CPPFLAGS) thread_util.c
@@ -51,13 +51,25 @@ mytestlist.o: mytestlist.c list.h
 liblist.a : list_adders.o list_movers.o list_removers.o list_data.o
 	ar -r liblist.a list_movers.o list_adders.o list_removers.o list_data.o
 
+partA2.o: partA2.c
+	$(CC) -o partA2.o -c $(CFLAGS) $(CPPFLAGS) partA2.c -I/student/cmpt332/pthreads/ -I./
+
+
+
 ifeq ($(OS), Windows_NT)
 mytestlist:
 	@echo "On Windows, but assignment spec says PartC is linux only, skipping..."
-else 
+partA2:
+	@echo "On Windows, partA2 skipping..."
+else
 mytestlist: mytestlist.o liblist.a list.h
-	$(CC) -o mytestlist $(CFLAGS) mytestlist.o -L. -llist
+	$(CC) -o mytestlist $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
+
+partA2: partA2.o fib.o thread_util.o
+	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib.o thread_util.o -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
+
+
 endif
 
 clean:
-	rm -f *.o liblist.a mytestlist
+	rm -f *.o liblist.a mytestlist partA1 partA2
