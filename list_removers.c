@@ -27,17 +27,26 @@ void *ListRemove(LIST *list){
 }
 
 void ListFree(LIST *list, void (*itemFree)(void*)){
+    NODE *node = NULL;
     if (list == NULL){
-        printf("Error in procedure ListFree(): Invalid parameter list \n");
         return;
    }else if (itemFree == NULL)
     {
-        printf("Error in procedure ListFree(): "
-        "Invalid parameter itemFree() \n");
         return;
     }
 
-    /* TODO: Call the provided function pointer to free everything. */
+    /* Free all nodes and item data. */
+    node = list->firstNodep;
+    while (node) {
+        NODE *nextNode = node->next;
+        itemFree(node->item);
+
+        /* Free the current node. */
+        *(NODE**)node = freeNodes;
+        freeNodes = node;
+
+        node = nextNode;
+    }
 
     /* Add the newly freed list entry to the front of the stack */
     *(LIST**)list = freeLists;

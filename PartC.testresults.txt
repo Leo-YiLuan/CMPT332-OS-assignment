@@ -1,0 +1,38 @@
+ListCreate: Successfully received a new valid list.
+
+ListCreate: Successfully received NULL after reaching max allocated lists.
+
+ListAdd: Successfully received error -1 after passing a NULL list parameter.
+
+ListAdd: Successfully received error -1 after passing a NULL item.
+
+ListAdd: Add 5 to empty list: 
+[5* -> END]
+
+ListAdd: Add 16 to list with 1 element: 
+[5 -> 16* -> END]
+
+ListAdd: Add 27 to list with multiple elems, cur at end: 
+[5 -> 16 -> 27* -> END]
+
+ListAdd: Add 42 to the middle of a list with multiple elements: 
+[5 -> 16 -> 42* -> 27 -> END]
+
+ListInsert: Successfully received error -1 after passing a NULL list parameter.
+
+ListInsert: Successfully received error -1 after passing a NULL item.
+
+ListInsert: Insert 0 to the middle of a list with multiple elems:
+[5 -> 16 -> 0* -> 42 -> 27 -> END]
+
+ListInsert: Insert 512 to empty list:
+[512* -> END]
+
+ListInsert: Insert 1 to a list with one element:
+[1* -> 512 -> END]
+
+ListInsert: Insert 22 to a list with multiple elements, cur at begin:
+[22* -> 1 -> 512 -> END]
+
+ListInsert: insert 5000 to a list with multiple elements in the middle:
+[22 -> 5000* -> 1 -> 512 -> END]

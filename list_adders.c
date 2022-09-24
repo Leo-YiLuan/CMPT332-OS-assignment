@@ -40,6 +40,12 @@ LIST* ListCreate(){
             NODE **next = (NODE**)&nodes[j];
             *next = &nodes[j+1];
         }
+        initialized = 1;
+    }
+
+    if (freeLists == NULL) {
+        /* Out of memory! */
+        return NULL;
     }
 
     /* 
@@ -102,16 +108,42 @@ int ListAdd(LIST *list,void *item){
 }
 
 int ListInsert(LIST *list, void *item){
+    NODE *node = NULL;
     if (list == NULL){
-        printf("Error in procedure ListInsert(): Invalid parameter list \n");
         return -1;
     }else if (item == NULL)
     {
-        printf("Error in procedure ListInsert(): Invalid parameter item \n");
         return -1;
-
     }
-    printf("Got to procedure ListInsert\n");
+
+    if (freeNodes == NULL) {
+        /* Out of memory! */
+        return -1;
+    }
+    /* Grab a new node */
+    node = freeNodes;
+    freeNodes = *(NODE**)freeNodes;
+    memset(node, 0, sizeof(NODE));
+
+    /* Where to insert? */
+    if (list->listCount == 0) {
+        /* List is empty, insert first. */
+        list->currNodep = node;
+        list->firstNodep = node;
+        list->lastNodep = node;
+    } else {
+        NODE *before = list->currNodep->prev;
+        NODE *after = list->currNodep;
+        node->prev = before;
+        node->next = after;
+
+        if (before) { before->next = node; } else { list->firstNodep = node; }
+        after->prev = node;
+    }
+
+    list->listCount += 1;
+    list->currNodep = node;
+    node->item = item;
 
     return 0;
 }
