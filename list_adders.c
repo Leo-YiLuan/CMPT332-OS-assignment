@@ -10,31 +10,51 @@
 */
 #include "list.h"
 #include <stdio.h>
+#include <string.h>
 
 #include "list_data.h"
 
 LIST* ListCreate(){
-    /* Take the next available position off our stack. */
-    LIST_ENTRY *entry = freeLists;
-    LIST *list = &(entry->list);
+    static int initialized = 0;
+    LIST *list = NULL;
+
+    if (!initialized) {
+        /* First time library initialization. */
+        int i = 0; 
+        int j = 0;
+        for (i = 0; i < MAX_LISTS - 1; i++) {
+            /* 
+                For each entry, we re-interpret it as a LIST**,
+                then store the address of the next free entry in that pointer.
+                This gives us the effect of a very simple linked list
+                of free entries stored within the entries themselves. 
+                This means no additional storage is necessary. 
+            */
+            /* Reinterpret cast this LIST* as a LIST** */
+            LIST **next = (LIST**)&lists[i];
+            /* Dereference and store the next entry in the chain */
+            *next = &lists[i+1];
+        }
+        for (j = 0; j < MAX_LISTS - 1; j++) {
+            /* Same as above. */
+            NODE **next = (NODE**)&nodes[j];
+            *next = &nodes[j+1];
+        }
+    }
 
     /* 
-     If the next entry is null, it is defined to mean that the next
-     index in the array is free, so we need to set that now. 
-     This avoids an O(n) initialization of the stack.
+     Pull a new list off the stack. 
+     Then set the next free entry to be the top of the stack.
     */
-    if (entry->next == NULL) {
-        entry->next = entry + 1;
-    } 
-    /* Remove the free pos we just utilized. */
-    freeLists = freeLists->next;
+    list = freeLists;
+    freeLists = *(LIST**)freeLists;
+    memset(list, 0, sizeof(LIST));
 
     return list;
 }
 
 
 int ListAdd(LIST *list,void *item){
-    NODE_ENTRY *entry = NULL;
     NODE *node = NULL;
     if (list == NULL){
         return -1;
@@ -43,36 +63,40 @@ int ListAdd(LIST *list,void *item){
         return -1;
     }
 
-    /* Grab a free node. */
-    entry = freeNodes;
-    node = &(entry->node);
-    node->item = item;
-
-    /* Time to do book-keeping to update the free list correctly. */
-    if (entry->nextEntry == NULL) {
-        entry->nextEntry = entry + 1;
+    if (freeNodes == NULL) {
+        /* Out of memory! */
+        return -1;
     }
-    freeNodes = freeNodes->nextEntry;
+    /* Grab a new node */
+    node = freeNodes;
+    freeNodes = *(NODE**)freeNodes;
+    memset(node, 0, sizeof(NODE));
 
-    /* List is empty, treat it as if we are at the end. */
-    if (list->listSize == 0) {
+    /* Where to insert? */
+    if (list->listCount == 0) {
+        /* List is empty, add to end! */
         list->currNodep = node;
         list->firstNodep = node;
         list->lastNodep = node;
     } else {
-        NODE *currNode = list->currNodep;
-        node->next = currNode->next;
-        node->prev = currNode;
-        currNode->next = node;
-        list->currNodep = node;
+        NODE *after = list->currNodep->next;
+        NODE *before = list->currNodep;
+        node->prev = before;
+        node->next = after;
 
-        if (node->next == NULL) {
-            /* Just inserted at the end of the list, update lastNodep */
-            list->lastNodep = node;
-        }
+        before->next = node;
+        /* 
+         Semi-special case: behavior differs depending on whether
+         we are adding to the end of a non-empty list, or elsewhere 
+         in a non-empty list.
+         */
+        if (after) { after->prev = node; } else { list->lastNodep = node; }
+
+        list->currNodep = node;
     }
 
-    list->listSize += 1;
+    list->listCount += 1;
+    node->item = item;
 
     return 0;
 }

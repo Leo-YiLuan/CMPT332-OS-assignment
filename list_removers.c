@@ -27,7 +27,6 @@ void *ListRemove(LIST *list){
 }
 
 void ListFree(LIST *list, void (*itemFree)(void*)){
-    LIST_ENTRY *entryToFree = NULL;
     if (list == NULL){
         printf("Error in procedure ListFree(): Invalid parameter list \n");
         return;
@@ -40,10 +39,9 @@ void ListFree(LIST *list, void (*itemFree)(void*)){
 
     /* TODO: Call the provided function pointer to free everything. */
 
-    /* Add the list we were given to the beginning of our stack. */
-    entryToFree = (LIST_ENTRY*)((char*)list - sizeof(LIST*));
-    entryToFree->next = freeLists->next;
-    freeLists = entryToFree;
+    /* Add the newly freed list entry to the front of the stack */
+    *(LIST**)list = freeLists;
+    freeLists = list;
 }
 
 void *ListTrim(LIST *list){

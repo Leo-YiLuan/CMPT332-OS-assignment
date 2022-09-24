@@ -5,8 +5,8 @@
 #define MAX_NODES 1000
 #define MAX_LISTS 10
 
-LIST_ENTRY lists[MAX_LISTS] = {0};
-LIST_ENTRY *freeLists = &lists[0];
+LIST lists[MAX_LISTS];
+LIST *freeLists = &lists[0];
 
-NODE_ENTRY nodes[MAX_NODES] = {0};
-NODE_ENTRY *freeNodes = &nodes[0];
+NODE nodes[MAX_NODES];
+NODE *freeNodes = &nodes[0];

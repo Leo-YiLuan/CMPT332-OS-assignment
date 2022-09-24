@@ -18,6 +18,29 @@ Structures:
     and 2 integer, one is the count of list, the other is the memory allocated 
     to list.
 
+
+For memory allocation:
+
+    We statically allocate memory by storing a fixed-length global array,
+    one for lists and one for nodes. 
+    We also have two stacks based on a very simple linked-List
+    implementation, that is described as follows:
+    Each entry in our global array represents memory for a single 
+    node (or list). But when a node is not being used, we can repurpose
+    that memory and instead store a very simple linked list of free node 
+    entries. Each free node entry contains a pointer to the next free node
+    in the stack. When we grab a new node off the stack, we no longer 
+    interpret it as a pointer to a free entry, and its simply interpreted 
+    as a node. This reuse of memory means we do not need additional storage
+    for our stacks of free entries. 
+
+    Other translation units in the library will access these 
+    global stacks and arrays via the extern keyword. 
+
+    Note that an O(n) operation is necessary during library 
+    initialization. We first have to initialize our stacks 
+    to contain every entry in the array. 
+
 functions:
     ListCreate():   
     Allocate address to list and set item, next, prev to NULL, listSize to 0
@@ -307,26 +330,3 @@ functions:
         to last node or the matched node.
         
         RETURNS: A pointer points to match node or NULL.
-
-
-For memory allocation:
-    check and update the memory space whenever changes the list. 
-
-    For handling of statically allocating memory for nodes and lists, we
-    can perform something like the following:
-    Create a file data.c that contains two statically allocated arrays, eg 
-    NODE nodes[MAX_NODE_COUNT];
-    LIST lists[MAX_LIST_COUNT];
-    We can then provide our library's .c files access to these variables 
-    via extern, for example:
-    extern NODE nodes[MAX_NODE_COUNT];
-    extern LIST lists[MAX_NODE_COUNT];
-    
-    Regarding tracking of free positions in our array:
-    To avoid O(n) insertion, we create a type, eg NODE_ENTRY
-    that contains a node, and a pointer to the next free node in our array.
-    Instead of storing NODE, our array now stores NODE_ENTRY.
-    Then we define a pointer, freeNodes, that stores a linked list 
-    of freely available nodes to use. When we need a node, we just 
-    pull it off the front of freeNodes. When we are done with a node,
-    we add it back to the front of freeNodes. 
