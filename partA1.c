@@ -17,11 +17,6 @@
 #include "fib.h"
 #include "thread_util.h"
 #include <windows.h>
-// struct threadParameters
-// {
-//     int threadID;
-//     int size;
-// }TP;
 
 
 /* flag of deadline */
@@ -43,14 +38,17 @@ int threadIdxStart = -1;
 unsigned int thread_start(void *paramP) {
 
     /* system time start and end */
-    SYSTEMTIME st; 
+    SYSTEMTIME st;
     SYSTEMTIME et;
 
     /* time cost, calculated by system time */
     int timeCost;
-
+    /* track the number of size when fib() end */
+    int fibEnd;
+    /* loop count */
+    int i = 0;
     /* set the start time */
-    GetSystemTime(&st); 
+    GetSystemTime(&st);
 
     /* the index of the thread */
     threadIdxStart ++ ;
@@ -58,11 +56,10 @@ unsigned int thread_start(void *paramP) {
     /* save the index of the thread to a tread variable */
     threadIdx = threadIdxStart;
 
-    /* track the number of size when fib() end */
-    int fibEnd;
+
 
     /* loop to call fib(1), fib(2),...,fib(n) */
-    for(int i = 1; i <= *(int *)paramP; i++){
+    for(i = 1; i <= *(int *)paramP; i++){
         fib(i);
         /* save fib() size, use to print */
         fibEnd = i;
@@ -73,17 +70,17 @@ unsigned int thread_start(void *paramP) {
         }
     }
     /* get the end time */
-    GetSystemTime(&et); 
+    GetSystemTime(&et);
     /* calculate the time cost */
     timeCost = et.wSecond-st.wSecond + 60*(et.wMinute-st.wMinute);
     /* print information */
-    printf("thread ID: %d, up to fib(%d) count is %"PRIu64", Real time is %d\n",threadIdx, 
+    printf("thread ID: %d, up to fib(%d) count is %"PRIu64", Real time is %ds\n",threadIdx,
             fibEnd,arr[threadIdx],timeCost);
-
+    return 0;
 }
 
 int main(int argc, char **argv) {
-    /*  
+    /*
         threads: number of thread will created
         deadline: the deadline in sec
         size: the size of the fib()
@@ -91,17 +88,21 @@ int main(int argc, char **argv) {
     int threads = 0;
     int deadline = 0;
     int size = 0;
-
+    int i = 0 ;
     /* transfer input arguments to need data type */
     if (!parse_args(argc, argv, &threads, &deadline, &size)) {
         return -1;
     }
 
+    if(size > 63){
+        printf("Size is too big, not enough space to hold counts");
+        return 0;
+    }
     /* allocate memories to array stores count number */
     arr = (uint64_t*) malloc(threads * sizeof(uint64_t));
 
 
-    for (int i=0; i<threads; i++){
+    for (i=0; i<threads; i++){
         /* make sure all counts are 0 */
         arr[i] = (uint64_t)0;
 
@@ -110,7 +111,7 @@ int main(int argc, char **argv) {
 
 	}
 
-    /* Convert seconds to ms */    
+    /* Convert seconds to ms */
     Sleep(deadline * 1000);
 
     keepRunning = 0;
@@ -121,7 +122,6 @@ int main(int argc, char **argv) {
     free(arr);
 
 
-    
+
     return 0;
 }
-

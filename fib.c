@@ -1,7 +1,7 @@
 #include "fib.h"
-#include <processthreadsapi.h>
 #include <stdio.h>
 #include <inttypes.h>
+
 
 int fib(int value){
     if (value < 0) {
@@ -9,6 +9,7 @@ int fib(int value){
         return -1;
     }
 
+    /* add count to index */
     arr[threadIdx] = arr[threadIdx] + (uint64_t)1;
 
     if (value == 0)
