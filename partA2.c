@@ -45,8 +45,8 @@ PROCESS myThread(void *param)
   	fib(i);
   }
   /* skeleton program */
-  printf("Thread id: %ld, fib(%d) to fib(1) is called\n",idArr[threadIdx], *(int*)param);
-}
+  printf("Thread id: %ld, fib(%d) to fib(1) is called\n",idArr[threadIdx],
+  *(int*)param);}
 
 
 int mainp(int argc, char** argv)
