@@ -26,11 +26,13 @@ ListFirst():
     * When list is empty. Should return NULL?
     * When there's only one element.
     * When there's many elements.
+    * when there's many elements, and we are already at the first element.
 
 ListLast():
     * When list is empty. Should return NULL?
     * When there's only one element.
     * When there's many elements.
+    * When there's many elements, and we are already at the last element.
 
 ListNext():
     * When the list is empty. Return NULL.
@@ -98,7 +100,7 @@ ListFree():
 
 ListTrim():
     * When list is empty. Return NULL?
-    * When list has 1 element. currNode would get set to NULL?
+    * When list has 1 element.
     * When list has many elements, not at end.
     * When list has many elements, and at end.
 
