@@ -6,7 +6,7 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 */
 #include "list.h"
 #include <stdio.h>
@@ -22,7 +22,7 @@ void *ListRemove(LIST *list){
         printf("Error in procedure ListRemove(): Invalid parameter list \n");
         return NULL;
     }
-    printf("Got to procedure ListRemove()\n"); 
+    printf("Got to procedure ListRemove()\n");
     return NULL;
 }
 

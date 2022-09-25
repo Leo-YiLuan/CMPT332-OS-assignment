@@ -6,54 +6,54 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 */
 
-Structures: 
-    NODE Structure is designed to hold a value of any data type(void *). 
+Structures:
+    NODE Structure is designed to hold a value of any data type(void *).
     It holds its previous and next NODE pointer. nodeSize is the memory
     allocated to the node.
 
     LIST Structure is designed to hold 3 NODE values (current, first, last)
-    and 2 integer, one is the count of list, the other is the memory allocated 
+    and 2 integer, one is the count of list, the other is the memory allocated
     to list.
 
 
 For memory allocation:
 
     We statically allocate memory by storing a fixed-length global array,
-    one for lists and one for nodes. 
+    one for lists and one for nodes.
     We also have two stacks based on a very simple linked-List
     implementation, that is described as follows:
-    Each entry in our global array represents memory for a single 
+    Each entry in our global array represents memory for a single
     node (or list). But when a node is not being used, we can repurpose
-    that memory and instead store a very simple linked list of free node 
+    that memory and instead store a very simple linked list of free node
     entries. Each free node entry contains a pointer to the next free node
-    in the stack. When we grab a new node off the stack, we no longer 
-    interpret it as a pointer to a free entry, and its simply interpreted 
+    in the stack. When we grab a new node off the stack, we no longer
+    interpret it as a pointer to a free entry, and its simply interpreted
     as a node. This reuse of memory means we do not need additional storage
-    for our stacks of free entries. 
+    for our stacks of free entries.
 
-    Other translation units in the library will access these 
-    global stacks and arrays via the extern keyword. 
+    Other translation units in the library will access these
+    global stacks and arrays via the extern keyword.
 
-    Note that an O(n) operation is necessary during library 
-    initialization. We first have to initialize our stacks 
-    to contain every entry in the array. 
+    Note that an O(n) operation is necessary during library
+    initialization. We first have to initialize our stacks
+    to contain every entry in the array.
 
 functions:
-    ListCreate():   
+    ListCreate():
     Allocate address to list and set item, next, prev to NULL, listSize to 0
 
         PRECONDITION: None;
 
-        FUNCITONING:  Makes a new, empty list, and returns its reference on 
+        FUNCITONING:  Makes a new, empty list, and returns its reference on
         success. Returns a NULL pointer on failure.
 
         POSTCONDITION: allocated static memory space to a list;
 
         RETURNS: A pointer that represents the empty list. NULL if failure;
-    
+
     listCount():
     return the value of listCount variable in the list;
 
@@ -64,7 +64,7 @@ functions:
         RETURNS: An integer represents the number of items in the list.
 
     ListFirst():
-    get the firstNodep variable stores in the list, set it to currNodep and 
+    get the firstNodep variable stores in the list, set it to currNodep and
     return the pointer
         PRECONDITION: the list is created and has at least one node;
 
@@ -74,70 +74,70 @@ functions:
         FUNCITONING: returns a pointer to the first node in the list and set
         the first node to the current node.
 
-        POSTCONDITION: the pointer of currNodep has changed to point 
+        POSTCONDITION: the pointer of currNodep has changed to point
         the first node
 
         RETURNS: A pointer points to the first node in the list
 
     ListLast():
-     get the lastNodep variable stores in the list, set it to currNodep and 
+     get the lastNodep variable stores in the list, set it to currNodep and
      return the pointer
         PRECONDITION: the list is created and has at least one node;
 
         PARAMETER:
             list: A pointer points to a list.
 
-        FUNCITONING: returns a pointer to the last node in the list and set 
+        FUNCITONING: returns a pointer to the last node in the list and set
         the last node to the current node.
 
-        POSTCONDITION: the pointer currNodep has changed to point 
+        POSTCONDITION: the pointer currNodep has changed to point
         the last node in the list
 
         RETURNS: A pointer points to the last node in the list
 
     ListNext():
-     get the pointer of the next node of currNodep, set it to currNodep and 
+     get the pointer of the next node of currNodep, set it to currNodep and
      return the pointer. If the next node is NULL return NULL.
         PRECONDITION: the list is created and has at least two nodes;
 
         PARAMETER:
             list: A pointer points to a list.
 
-        FUNCITONING: advances the list's current node by one, and returns a 
+        FUNCITONING: advances the list's current node by one, and returns a
         pointer to the new current item. If this operation attempts to advance
         the current item beyond the end of the list, a NULL pointer is returned
 
         POSTCONDITION: the pointer currNodep has changed to point
         the next node
 
-        RETURNS: An pointer points to the next node in the list 
+        RETURNS: An pointer points to the next node in the list
         or NULL if there is no next node
 
     ListPrev():
      get the pointer points to the previous node of currNodep,
-     set it to currNodep and return the pointer. 
+     set it to currNodep and return the pointer.
      If the previous node is NULL, return NULL.
         PRECONDITION: the list is created and has at least two nodes;
 
-        PARAMETER: 
+        PARAMETER:
             list: A pointer points to a list.
 
-        FUNCITONING: backs up the list's current node by one, and returns a 
+        FUNCITONING: backs up the list's current node by one, and returns a
         pointer to the new current item. If this operation attempts to back
-        up the current item beyond the start of the list, a NULL pointer 
+        up the current item beyond the start of the list, a NULL pointer
         is returned
 
-        POSTCONDITION: the pointer currNodep has changed to point 
+        POSTCONDITION: the pointer currNodep has changed to point
         the previous node
 
-        RETURNS: A pointer of the new current node(prev node) in the 
+        RETURNS: A pointer of the new current node(prev node) in the
         list or NULL if no prev node
-    
+
     ListCurr():
     get the pointer points to the currNodep.
         PRECONDITION: list is created and has at least one node;
 
-        PARAMETER: 
+        PARAMETER:
             list: A pointer points to a list.
 
         FUNCITONING: returns a pointer to the current item in the list
@@ -147,8 +147,8 @@ functions:
         RETURNS: A pointer of current node in the list.
 
     ListAdd():
-    Create a new node containing 'item', set its address to the current 
-    node's next pointer and set the current node address to the new node's 
+    Create a new node containing 'item', set its address to the current
+    node's next pointer and set the current node address to the new node's
     previous pointer.
     If the next pointer was NULL, also set it to lastNodep in the list. If next
     is not NULL, set the new node's address to the next node's prev pointer
@@ -159,8 +159,8 @@ functions:
         PARAMETER:
             list: A pointer of a list.
             item: A pointer of a item(data)
-            
-        FUNCITONING:  adds the new item to the list directly after the 
+
+        FUNCITONING:  adds the new item to the list directly after the
         current item, and makes the new item the current item.
         If the current pointer is at the end of the list, the item is added
         at the end. Returns 0 on success, -1 on failure.
@@ -172,8 +172,8 @@ functions:
 
     ListInsert():
     Create a new node containing 'item', set its address to the current node's
-    prev pointer and set the current node address to the new node's 
-    next pointer. If prev was NULL, also set it to firstNodep in the list. 
+    prev pointer and set the current node address to the new node's
+    next pointer. If prev was NULL, also set it to firstNodep in the list.
     If prev is not NULL, set the new node's address to prev node's next
     and set the new node's prev as prev node's address.
         PRECONDITION: the list is created, item is not NULL and has
@@ -183,59 +183,59 @@ functions:
             list: A pointer of a list.
             item: A pointer of a item(data)
 
-        FUNCITONING: adds the item to the list directly before the current 
-        item, and makes the new item the current one. 
+        FUNCITONING: adds the item to the list directly before the current
+        item, and makes the new item the current one.
         If the current pointer is at the start of the list, the item is
          added at the start.  Returns 0 on success, -1 on failure.
-        
+
         POSTCONDITION: a new node is added to the list, listCount +1.
         remaining space -1
 
         RETURNS: An integer that 0 on success, 1 on failure.
 
     ListAppend():
-    Create a new node containing 'item' set its address to the next node 
+    Create a new node containing 'item' set its address to the next node
     of last node and set the new node's previous node to old last node
     set lastNode and currentNode pointer to the new node.
         PRECONDITION: the list is created, item is not NULL and have
          memory space.
-         
+
         PARAMETER:
             list: A pointer of a list.
             item: A pointer of a item(data)
 
-        FUNCITONING: adds the item to the end of the list, and makes 
+        FUNCITONING: adds the item to the end of the list, and makes
         the new item the current one. Returns 0 on success, -1 on failure.
-        POSTCONDITION: a new node is added to the list, listCount +1. 
+        POSTCONDITION: a new node is added to the list, listCount +1.
         remaining space -1
         RETURNS: A integer that 0 on success, 1 on failure.
-    
+
     ListPrepend():
     Creare a new node containing 'item', set its address to the previous node
     of the firstNode and firstNode pointer in the list, also set the firstNode
-    pointer to the next pointer of new node. 
-    if the list is empty, just set new node's address to firstNodep, 
-    currNodep and lastNodep. 
+    pointer to the next pointer of new node.
+    if the list is empty, just set new node's address to firstNodep,
+    currNodep and lastNodep.
         PRECONDITION: the list is created, item is not NULL and have memory
         space.
 
-        PARAMETER: 
+        PARAMETER:
             list: A pointer of a list.
             item: A pointer of a item(data)
 
         FUNCITONING: adds item to the front of list, and makes the new item
         the current one. Returns 0 on success, -1 on failure.
 
-        POSTCONDITION: a new node is added to the list, listCount +1. 
+        POSTCONDITION: a new node is added to the list, listCount +1.
         remaining space -1
 
         RETURNS: A integer that 0 on success, 1 on failure.
 
     ListRemove():
     Get the currNodep and set currNode pointer to currNode pointer -> next.
-    After removed currNode. Set previous node's next node as removed node's 
+    After removed currNode. Set previous node's next node as removed node's
     next node, next node's previous node as removed node's previous node.
-    If next node is NULL, set currNodep as currNodep -> prev. 
+    If next node is NULL, set currNodep as currNodep -> prev.
     if previous node is NULL, set currNodep as NULL.
 
         PRECONDITION: the list is created
@@ -249,13 +249,13 @@ functions:
         space +1
 
         RETURNS: A pointer points to the item that was taken out from the list.
-    
+
     ListConcat():
-    set next node of lastNode in list 1 as the firstNode in list 2 , set 
+    set next node of lastNode in list 1 as the firstNode in list 2 , set
     firstNode's prev node in list 2 as lastNode in list 1, set lastNode pointer
     in list 1 to lastNode in list 2.
     list1->listCount = list1->listCount + list2->listCount.
-    if list1 or list2 is NULL, just set list1's pointer points to 
+    if list1 or list2 is NULL, just set list1's pointer points to
     the non-NULL list.
     Have to check if memory space is enough to add list2 to list1.
         PRECONDITION: the list1 and list2 is created, list1 have enough space
@@ -265,18 +265,18 @@ functions:
             list1: A pointer of a list
             list2: A pointer of a list
 
-        FUNCITONING: adds list2 to the end of list1. The current pointer is 
-        set to the current pointer of list1. List2 no longer exists after 
+        FUNCITONING: adds list2 to the end of list1. The current pointer is
+        set to the current pointer of list1. List2 no longer exists after
         the operation.
 
         POSTCONDITION: list2 appended to list one. list2 is free. listCount
         of list1 is increased. remaining space decreased.
 
         RETURNS: None
-    
+
     ListFree():
-    Traversing the whole list, call itemFree and pass in evey node as 
-    parameter. Eventually, free all pointer points to item, free 
+    Traversing the whole list, call itemFree and pass in evey node as
+    parameter. Eventually, free all pointer points to item, free
     the whole list in list as NULL,
         PRECONDITION: the list is created. itemFree is not NULL
 
@@ -286,39 +286,39 @@ functions:
 
         FUNCITONING: delete list. Frees all items.
 
-        POSTCONDITION: the list has been deleted. space of node and list 
+        POSTCONDITION: the list has been deleted. space of node and list
         has been freed
 
         RETURNS: None
-    
+
     ListTrim():
-    get node in lastNodep of the list. set new lastNodep as 
+    get node in lastNodep of the list. set new lastNodep as
     old lastNodep->previous. set old lastNodep->previous as NULL.
         PRECONDITION: the list is created.
 
         PARAMETER:
             list: A pointer of a list
 
-        FUNCITONING: Return last item and take it out of list. 
+        FUNCITONING: Return last item and take it out of list.
         The current pointer shall be the new last item in the list.
 
         POSTCONDITION: last node of the list has changed, listCount -1,
         free space increased.
 
         RETURNS: A pointer of a node.
-    
+
     ListSearch():
-     Traversing the whole list, call comparator in each loop, compare the 
+     Traversing the whole list, call comparator in each loop, compare the
      node to comparisonArg. if match, comparator return 1,
-     and List return the pointer to that node and left currNodep at 
-     the matched node. If never match, returns NULL pointer 
+     and List return the pointer to that node and left currNodep at
+     the matched node. If never match, returns NULL pointer
      and left currNodep at the last node.
-        PRECONDITION: the list is created, the comparator is not NULL, 
+        PRECONDITION: the list is created, the comparator is not NULL,
         the comparisonArg is not NULL
 
         PARAMETER:
             list: A pointer of a list
-            comparator: a pointer points to a function that 
+            comparator: a pointer points to a function that
             takes two parameters and compare them,
             return 1 when match, 0 when not match.
             comparisonArg: A pointer of data that want to find.
@@ -328,5 +328,5 @@ functions:
 
         POSTCONDITION: the current node pointer of the list will be changed
         to last node or the matched node.
-        
+
         RETURNS: A pointer points to match node or NULL.

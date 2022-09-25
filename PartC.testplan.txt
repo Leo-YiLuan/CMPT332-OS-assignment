@@ -6,101 +6,101 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 */
 Note: For every function, we always do a test case where a parameter is NULL.
 
 CreateList():
     * Test under circumstances
     * Test after exceeding the maximum number of active lists,
-      check for NULL pointer return. 
+      check for NULL pointer return.
 
 ListCount():
     * When list is empty.
     * When list contains one element.
     * When list contains many elements.
     * After an element has been added.
-    * After an element has been removed. 
+    * After an element has been removed.
 
 ListFirst():
     * When list is empty. Should return NULL?
-    * When there's only one element. 
-    * When there's many elements. 
+    * When there's only one element.
+    * When there's many elements.
 
-ListLast(): 
+ListLast():
     * When list is empty. Should return NULL?
     * When there's only one element.
-    * When there's many elements. 
+    * When there's many elements.
 
 ListNext():
     * When the list is empty. Return NULL.
     * When there is only one element in list. Return NULL, can't continue.
-    * When there are many elements in the list. 
+    * When there are many elements in the list.
     * When currNode is at the last element.
 
 ListPrev():
     * When the list is empty. Return NULL.
     * When there is only one element in the list. Return NULL, can't go prev.
     * When there are many elements in the list
-    * When currNode is at the first element. 
+    * When currNode is at the first element.
 
 ListCurr():
     * When the list is empty. Return NULL.
     * When currNode is first.
-    * When currNode is last. 
+    * When currNode is last.
     * When currNode is somewhere in the middle.
 
  ListAdd():
-    * When the list is empty. 
-    * When there is one element in the list. 
+    * When the list is empty.
+    * When there is one element in the list.
     * When there are multiple elements in the list.
-    * When there are multiple elements, and we are at end. 
-    * When there are no more nodes left. 
+    * When there are multiple elements, and we are at end.
+    * When there are no more nodes left.
 
 ListInsert():
-    * When the list is empty. 
+    * When the list is empty.
     * When there is one element.
-    * When there are many elements in the list. 
+    * When there are many elements in the list.
     * When there are many elements, and we are at begin.
-    * When there are no more nodes left. 
+    * When there are no more nodes left.
 
 ListAppend():
-    * When the list is empty. 
-    * When there is one element. 
+    * When the list is empty.
+    * When there is one element.
     * When there are many elements, and we are already at the end.
-    * When there are many elements, and we are not at the end. 
-    * when there are no more nodes left. 
+    * When there are many elements, and we are not at the end.
+    * when there are no more nodes left.
 
 ListPrepend():
-    * When the list is empty. 
-    * When there is one element. 
+    * When the list is empty.
+    * When there is one element.
     * When there are many elements, and we are already at begin.
-    * When there are many elements, and we are not at begin. 
-    * when there are no more nodes left. 
+    * When there are many elements, and we are not at begin.
+    * when there are no more nodes left.
 
 ListRemove():
     * When the list is empty. Return NULL?
-    * When there is one element. 
-    * When there are many elements. 
+    * When there is one element.
+    * When there are many elements.
     * When there are many elements, beginning of list. (Test Correct Begin)
     * When there are many elements, end of the list (Test Correct End)
 
 ListConcat():
     * When one of the lists is NULL.
     * Two empty lists.
-    * One empty list, one non-empty. 
-    * Two non-empty lists. 
+    * One empty list, one non-empty.
+    * Two non-empty lists.
 
-ListFree(): 
+ListFree():
     * Freeing an empty list.
     * Freeing a list with one element.
-    * Freeing a list with many elements. 
+    * Freeing a list with many elements.
 
 ListTrim():
     * When list is empty. Return NULL?
     * When list has 1 element. currNode would get set to NULL?
     * When list has many elements, not at end.
-    * When list has many elements, and at end. 
+    * When list has many elements, and at end.
 
 ListSearch()
     * When list is empty.

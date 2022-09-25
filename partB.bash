@@ -5,7 +5,7 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 
 #!/bin/bash
 
@@ -29,11 +29,11 @@ case $1 in
     *)
         printf "Error: Argument $1 failed to match any known executables!\n"
         exit 1
-esac 
+esac
 
 # Validate we are on correct platform for partA1
 if [ "$binary" = "partA1" ] && [ "$OS" != "Windows_NT" ]
-then 
+then
     printf "Error: Cannot run partA1 on Linux!\n"
     exit 1
 fi
@@ -44,14 +44,14 @@ validate_arg() {
     # if there's a way to catch stderr into a var directly,
     # I am not aware of it.
     err=$(test "$1" -lt 0 2>&1)
-    if [ ! -z "$err" ] 
-    then 
+    if [ ! -z "$err" ]
+    then
         printf "Error: Could not understand non-numeric arg $1...\n"
         return 1
     fi
 
     if [ $1 -lt 0 ]
-    then 
+    then
         printf "Error: Input $1 must be non-negative...\n"
         return 1
     fi
@@ -67,7 +67,7 @@ while read line
 do
     # Bail early if interactive user chooses to quit.
     if [ "$line" = "q" ] || [ "$line" = "quit" ]
-    then 
+    then
         printf "Interactive user chose to quit. Goodbye.\n"
         exit 0
     fi
@@ -94,7 +94,7 @@ do
 done
 
 # Do this one more time, because we hit a line with eof.
-# does bash have some kind of do while? 
+# does bash have some kind of do while?
 threads=$(echo "$line" | cut -d " " -f 1)
 validate_arg $threads
 rc1=$?

@@ -6,10 +6,10 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 */
 #include <stdio.h>
-#include "list.h" 
+#include "list.h"
 
 /**
  *  These function just test parameters, no functional implemented
@@ -19,13 +19,13 @@ int ListCount(LIST *list){
     if (list == NULL){
         return -1;
     }
-    
+
     return list->listCount;
 }
 
 void *ListFirst(LIST *list){
     if (list == NULL){
-        return NULL;    
+        return NULL;
     }
     list->currNodep = list->firstNodep;
 
@@ -93,5 +93,5 @@ void *ListSearch(LIST *list, int (*comparator)(void *, void *),
     }
     printf("Got to procedure ListSearch()\n");
 
-    return NULL;    
+    return NULL;
 }

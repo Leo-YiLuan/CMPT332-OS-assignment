@@ -6,7 +6,7 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 */
 
 
@@ -44,14 +44,14 @@ struct LIST
 /*
  * Create an empty list
  *
- * return: a pointer of the list 
+ * return: a pointer of the list
  */
 LIST *ListCreate();
 
 /*
  * get the number of nodes in the list
 
- * * parameters: 
+ * * parameters:
  *      list: a pointer to a LIST
  * return: The number of nodes in the list if success.
  */
@@ -60,61 +60,61 @@ int ListCount(LIST *list);
 /*
  * get the first node in the list, and make first node the current one
  *
- * parameters: 
+ * parameters:
  *      list: a pointer to a LIST
- * return: a pointer to a node. 
+ * return: a pointer to a node.
  */
 void *ListFirst(LIST *list);
 
 /*
  * get the last node in the list, and make last node the current one
  *
- * parameters: 
+ * parameters:
  *      list: a pointer to a LIST
- * return: a pointer to a node. 
+ * return: a pointer to a node.
  */
 void *ListLast(LIST *list);
 
 /*
- * advances the list's current node by one, 
- * and returns a pointer to the new current item. 
- * If this operation attempts to advances the current 
+ * advances the list's current node by one,
+ * and returns a pointer to the new current item.
+ * If this operation attempts to advances the current
  * item beyond the end of the list, a NULL pointer is returned.
- * 
- * parameters: 
+ *
+ * parameters:
  *      list: a pointer to a LIST
  * return: a pointer to a node if success, NULL if faliure
  */
 void *ListNext(LIST *list);
 
 /*
- * backs up the list's current node by one, 
+ * backs up the list's current node by one,
  * and returns a pointer to the new current item.
  * If this operation attempts to back up the current
- * item beyond the start of the list, a NULL pointer is returned. 
- * 
- * parameters: 
+ * item beyond the start of the list, a NULL pointer is returned.
+ *
+ * parameters:
  *      list: a pointer to a LIST
- * return: a pointer to a node if success, NULL if faliure 
+ * return: a pointer to a node if success, NULL if faliure
  */
 void *ListPrev(LIST *list);
 
 /*
  *  returns a pointer to the current item in list.
- * 
- *  parameters: 
+ *
+ *  parameters:
  *      list: a pointer to a LIST
- *  return: a pointer to a node if success, NULL if faliure 
+ *  return: a pointer to a node if success, NULL if faliure
  */
 void *ListCurr(LIST *list);
 
 /*
  *  adds the new item to list directly after the current item,
- *  and makes the new item the current item. 
+ *  and makes the new item the current item.
  *  If the current pointer is at the end of the list,
  *  the item is added at the end.
- * 
- *  parameters: 
+ *
+ *  parameters:
  *      list: a pointer to a LIST
  *      item: a pointer to any type of data will be stored in node.
  *  Returns: 0 on success, -1 on failure.
@@ -122,13 +122,13 @@ void *ListCurr(LIST *list);
 int ListAdd(LIST *list,void *item);
 
 /**
- * 
- * adds item to list directly before the current item, 
+ *
+ * adds item to list directly before the current item,
  * and makes the new item the current one.
  * If the current pointer is at the start of the list,
  * the item is added at the start.
- *  
- * parameters: 
+ *
+ * parameters:
  *      list: a pointer to a LIST
  *      item: a pointer to any type of data will be stored in node.
  * Returns: 0 on success, -1 on failure.
@@ -136,21 +136,21 @@ int ListAdd(LIST *list,void *item);
 int ListInsert(LIST *list, void *item);
 
 /*
- * 
+ *
  * adds item to the end of list, and makes the new item the current one.
- * 
- * parameters: 
+ *
+ * parameters:
  *      list: a pointer to a LIST
  *      item: a pointer to any type of data will be stored in node.
  * Returns: 0 on success, -1 on failure.
  */
 int ListAppend(LIST *list, void *item);
 
-/* 
+/*
  * adds item to the front of list, and makes the new item the current one.
  * Returns: 0 on success, -1 on failure.
- * 
- * parameters: 
+ *
+ * parameters:
  *      list: a pointer to a LIST
  *      item: a pointer to any type of data will be stored in node.
  * Returns: 0 on success, -1 on failure.
@@ -158,20 +158,20 @@ int ListAppend(LIST *list, void *item);
 int ListPrepend(LIST *list, void *item);
 
 /*
- * Return current item and take it out of list. 
+ * Return current item and take it out of list.
  * Make the next item the current one.
- * 
+ *
  * parameters:
  *      list: a pointer to a LIST
- * Return: a pointer to a node or NULL 
+ * Return: a pointer to a node or NULL
  */
 void *ListRemove(LIST *list);
 
 /*
  * adds list2 to the end of list1. The current pointer is set to
  * the current pointer of list1.
- * 
- * parameters: 
+ *
+ * parameters:
  *      list1: a pointer to a LIST
  *      list2: a pointer to a LIST will be merged
  * Return: none
@@ -179,7 +179,7 @@ void *ListRemove(LIST *list);
 void ListConcat(LIST *list1, LIST *list2);
 
 /*
- * delete list. itemFree is a pointer to a routine that frees an item. 
+ * delete list. itemFree is a pointer to a routine that frees an item.
  * parameters:
  *      list: a pointer to a list
  *      itemFree: a pointer to a function that free a item(node)
@@ -188,9 +188,9 @@ void ListConcat(LIST *list1, LIST *list2);
 void ListFree(LIST *list, void (*itemFree)(void*));
 
 /*
- * Return last item and take it out of list. 
+ * Return last item and take it out of list.
  * The current pointer shall be the new last item in the list.
- * 
+ *
  * parameters:
  *      list: a pointer to a list
  * return: none
@@ -198,10 +198,10 @@ void ListFree(LIST *list, void (*itemFree)(void*));
 void *ListTrim(LIST *list);
 
 /**
- * searches list starting at the current item until 
- * the end is reached or a match is found. 
- * 
- * parameters: 
+ * searches list starting at the current item until
+ * the end is reached or a match is found.
+ *
+ * parameters:
  *      list: a pointer to a list
  *      comparator: a pointer to a function
  *      comparisionArg: a pointer to a item will be compared

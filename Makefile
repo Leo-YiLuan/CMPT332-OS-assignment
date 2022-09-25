@@ -5,7 +5,7 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 
 CC=gcc
 CFLAGS=-g

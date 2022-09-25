@@ -6,7 +6,7 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 */
 #include <stdio.h>
 #include "list.h"
@@ -15,8 +15,8 @@ int numbers[1000];
 
 /**
  * compare two items, check if they match
- * 
- * Parameters: 
+ *
+ * Parameters:
  *      item1: pointer to an item
  *      item2: pointer to an item
  * Return: 1 on success, 0 on failure, -1 means error
@@ -35,17 +35,17 @@ int comparator(void *item1, void *item2){
 
 /**
  * free a space of a pointer points to an item
- * 
- * Parameters: 
+ *
+ * Parameters:
  *      item: pointer to an item
- * 
+ *
  * Return: none
  */
 void itemFree(void *item){
     /*
     Hack to avoid compiler warnings since this
-    function doesn't actually do anything and is 
-    just for testing. 
+    function doesn't actually do anything and is
+    just for testing.
     */
     *(int*)item = *(int*)item;
     return;
@@ -83,7 +83,7 @@ int main(){
     /****** TEST ListCreate ******/
     LIST *list1 = ListCreate();
     LIST *list2 = NULL;
-    if (list1) { 
+    if (list1) {
         printf("ListCreate: Successfully received a new valid list.\n");
     } else {
         fprintf(stderr, "ERROR: ListCreate failed to create a valid list!\n");
@@ -172,7 +172,7 @@ int main(){
             "passing a NULL item!\n");
         }
         printf("\n");
-        
+
         printf("ListInsert: Insert 0 to the middle of a list with "
         "multiple elems:\n");
         ListInsert(list1, &next);

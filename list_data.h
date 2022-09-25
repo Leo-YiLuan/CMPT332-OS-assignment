@@ -6,7 +6,7 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 */
 
 #ifndef __LIST_DATA_H__
@@ -15,7 +15,7 @@
 #define MAX_LISTS 10
 #define MAX_NODES 1000
 
-/* 
+/*
  For extended info on how our stacks of free lists/nodes works,
  please see the partC documentation.
 */

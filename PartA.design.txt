@@ -5,70 +5,83 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 
 
 General Program Flow:
 
 The main function parses the arguments passed in through argv via a seperate
-function parse_args. This is done because args between the different 
-executables will not change, so we can reuse this function in every 
+function parse_args. This is done because args between the different
+executables will not change, so we can reuse this function in every
 executable for Part A.
-We would then use a loop to construct the platform/library specific threads as 
+We would then use a loop to construct the platform/library specific threads as
 necessary for each part. We can wrap isRunning (as applicable) in a platform
-specific mutex to ensure race conditions can't cause a thread to run one 
+specific mutex to ensure race conditions can't cause a thread to run one
 extra time when it shouldn't. For Part A2, we will of course need to use Kill
-as opposed to a shared global. For Part A3 returning to the use of a shard 
-global seems reasonable. 
+as opposed to a shared global. For Part A3 returning to the use of a shard
+global seems reasonable.
 
+UPDATED Phase2:
+
+To make sure fib() can counts successfully on every invocation. We use a thread
+variable (__thread) for each thread to save a index of array. With two arrays,
+one saves threads' ids and the other saves fib count in that thread. Thread
+tracked by the index in thread variable. E.g.: IDArray [1] and CountArray[1]
+belongs to the thread have index 1 saved in the thread variable.
+
+In that way, we avoid the risk of lower compatibility(different datatype of
+thread id) and improve the program speed(no traverse) without using struct to
+save id and count.
 
 Functions:
 
 parse_args:
-    Tests user-supplied arguments for correctness. Ensures the correct number 
-    of arguments are supplied and that they are in a valid range. 
+    Tests user-supplied arguments for correctness. Ensures the correct number
+    of arguments are supplied and that they are in a valid range.
 
     PRECONDITIONS: none
-    POSTCONDITIONS: 
-      If parsing arguments fails, a message is written to stderr.
-    PARAMS: 
+    POSTCONDITIONS:
+      If parsing arguments fails, a message is printout.
+    PARAMS:
       argc: the number of arguments to parse.
       argv: An array of char pointers each containing a null-terminated arg.
-      outThreads: a pointer to be filled with the desired number of threads. 
-      outDeadline: a pointer to be filled with the maximum time the process 
+      outThreads: a pointer to be filled with the desired number of threads.
+      outDeadline: a pointer to be filled with the maximum time the process
                    should run, in seconds.
-      outSize: a pointer to be filled with the number of threads to create. 
+      outSize: a pointer to be filled with the number of threads to create.
 
       RETURN:
-        1 on success, 0 on failure. 
+        1 on success, 0 on failure.
 
 fib:
-      Calculates the nth fibonacci number. 
+      Calculates the nth fibonacci number. And add 1 count to it's counter
 
       PRECONDITIONS: value >= 0
-      POSTCONDITIONS: none
+      POSTCONDITIONS: counter of fib() increased by 1
       PARAMS:
-        value: the nth fibonacci number to calculate. 
+        value: the nth fibonacci number to calculate.
       RETURN:
-        the nth fibonacci number. 
+        the nth fibonacci number.
 
 thread_start (part A1):
-      The entry point for a Win32 child thread. 
+      The entry point for a Win32 child thread.
 
       PRECONDITIONS: none
-      POSTCONDITIONS: 
-        a global array of counters is modified to denote the number of 
-        executions of fib by a specific child thread identified by 
-        some thread id.
-      PARAMS: 
-        fibData: a void pointer to the nth fibonacci number to calculate.
+      POSTCONDITIONS:
+        a global array of counters is modified to denote the number of
+        executions of fib by a specific child thread identified by
+        index in thread variable
+        a global array of thread id get from GetCurrentThreadId() function.
+        tracking by index in thread variable
+      PARAMS:
+        paramP: a void pointer to the nth fibonacci number to calculate.
       RETURNS:
-        Unused, but returns an unsigned integer to comply with the 
-        Win32 API requirements. 
+        Unused, but returns an unsigned integer to comply with the
+        Win32 API requirements.
 
 
-Considerations for Part B & C: 
+Considerations for Part B & C:
 * It may be a good idea to wrap our isRunning global variable in a Win32 mutex.
 * How to index threads by ID. The number of threads isn't known until run-time.
-  Should probably define a reasonable constant max, MAX_THREADS, that will 
+  Should probably define a reasonable constant max, MAX_THREADS, that will
   be allowed.

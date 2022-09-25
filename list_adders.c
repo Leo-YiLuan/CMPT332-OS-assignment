@@ -6,7 +6,7 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 1
+# A1 Phase 2
 */
 #include "list.h"
 #include <stdio.h>
@@ -20,15 +20,15 @@ LIST* ListCreate(){
 
     if (!initialized) {
         /* First time library initialization. */
-        int i = 0; 
+        int i = 0;
         int j = 0;
         for (i = 0; i < MAX_LISTS - 1; i++) {
-            /* 
+            /*
                 For each entry, we re-interpret it as a LIST**,
                 then store the address of the next free entry in that pointer.
                 This gives us the effect of a very simple linked list
-                of free entries stored within the entries themselves. 
-                This means no additional storage is necessary. 
+                of free entries stored within the entries themselves.
+                This means no additional storage is necessary.
             */
             /* Reinterpret cast this LIST* as a LIST** */
             LIST **next = (LIST**)&lists[i];
@@ -48,8 +48,8 @@ LIST* ListCreate(){
         return NULL;
     }
 
-    /* 
-     Pull a new list off the stack. 
+    /*
+     Pull a new list off the stack.
      Then set the next free entry to be the top of the stack.
     */
     list = freeLists;
@@ -91,9 +91,9 @@ int ListAdd(LIST *list,void *item){
         node->next = after;
 
         before->next = node;
-        /* 
+        /*
          Semi-special case: behavior differs depending on whether
-         we are adding to the end of a non-empty list, or elsewhere 
+         we are adding to the end of a non-empty list, or elsewhere
          in a non-empty list.
          */
         if (after) { after->prev = node; } else { list->lastNodep = node; }
