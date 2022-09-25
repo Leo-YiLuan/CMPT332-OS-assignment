@@ -19,7 +19,7 @@ Structures:
     to list.
 
 
-For memory allocation:
+For memory allocation: (Updated for Part 2)
 
     We statically allocate memory by storing a fixed-length global array,
     one for lists and one for nodes.
