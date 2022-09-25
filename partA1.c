@@ -98,10 +98,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    if(size > 63){
-        printf("Size is too big, not enough space to hold counts");
-        return 0;
-    }
+
     /* allocate memories to array stores count number */
     countArr = (uint64_t*) malloc(threads * sizeof(uint64_t));
     /* allocate memories to array stores id of thread */

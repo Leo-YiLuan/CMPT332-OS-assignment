@@ -34,10 +34,12 @@ int main(int argc, char **argv){
   /* pid for timer process */
   pid_t timerproc;
   int i=0;
+
   /* check arguments (usage) */
   if (! parse_args(argc,argv,&processes,&deadline,&size)) {
       return -1;
   }
+
   /* create timer process */
   timerproc = fork();
     if (timerproc == 0) {
