@@ -11,9 +11,13 @@ PartA1:
     the basic test plan is input different arguments and check if the threads
 created and call fib() successfully with given fib() size.
 
+NOTE: Suggest test fib(40) to fib(50). Which do not take too long or too quick
+to finish. If the fib() size is big, the 3 seconds gap in main after deadline
+may not be able to let fib() print the result.
+
     Argument validation:
-    1. Our limit of fib() size is set to 63. so if given a size argument greater
-    than 63 will not work.
+    1. Our limit of fib() size is set to 63. so if given a size argument
+    greater than 63 will not work.
     2. Any input < 0 will stop the program and shows error message.
     3. With any valid arguments, the program should work. see below
 
@@ -26,8 +30,8 @@ created and call fib() successfully with given fib() size.
 PartA2:
 
     Argument validation:
-    1. Our limit of fib() size is set to 63. so if given a size argument greater
-    than 63 will not work.
+    1. Our limit of fib() size is set to 63. so if given a size argument
+    greater than 63 will not work.
     2. Any input < 0 will stop the program and shows error message.
     3. With any valid arguments, the program should work. see below
 
@@ -39,8 +43,8 @@ PartA2:
 PartA3:
 
     Argument validation:
-    1. Our limit of fib() size is set to 63. so if given a size argument greater
-    than 63 will not work.
+    1. Our limit of fib() size is set to 63. so if given a size argument
+    greater than 63 will not work.
     2. Any input < 0 will stop the program and shows error message.
     3. With any valid arguments, the program should work. see below
 
@@ -51,8 +55,8 @@ PartA3:
 PartA4:
 
     Argument validation:
-    1. Our limit of fib() size is set to 63. so if given a size argument greater
-    than 63 will not work.
+    1. Our limit of fib() size is set to 63. so if given a size argument
+    greater than 63 will not work.
     2. Any input < 0 will stop the program and shows error message.
     3. With any valid arguments, the program should work. see below
 

@@ -7,6 +7,7 @@
 # CMPT 332 2022
 # A1 Phase 2
 
+PART A1:
 
 General Program Flow:
 
@@ -32,6 +33,11 @@ belongs to the thread have index 1 saved in the thread variable.
 In that way, we avoid the risk of lower compatibility(different datatype of
 thread id) and improve the program speed(no traverse) without using struct to
 save id and count.
+
+We decided to use uint64_t to save the count of fib(), in that case, the
+maximum fib size allowed to input will be 63.
+
+we make main thread sleep 3 seconds to let fib() finish and print things.
 
 Functions:
 
@@ -80,8 +86,115 @@ thread_start (part A1):
         Win32 API requirements.
 
 
-Considerations for Part B & C:
+Considerations for Part 2 & 3:
 * It may be a good idea to wrap our isRunning global variable in a Win32 mutex.
 * How to index threads by ID. The number of threads isn't known until run-time.
   Should probably define a reasonable constant max, MAX_THREADS, that will
   be allowed.
+
+===============================================================================
+
+Part A2 Phase2 UPDATED:
+    The only difference about design in PartA1 and PartA2 is, in PartA1 threads
+exit itself and in PartA2 the main thread kills all thread when after deadline.
+to do this, our IDArray will be useful for mainp to kill all threads in a loop.
+mainp have to print result. that can be done by using IDArray and CountArray.
+
+Functions:
+
+parse_args:
+    Tests user-supplied arguments for correctness. Ensures the correct number
+    of arguments are supplied and that they are in a valid range.
+
+    PRECONDITIONS: none
+    POSTCONDITIONS:
+      If parsing arguments fails, a message is printout.
+    PARAMS:
+      argc: the number of arguments to parse.
+      argv: An array of char pointers each containing a null-terminated arg.
+      outThreads: a pointer to be filled with the desired number of threads.
+      outDeadline: a pointer to be filled with the maximum time the process
+                   should run, in seconds.
+      outSize: a pointer to be filled with the number of threads to create.
+
+      RETURN:
+        1 on success, 0 on failure.
+
+fib:
+      Calculates the nth fibonacci number. And add 1 count to it's counter
+
+      PRECONDITIONS: value >= 0
+      POSTCONDITIONS: counter of fib() increased by 1
+      PARAMS:
+        value: the nth fibonacci number to calculate.
+      RETURN:
+        the nth fibonacci number.
+
+myThread:
+      The entry point for a UBC pthread child thread.
+
+      PRECONDITIONS: none
+      POSTCONDITIONS:
+        a global array of counters is modified to denote the number of
+        executions of fib by a specific child thread identified by
+        index in thread variable
+        a global array of thread id get from MyPid() function. Tracking by
+        index in thread variable
+      PARAMS:
+        paramP: a void pointer to the nth fibonacci number to calculate.
+      RETURNS:
+        Unused
+
+===============================================================================
+
+Part A3 Phase2 UPDATED:
+  For PartA3: The Posix thread requires a pointer to threadId at creation time,
+we gives it the address in IDArray. And we use a for loop and pthread_self() to
+find the matching threadId in certain index. Save index as a thread variable.
+  we use a for loop at the end to wait all the threads finish by using
+pthread_join() function. Others are same design as Part A2.
+
+Functions:
+
+parse_args:
+    Tests user-supplied arguments for correctness. Ensures the correct number
+    of arguments are supplied and that they are in a valid range.
+
+    PRECONDITIONS: none
+    POSTCONDITIONS:
+      If parsing arguments fails, a message is printout.
+    PARAMS:
+      argc: the number of arguments to parse.
+      argv: An array of char pointers each containing a null-terminated arg.
+      outThreads: a pointer to be filled with the desired number of threads.
+      outDeadline: a pointer to be filled with the maximum time the process
+                   should run, in seconds.
+      outSize: a pointer to be filled with the number of threads to create.
+
+      RETURN:
+        1 on success, 0 on failure.
+
+fib:
+      Calculates the nth fibonacci number. And add 1 count to it's counter
+
+      PRECONDITIONS: value >= 0
+      POSTCONDITIONS: counter of fib() increased by 1
+      PARAMS:
+        value: the nth fibonacci number to calculate.
+      RETURN:
+        the nth fibonacci number.
+
+myThread:
+      The entry point for a pthread child thread.
+
+      PRECONDITIONS: none
+      POSTCONDITIONS:
+        a global array of counters is modified to denote the number of
+        executions of fib by a specific child thread identified by
+        index in thread variable
+        a global array of thread id saved when creation. Tracking by
+        index in thread variable
+      PARAMS:
+        paramP: a void pointer to the nth fibonacci number to calculate.
+      RETURNS:
+        Unused
