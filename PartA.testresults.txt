@@ -65,7 +65,7 @@ PartA1:
 
     input: ./partA1 6 10 30
     output:
-            thread ID: 4540, up to fib(33) count is 29860667, Real timeis 5s        
+            thread ID: 4540, up to fib(33) count is 29860667, Real timeis 5s
             thread ID: 6804, up to fib(33) count is 29860667, Real timeis 6s
             thread ID: 12896, up to fib(33) count is 29860667, Real timeis 6s
             thread ID: 8108, up to fib(33) count is 29860667, Real timeis 6s

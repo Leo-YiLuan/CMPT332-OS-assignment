@@ -10,6 +10,7 @@
 CC=gcc
 CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
+PTHREADS_INCLUDE=-I/student/cmpt332/pthreads/
 
 .PHONY : all
 all: mytestlist partA1 partA2 partA3 partA4
@@ -67,10 +68,11 @@ mytestlist: mytestlist.o liblist.a list.h
 	$(CC) -o mytestlist $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
 
 partA2: partA2.o fib.o thread_util.o
-	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib.o thread_util.o -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
+	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib.o thread_util.o \
+	-L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
 
 partA2.o: partA2.c
-	$(CC) -o partA2.o -c $(CFLAGS) $(CPPFLAGS) partA2.c -I/student/cmpt332/pthreads/ -I./
+	$(CC) -o partA2.o -c $(CFLAGS) $(CPPFLAGS) partA2.c $(PTHREADS_INCLUDE) -I./
 
 partA3: partA3.o fib.o thread_util.o
 	$(CC) -o partA3 $(CFLAGS) $(CPPFLAGS) partA3.o fib.o thread_util.o -lpthread
