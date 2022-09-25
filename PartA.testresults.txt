@@ -10,6 +10,71 @@
 */
 
 PartA1:
+    Argument validation:
+    input: ./partA1
+    output: Error: Incorrect number of arguments. Usage: ./<exectuable program>
+    <threads> <deadline> <size>
+
+    input: ./partA1 0 0 0
+    output: Error: Arguments supplied must be greater than 0.
+
+    input: ./partA1 0 1 1
+    output: Error: Arguments supplied must be greater than 0.
+
+    input: ./partA1 1 0 1
+    output: Error: Arguments supplied must be greater than 0.
+
+    input: ./partA1 1 1 0
+    output: Error: Arguments supplied must be greater than 0.
+
+    input: ./partA1 4 4 64
+    output: Size is too big, not enough space to hold counts
+
+    ====== Argument validation test PASS. =======
+
+    Functional testing:
+    input: ./partA1 4 4 4
+    output:
+            thread ID: 2856, up to fib(4) count is 18, Real timeis 0s
+            thread ID: 11784, up to fib(4) count is 18, Real timeis 0s
+            thread ID: 12576, up to fib(4) count is 18, Real timeis 0s
+            thread ID: 11772, up to fib(4) count is 18, Real timeis 0s
+
+    input: ./partA1 6 8 40
+    output:
+            thread ID: 11320, up to fib(34) count is 48315596, Real timeis 10s
+            thread ID: 10636, up to fib(34) count is 48315596, Real timeis 10s
+            thread ID: 6488, up to fib(34) count is 48315596, Real timeis 11s
+            thread ID: 9288, up to fib(34) count is 48315596, Real timeis 11s
+            thread ID: 12912, up to fib(34) count is 48315596, Real timeis 11s
+            thread ID: 2668, up to fib(34) count is 48315596, Real timeis 11s
+
+        (all thread finished it's last fib() count when deadline occurs, takes
+      2-3 seconds to finish fib(34))
+
+    input: ./partA1 6 10 30
+    output:
+            thread ID: 11232, up to fib(30) count is 7049122, Real timeis 1s
+            thread ID: 9324, up to fib(30) count is 7049122, Real timeis 1s
+            thread ID: 1820, up to fib(30) count is 7049122, Real timeis 1s
+            thread ID: 7156, up to fib(30) count is 7049122, Real timeis 1s
+            thread ID: 1860, up to fib(30) count is 7049122, Real timeis 1s
+            thread ID: 11352, up to fib(30) count is 7049122, Real timeis 1s
+
+        (all thread finished)
+
+    input: ./partA1 6 10 30
+    output:
+            thread ID: 4540, up to fib(33) count is 29860667, Real timeis 5s        
+            thread ID: 6804, up to fib(33) count is 29860667, Real timeis 6s
+            thread ID: 12896, up to fib(33) count is 29860667, Real timeis 6s
+            thread ID: 8108, up to fib(33) count is 29860667, Real timeis 6s
+            thread ID: 10496, up to fib(33) count is 29860667, Real timeis 6s
+            thread ID: 2936, up to fib(33) count is 29860667, Real timeis 6s
+
+
+        (all thread finished))
+    ====== Functional testing PASS. =======
 
 PartA2:
 
@@ -18,25 +83,25 @@ PartA2:
     output: Error: Incorrect number of arguments. Usage: ./<exectuable program>
     <threads> <deadline> <size>
 
-    input: ./part2 0 0 0
+    input: ./partA2 0 0 0
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part2 0 1 1
+    input: ./partA2 0 1 1
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part2 1 0 1
+    input: ./partA2 1 0 1
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part2 1 1 0
+    input: ./partA2 1 1 0
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part2 4 4 64
+    input: ./partA2 4 4 64
     output: Size is too big, not enough space to hold counts
 
     ====== Argument validation test PASS. =======
 
     Functional testing;
-    input: ./part2 4 4 4
+    input: ./partA2 4 4 4
     output:
           Thread id: 0, fib(4) to fib(1) is called
           Thread id: 1, fib(4) to fib(1) is called
@@ -44,7 +109,7 @@ PartA2:
           Thread id: 3, fib(4) to fib(1) is called
     (ALL 4 threads created and calls fib())
 
-    input: ./part2 6 4 12
+    input: ./partA2 6 4 12
     output:
           Thread id: 0, fib(12) to fib(1) is called
           Thread id: 1, fib(12) to fib(1) is called
@@ -64,25 +129,25 @@ PartA3:
     output: Error: Incorrect number of arguments. Usage: ./<exectuable program>
     <threads> <deadline> <size>
 
-    input: ./part3 0 0 0
+    input: ./partA3 0 0 0
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part3 0 1 1
+    input: ./partA3 0 1 1
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part3 1 0 1
+    input: ./partA3 1 0 1
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part3 1 1 0
+    input: ./partA3 1 1 0
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part3 4 4 64
+    input: ./partA3 4 4 64
     output: Size is too big, not enough space to hold counts
 
     ====== Argument validation test PASS. =======
 
     Functional testing;
-    input: ./part3 4 4 4
+    input: ./partA3 4 4 4
     output:
           Thread id: 139917292205632, fib(4) to fib(1) is called
           Thread id: 139917267027520, fib(4) to fib(1) is called
@@ -90,7 +155,7 @@ PartA3:
           Thread id: 139917283812928, fib(4) to fib(1) is called
     (ALL 4 threads created and calls fib())
 
-    input: ./part3 8 10 10
+    input: ./partA3 8 10 10
     output:
           Thread id: 139649940977216, fib(10) to fib(1) is called
           Thread id: 139649915799104, fib(10) to fib(1) is called
@@ -112,22 +177,22 @@ PartA4:
     input: ./partA4
     output: Error: Incorrect number of arguments. Usage: ./<exectuable program>
     <threads> <deadline> <size>
-    input: ./part4 0 0 0
+    input: ./partA4 0 0 0
     output: Error: Arguments supplied must be greater than 0.
-    input: ./part4 0 1 1
+    input: ./partA4 0 1 1
     output: Error: Arguments supplied must be greater than 0.
-    input: ./part4 1 0 1
+    input: ./partA4 1 0 1
     output: Error: Arguments supplied must be greater than 0.
 
-    input: ./part4 1 1 0
+    input: ./partA4 1 1 0
     output: Error: Arguments supplied must be greater than 0.
-    input: ./part4 4 4 64
+    input: ./partA4 4 4 64
     output: Size is too big, not enough space to hold counts
 
     ====== Argument validation test PASS. =======
 
     Functional testing;
-    input: ./part4 4 4 4
+    input: ./partA4 4 4 4
     output:
           In timer process id: 70627
           timer is called start timing
@@ -142,7 +207,7 @@ PartA4:
 
     (ALL 5 processes include timer created and calls fib())
 
-    input: ./part4 6 5 8
+    input: ./partA4 6 5 8
     output:
           In timer process id: 70998
           timer is called start timing

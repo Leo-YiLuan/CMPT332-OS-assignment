@@ -51,20 +51,17 @@ mytestlist.o: mytestlist.c list.h
 liblist.a : list_adders.o list_movers.o list_removers.o list_data.o
 	ar -r liblist.a list_movers.o list_adders.o list_removers.o list_data.o
 
-partA2.o: partA2.c
-	$(CC) -o partA2.o -c $(CFLAGS) $(CPPFLAGS) partA2.c -I/student/cmpt332/pthreads/ -I./
 
-partA3.o: partA3.c
-	$(CC) -o partA3.o -c $(CFLAGS) $(CPPFLAGS) partA3.c
-
-partA4.o: partA4.c
-	$(CC) -o partA4.o -c $(CFLAGS) $(CPPFLAGS) partA4.c
 
 ifeq ($(OS), Windows_NT)
 mytestlist:
 	@echo "On Windows, but assignment spec says PartC is linux only, skipping..."
 partA2:
 	@echo "On Windows, partA2 skipping..."
+partA3:
+	@echo "On Windows, partA3 skipping..."
+partA4:
+	@echo "On Windows, partA4 skipping..."
 else
 mytestlist: mytestlist.o liblist.a list.h
 	$(CC) -o mytestlist $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
@@ -72,11 +69,20 @@ mytestlist: mytestlist.o liblist.a list.h
 partA2: partA2.o fib.o thread_util.o
 	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib.o thread_util.o -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
 
+partA2.o: partA2.c
+	$(CC) -o partA2.o -c $(CFLAGS) $(CPPFLAGS) partA2.c -I/student/cmpt332/pthreads/ -I./
+
 partA3: partA3.o fib.o thread_util.o
 	$(CC) -o partA3 $(CFLAGS) $(CPPFLAGS) partA3.o fib.o thread_util.o -lpthread
 
+partA3.o: partA3.c
+	$(CC) -o partA3.o -c $(CFLAGS) $(CPPFLAGS) partA3.c
+
 partA4: partA4.o
 	$(CC) -o partA4 $(CFLAGS) $(CPPFLAGS) partA4.o fib.o thread_util.o
+
+partA4.o: partA4.c
+	$(CC) -o partA4.o -c $(CFLAGS) $(CPPFLAGS) partA4.c
 endif
 
 clean:
