@@ -26,7 +26,7 @@ ListAdd: Add 16 to list with 1 element:
 ListAdd: Add 27 to list with multiple elems, cur at end:
 [5 -> 16 -> 27* -> END]
 
-ListAdd: Add 42 to the middle of a list with multiple elements:
+ListAdd: Add 42 to the middle of a list with multiple elements (cur was at 16):
 [5 -> 16 -> 42* -> 27 -> END]
 
 ListInsert: Successfully received error -1 after passing a NULL list parameter.
@@ -45,7 +45,8 @@ ListInsert: Insert 1 to a list with one element:
 ListInsert: Insert 22 to a list with multiple elements, cur at begin:
 [22* -> 1 -> 512 -> END]
 
-ListInsert: insert 5000 to a list with multiple elements in the middle:
+ListInsert: insert 5000 to a list with multiple elements in the middle 
+(cur was at 1):
 [22 -> 5000* -> 1 -> 512 -> END]
 
 ListAppend: Successfully received error -1 after passing a NULL list parameter.
@@ -80,4 +81,5 @@ ListPrepend: Insert 0 into list with no elems:
 ListPrepend: Insert -5 into list with one elem:
 [-5* -> 0 -> END]
 
-Successfully received error when trying to add node after exhausting all nodes.
+Successfully received error when trying to add node after exhausting 
+all free nodes.
