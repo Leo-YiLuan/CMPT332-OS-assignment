@@ -72,7 +72,7 @@ shell: shell.o
 	$(CC) -o shell $(CFLAGS) $(CPPFLAGS) shell.o 
 
 shell.o: shell.c
-	$(CC) -o shell.o $(CPPFLAGS) -c shell.c
+	$(CC) -o shell.o $(CPPFLAGS) $(CFLAGS) -c shell.c
 
 mytestlist: mytestlist.o liblist.a list.h
 	$(CC) -o mytestlist $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
