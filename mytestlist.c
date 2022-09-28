@@ -29,8 +29,10 @@ int comparator(void *item1, void *item2){
 
         return -1;
     }
-    printf("Got to procedure comparator()\n");
-    return 1;
+    if ((int *)item1 == (int *)item2) {
+      return 1;
+    }
+    return 0;
 }
 
 /**
@@ -52,9 +54,16 @@ void itemFree(void *item){
 }
 
 void PrintList(LIST *list) {
-    int *currItem = (int*)ListCurr(list);
-    int *item = (int*)ListFirst(list);
 
+    int *currItem;
+    int *item;
+
+    if (ListCount(list) == 0) {
+      printf("LIST IS EMPTY\n");
+      return;
+    }
+    currItem = (int*)ListCurr(list);
+    item = (int*)ListFirst(list);
     printf("[");
 
     while (item) {
@@ -82,7 +91,8 @@ int main(){
 
     /****** TEST ListCreate ******/
     LIST *list1 = ListCreate();
-    LIST *list2 = NULL;
+    LIST *list2 = ListCreate();
+    LIST *list3 = NULL;
     if (list1) {
         printf("ListCreate: Successfully received a new valid list.\n");
     } else {
@@ -93,8 +103,8 @@ int main(){
     for (iter = 1; iter < 10; iter++) {
         ListCreate();
     }
-    list2 = ListCreate();
-    if (!list2) {
+    list3 = ListCreate();
+    if (!list3) {
         printf("ListCreate: Successfully received NULL after reaching "
        "max allocated lists.\n");
     } else {
@@ -255,6 +265,8 @@ int main(){
         PrintList(list1);
         printf("\n");
 
+
+
         ListFree(list1, itemFree);
         list1 = ListCreate();
 
@@ -321,7 +333,57 @@ int main(){
         PrintList(list1);
         printf("\n");
     }
+    {
 
+      int first = 6687;
+      int second = -45;
+      int third = 0;
+      int fourth = -8;
+      ListAdd(list1,&first);
+      ListAdd(list1,&second);
+      ListAdd(list1,&third);
+      ListAdd(list1,&fourth);
+      PrintList(list1);
+      ListTrim(list1);
+      PrintList(list1);
+
+      ListPrev(list1);
+      ListPrev(list1);
+      PrintList(list1);
+      ListTrim(list1);
+      PrintList(list1);
+      ListTrim(list1);
+      ListTrim(list1);
+      PrintList(list1);
+      ListTrim(list1);
+      PrintList(list1);
+
+    }
+    {
+
+      int first = 6687;
+      int second = -45;
+      int third = 0;
+      int fourth = -8;
+      LIST* list5;
+
+      ListAdd(list1,&first);
+      ListAdd(list1,&second);
+      ListAdd(list1,&third);
+      ListAdd(list1,&fourth);
+      ListFirst(list1);
+      ListSearch(list1,comparator,&second);
+      PrintList(list1);
+      ListSearch(list1,comparator,&first);
+      PrintList(list1);
+      ListAdd(list2, &first);
+      ListAdd(list2, &second);
+      ListAdd(list2, &third);
+      PrintList(list2);
+
+      ListConcat(list1,list2);
+      PrintList(list1);
+    }
     {
         int i = 0;
         int max = 1001;

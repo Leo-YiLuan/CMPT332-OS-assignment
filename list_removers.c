@@ -19,12 +19,14 @@
  *  All the comments or designs are in list.h and partC.design.txt
  */
 void *ListRemove(LIST *list){
-    void *item = list->currNodep->item;
-    NODE *removeNode = list->currNodep;
+    void *item;
+    NODE *removeNode;
     if (list == NULL){
         printf("Error in procedure ListRemove(): Invalid parameter list \n");
         return NULL;
     }
+    item = list->currNodep->item;
+    removeNode  = list->currNodep;
     if (list->listCount==1) {
       *(NODE**)removeNode = freeNodes;
       freeNodes = removeNode;
@@ -84,11 +86,29 @@ void ListFree(LIST *list, void (*itemFree)(void*)){
 }
 
 void *ListTrim(LIST *list){
+    void *item;
+    NODE *removeNode;
+
     if (list == NULL){
         printf("Error in procedure ListTrim(): Invalid parameter list \n");
         return NULL;
     }
-    printf("Got to procedure ListTrim()\n");
-    return NULL;
+    item = list->lastNodep->item;
+    removeNode = list->lastNodep;
+    if (list->listCount == 1) {
+      *(NODE**)removeNode = freeNodes;
+      freeNodes = removeNode;
+      memset(list,0,sizeof(LIST));
+    }else{
+      removeNode->prev->next = NULL;
+      list->lastNodep = removeNode->prev;
+      list->currNodep = list->lastNodep;
+      *(NODE**)removeNode = freeNodes;
+      freeNodes = removeNode;
+      list->listCount --;
+    }
+
+
+    return item;
 
 }

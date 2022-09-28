@@ -22,7 +22,6 @@ struct NODE {
 		void *item;
 		NODE *next;
     NODE *prev;
-    int nodeSize;
 };
 
 /**
@@ -38,7 +37,6 @@ struct LIST
     NODE *firstNodep;
     NODE *lastNodep;
     int listCount;
-    int listSize;
 };
 
 /*
