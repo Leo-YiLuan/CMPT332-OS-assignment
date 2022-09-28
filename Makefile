@@ -13,7 +13,7 @@ CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 PTHREADS_INCLUDE=-I/student/cmpt332/pthreads/
 
 .PHONY : all
-all: mytestlist partA1 partA2 partA3 partA4
+all: mytestlist partA1 partA2 partA3 partA4 shell
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
@@ -63,7 +63,17 @@ partA3:
 	@echo "On Windows, partA3 skipping..."
 partA4:
 	@echo "On Windows, partA4 skipping..."
+shell:
+	@echo "On Windows, don't build shell..."
+
 else
+
+shell: shell.o
+	$(CC) -o shell $(CFLAGS) $(CPPFLAGS) shell.o 
+
+shell.o: shell.c
+	$(CC) -o shell.o $(CPPFLAGS) -c shell.c
+
 mytestlist: mytestlist.o liblist.a list.h
 	$(CC) -o mytestlist $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
 
@@ -88,4 +98,4 @@ partA4.o: partA4.c
 endif
 
 clean:
-	rm -f *.o liblist.a mytestlist partA1 partA2 partA3 partA4
+	rm -f *.o liblist.a mytestlist partA1 partA2 partA3 partA4 shell
