@@ -137,6 +137,7 @@ int main(){
         PrintList(list1);
         printf("\n");
 
+
         printf("ListAdd: Add 27 to list with multiple elems, cur at end: \n");
         ListAdd(list1, &third);
         PrintList(list1);
@@ -178,6 +179,8 @@ int main(){
         ListInsert(list1, &next);
         PrintList(list1);
         printf("\n");
+        ListRemove(list1);
+        PrintList(list1);
 
         ListFree(list1, itemFree);
         list1 = ListCreate();
@@ -189,6 +192,10 @@ int main(){
 
         printf("ListInsert: Insert 1 to a list with one element:\n");
         ListInsert(list1, &second);
+        PrintList(list1);
+        printf("\n");
+        printf("ListRemove: ================================================:\n");
+        ListRemove(list1);
         PrintList(list1);
         printf("\n");
 
@@ -204,6 +211,11 @@ int main(){
         ListInsert(list1, &fourth);
         PrintList(list1);
         printf("\n");
+        printf("ListRemove: ================================================:\n");
+        ListRemove(list1);
+        PrintList(list1);
+        printf("\n");
+
     }
 
     {
@@ -293,12 +305,15 @@ int main(){
         PrintList(list1);
         printf("\n");
 
+
         ListFree(list1, itemFree);
         list1 = ListCreate();
 
         printf("ListPrepend: Insert 0 into list with no elems:\n");
         ListPrepend(list1, &third);
         PrintList(list1);
+        printf("\n");
+        ListRemove(list1);
         printf("\n");
 
         printf("ListPrepend: Insert -5 into list with one elem:\n");

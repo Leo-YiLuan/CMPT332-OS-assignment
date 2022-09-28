@@ -19,8 +19,8 @@
  */
 typedef struct NODE NODE;
 struct NODE {
-	void *item;
-	NODE *next;
+		void *item;
+		NODE *next;
     NODE *prev;
     int nodeSize;
 };

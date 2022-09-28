@@ -10,6 +10,7 @@
 */
 #include "list.h"
 #include <stdio.h>
+#include <string.h>
 
 #include "list_data.h"
 
@@ -18,12 +19,41 @@
  *  All the comments or designs are in list.h and partC.design.txt
  */
 void *ListRemove(LIST *list){
+    void *item = list->currNodep->item;
+    NODE *removeNode = list->currNodep;
     if (list == NULL){
         printf("Error in procedure ListRemove(): Invalid parameter list \n");
         return NULL;
     }
-    printf("Got to procedure ListRemove()\n");
-    return NULL;
+    if (list->listCount==1) {
+      *(NODE**)removeNode = freeNodes;
+      freeNodes = removeNode;
+      memset(list,0,sizeof(LIST));
+    }
+    else if (list->currNodep == list->lastNodep) {
+        list->currNodep = removeNode->prev;
+        list->listCount--;
+        list->lastNodep = list->currNodep;
+        list->currNodep->next = NULL;
+        *(NODE**)removeNode = freeNodes;
+        freeNodes = removeNode;
+    }else if (list->currNodep == list->firstNodep){
+        list->currNodep = removeNode->next;
+        list->listCount--;
+        list->firstNodep = list->currNodep;
+        list->currNodep->prev = NULL;
+        *(NODE**)removeNode = freeNodes;
+        freeNodes = removeNode;
+    }else{
+        list->currNodep = removeNode->next;
+        list->listCount--;
+        removeNode->next->prev = removeNode->prev;
+        removeNode->prev->next = removeNode->next;
+
+        *(NODE**)removeNode = freeNodes;
+        freeNodes = removeNode;
+    }
+    return item;
 }
 
 void ListFree(LIST *list, void (*itemFree)(void*)){
