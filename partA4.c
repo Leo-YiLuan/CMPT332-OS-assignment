@@ -16,8 +16,13 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-uint64_t *countArr;
-__thread int threadIdx;
+size_t PA_GetUID() {
+    return 0;
+}
+
+/* TODO: Just a skeleton program */
+ThreadEntry *countArr;
+int threadCount = 0;
 
 void timer(){
   /* skeleton function */

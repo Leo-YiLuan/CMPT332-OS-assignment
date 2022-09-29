@@ -10,6 +10,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <signal.h>
 #include <time.h>
 #include <pthread.h>
@@ -48,7 +49,7 @@ void *myThread(void *param)
   for (i = 0; i < threadCount; i++) {
     if (countArr[i].uid == PA_GetUID()) {
       /* skeleton program */
-      printf("Thread id: %ld, fib(%d) to fib(1) is called with %ld invocations in %d sec.\n",pthread_self(),
+      printf("Thread id: %ld, fib(%d) to fib(1) is called with %ld invocations in %ld sec.\n",pthread_self(),
       *(int*)param, countArr[i].count, dur);
     }
   }
@@ -83,18 +84,20 @@ int main(int argc,char **argv)
     /* kill threads past deadline */
     /* Bug, not currently working. Everything else is. */
      for (i = 0; i < threads; i++) {
-        printf("Guard\n");
-        int res = pthread_kill(countArr[i].uid, SIGTERM);
-        printf("res: %d\n", res);
-        if (res != 0) {
+      /* Don't actuall send a terminate, just do error checking.
+        This lets us confirm which threads are still alive.
+       */
+        if (pthread_kill(countArr[i].uid, 0) == 0) {
           time_t end = 0;
           time_t dur = 0;
           time(&end);
           dur = end - countArr[i].startTime;
-          printf("Thread id: %ld, fib(%d) to fib(1) is called with %ld invocations in %d sec.\n",pthread_self(),
+          printf("Thread id: %ld, fib(%d) to fib(1) is called with %ld invocations in %ld sec.\n",pthread_self(),
           size, countArr[i].count, dur);
         }
      }
 
+    /* No need to actually kill threads that are still working, they will end
+       with the parent process. */ 
      return 0;
 }

@@ -10,6 +10,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <standards.h>
 #include <kernelConfig.h>
@@ -57,7 +58,7 @@ PROCESS myThread(void *param)
 
   for (i = 0; i < threadCount; i++) {
     if (MyPid() == (PID)countArr[i].uid) {
-      printf("Thread id: %ld, fib(%d), with %ld invocations in %d sec.\n", MyPid(), *(int*)param, countArr[i].count, dur);
+      printf("Thread id: %ld, fib(%d), with %ld invocations in %ld sec.\n", MyPid(), *(int*)param, countArr[i].count, dur);
     }
   }
 }
@@ -76,8 +77,9 @@ PROCESS parentThread(void *param) {
   for (i = 0; i < params->threads; i++) {
     if (Kill(countArr[i].uid) != PNUL) {
       time_t end = 0;
+      time_t dur = 0;
       time(&end);
-      time_t dur = end - countArr[i].startTime;
+      dur = end - countArr[i].startTime;
       printf("Thread id: %ld, fib(%d), with %ld invocations in %ld sec.\n", countArr[i].uid, params->size, countArr[i].count, dur);
     }
   }
