@@ -57,7 +57,8 @@ int main() {
                 /* Count is one plus current index. */
                 if (tokenIndex + 1 > maxTokenCount) {
                     maxTokenCount *= 2;
-                    if (!realloc(tokenArr, maxTokenCount * sizeof(char *))) {
+                    tokenArr = realloc(tokenArr, maxTokenCount * sizeof(char *));
+                    if (!tokenArr) {
                         printf("Fatal error allocating memory, must quit...\n");
                         return -1;
                     }
