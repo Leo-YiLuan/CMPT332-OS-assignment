@@ -18,6 +18,9 @@
 #include "thread_util.h"
 #include <windows.h>
 
+uint64_t PA_GetUID() {
+    return threadIdx;
+}
 
 /* flag of deadline */
 int keepRunning = 1;

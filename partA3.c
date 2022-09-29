@@ -19,6 +19,10 @@ pthread_t *idArr;
 /* Array of counter */
 uint64_t *countArr;
 
+size_t PA_GetUID() {
+    return threadIdx;
+}
+
 /* thread variable to track it's array index */
 __thread int threadIdx = -1;
 

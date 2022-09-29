@@ -13,14 +13,22 @@
 #include <inttypes.h>
 
 
+extern uint64_t PA_GetUID();
+extern size_t threadCount;
+
 int fib(int value){
+    size_t i = 0;
     if (value < 0) {
         printf("Error in fib: value must be equal or greater than 0\n");
         return -1;
     }
 
-    /* add count to index */
-    countArr[threadIdx] = countArr[threadIdx] + (uint64_t)1;
+    /* add count */
+    for (i = 0; i < threadCount; i++) {
+        if (PA_GetUID() == countArr[i].uid) {
+            countArr[i].count += 1;
+        }
+    }
 
 
     if (value == 0)

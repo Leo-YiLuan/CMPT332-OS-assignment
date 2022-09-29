@@ -12,6 +12,12 @@
 #define FIB_H
 #include <stdint.h>
 
+typedef struct ThreadEntry ThreadEntry;
+struct ThreadEntry {
+    uint64_t uid;
+    uint64_t count;
+};
+
 /*
  * Calculates the nth fibonacci number.
  * value: the fibonacci number to calculate. Value must be >= 0.
@@ -19,6 +25,5 @@
  */
 int fib(int value);
 extern int keepRunning;
-extern uint64_t *countArr;
-extern __thread int threadIdx;
+extern ThreadEntry *countArr;
 #endif /* FIB_h */

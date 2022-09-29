@@ -12,42 +12,63 @@
 #include <stdlib.h>
 
 #include <standards.h>
+#include <kernelConfig.h>
 #include <os.h>
 #include "fib.h"
 #include "thread_util.h"
 #include <inttypes.h>
 
+#define TICKS_PER_SECOND 1000000 / TICKINTERVAL
 
-/* Array of PID */
-PID *idArr;
+uint64_t PA_GetUID() {
+    return MyPid();
+}
+
+typedef struct Params Params;
+struct Params {
+  int threads;
+  int deadline;
+  int size;
+};
+
 /* Array of counter */
-uint64_t *countArr;
-
-/* thread variable to track it's array index */
-__thread int threadIdx = -1;
-
+ThreadEntry *countArr;
 /* count how many times thread been created */
-int threadCount = -1;
+int threadCount = 0;
 
 PROCESS myThread(void *param)
 {
-  int i;
-  /* when new thread created thread count ++ */
-  threadCount ++;
-
-  /* save the array created order in thread variable, use as index */
-  threadIdx = threadCount;
-  /* save PID to PID array */
-  idArr[threadIdx] = MyPid();
-
+  int i = 0;
   /* call fib() with given size */
   for(i=1;i<=*(int*)param;i++){
   	fib(i);
   }
-  /* skeleton program */
-  printf("Thread id: %ld, fib(%d) to fib(1) is called\n",idArr[threadIdx],
-  *(int*)param);}
 
+  for (i = 0; i < threadCount; i++) {
+    if (MyPid() == (PID)countArr[i].uid) {
+      printf("Thread id: %ld, fib(%d), with %ld invocations.\n", MyPid(), *(int*)param, countArr[i].count);
+    }
+  }
+}
+
+
+PROCESS parentThread(void *param) {
+  Params *params = (Params*)param;
+  int i = 0;
+
+    for (i = 0; i < params->threads; i++) {
+    threadCount += 1;
+    countArr[i].uid = Create((void(*)())myThread, 1048576, NULL, (void*)&(params->size), NORM, USR);
+  }
+
+  Sleep(params->deadline * TICKS_PER_SECOND);
+
+  for (i = 0; i < params->threads; i++) {
+    if (Kill(countArr[i].uid) != PNUL) {
+      printf("Thread id: %ld, fib(%d), with %ld invocations.\n", countArr[i].uid, params->size, countArr[i].count);
+    }
+  }
+}
 
 int mainp(int argc, char** argv)
 {
@@ -55,23 +76,21 @@ int mainp(int argc, char** argv)
   int threads = 0;
   int deadline = 0;
   int size = 0;
-  int i = 0;
+  Params *params = malloc(sizeof(Params));
 
   /* check arguments (usage) */
   if (! parse_args(argc,argv,&threads,&deadline,&size)) {
       return -1;
   }
+  params->threads = threads;
+  params->deadline = deadline;
+  params->size = size;
 
   /* allocate counter and id array */
-  countArr = (uint64_t*) malloc(threads * sizeof(uint64_t));
-  idArr = (PID*) malloc(threads * sizeof(PID));
+  countArr = (ThreadEntry*) malloc(threads * sizeof(ThreadEntry));
+  memset(countArr, 0, threads * sizeof(ThreadEntry));
 
-  /* create threads */
-  for ( i = 0; i < threads; i++) {
-      Create( (void(*)()) myThread,16000,NULL, &size,
-  		   NORM, USR );
-    }
-
+  Create((void(*)())parentThread, 16000, "parent", (void*)params, HIGH, USR);
 
   return 0;
 }
