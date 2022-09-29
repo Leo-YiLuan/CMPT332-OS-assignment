@@ -18,23 +18,23 @@
 #include "thread_util.h"
 #include <windows.h>
 
-uint64_t PA_GetUID() {
-    return threadIdx;
-}
-
 /* flag of deadline */
 int keepRunning = 1;
 
 /* global array stores the counts */
-uint64_t *countArr;
+ThreadEntry *countArr;
+/* count how many times thread been created */
+int threadCount = 0;
 
-DWORD *idArr;
+typedef struct Params Params;
+struct Params {
+    int size;
+    int threads;
+};
 
-/* thread variable that fib use to find the index */
-__thread int threadIdx = -1;
-
-/* index counter, +1 when thread_start() calls */
-int threadCount = -1;
+uint64_t PA_GetUID() {
+    return GetCurrentThreadId();
+}
 
 /*
  * The entry point for all of our child threads.
@@ -46,6 +46,7 @@ unsigned int thread_start(void *paramP) {
     /* system time start and end */
     SYSTEMTIME st;
     SYSTEMTIME et;
+    Params *params = (Params*)paramP;
 
     /* time cost, calculated by system time */
     int timeCost;
@@ -56,17 +57,8 @@ unsigned int thread_start(void *paramP) {
     /* set the start time */
     GetSystemTime(&st);
 
-    /* the order this thread created */
-    threadCount ++ ;
-
-    /* save the order of the thread to a tread variable, use as index */
-    threadIdx = threadCount;
-
-    /* save current thread's id to idArr with it's index */
-    idArr[threadIdx] = GetCurrentThreadId();
-
     /* loop to call fib(1), fib(2),...,fib(n) */
-    for(i = 1; i <= *(int *)paramP; i++){
+    for(i = 1; i <= params->size; i++){
         fib(i);
         /* save fib() size, use to print */
         fibEnd = i;
@@ -81,8 +73,12 @@ unsigned int thread_start(void *paramP) {
     /* calculate the time cost */
     timeCost = et.wSecond-st.wSecond + 60*(et.wMinute-st.wMinute);
     /* print information */
-    printf("thread ID: %u, up to fib(%d) count is %"PRIu64", Real time"
-    "is %ds\n",idArr[threadIdx], fibEnd,countArr[threadIdx],timeCost);
+    for (i = 0; i < params->threads; i++) {
+        if (countArr[i].uid == PA_GetUID()) {
+            printf("thread ID: %lu, up to fib(%d) count is %"PRIu64", Real time"
+            "is %ds\n",PA_GetUID(), fibEnd,countArr[i].count,timeCost);
+        }
+    }
     return 0;
 }
 
@@ -96,24 +92,26 @@ int main(int argc, char **argv) {
     int deadline = 0;
     int size = 0;
     int i = 0 ;
+    Params *params = malloc(sizeof(Params));
     /* transfer input arguments to need data type */
     if (!parse_args(argc, argv, &threads, &deadline, &size)) {
         return -1;
     }
+    params->size = size;
+    params->threads = threads;
 
 
     /* allocate memories to array stores count number */
-    countArr = (uint64_t*) malloc(threads * sizeof(uint64_t));
-    /* allocate memories to array stores id of thread */
-    idArr = (DWORD *) malloc(threads * sizeof(DWORD));
+    countArr = (ThreadEntry*) malloc(threads * sizeof(ThreadEntry));
+    memset(countArr, 0, sizeof(threads * sizeof(ThreadEntry)));
 
     for (i=0; i<threads; i++){
-        /* make sure all counts are 0 */
-        countArr[i] = (uint64_t)0;
-
+        unsigned int threadID = 0;
+        threadCount += 1;
         /* thread created and passing the size of fib() */
-        CreateThread(NULL, 0, thread_start, &size, 0, NULL);
-
+        CreateThread(NULL, 0, thread_start, params, 0, &threadID);
+        countArr[i].uid = threadID;
+        countArr[i].count = 0;
 	}
 
     /* Convert seconds to ms */
@@ -125,8 +123,6 @@ int main(int argc, char **argv) {
     Sleep(3000);
 
     free(countArr);
-
-
 
     return 0;
 }
