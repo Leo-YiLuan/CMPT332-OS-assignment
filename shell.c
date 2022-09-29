@@ -67,9 +67,6 @@ int main() {
                 tokenArr[tokenIndex] = start;
                 start = charPos;
                 tokenIndex += 1;
-
-                /* placeholder, printing tokens back to stdout */
-                printf("%s\n", tokenArr[tokenIndex - 1]);
             }
 
             /* We've reached the end of the command string, done... */
@@ -77,6 +74,13 @@ int main() {
         };
 
         /* TODO: Probably where we would fork processes and set up pipes. */
+        /* For now, just print tokens back to stdout... */
+        {
+            size_t i = 0;
+            for (i = 0; i < tokenIndex; i++) {
+                printf("%s\n", tokenArr[i]);
+            }
+        }
 
         /* Free the old cmd string now that we are done with it. */
         free(command);
