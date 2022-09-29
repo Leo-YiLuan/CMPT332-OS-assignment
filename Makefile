@@ -18,8 +18,13 @@ all: mytestlist partA1 partA2 partA3 partA4 shell
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
 # assignment.
-partA1: partA1.c fib.o thread_util.o
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o partA1 partA1.c fib.o thread_util.o
+partA1: partA1.o fib_win.o thread_util_win.o
+	# TODO: Fix. partA1.c should be a seperate rule. 
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o partA1 partA1.o fib_win.o thread_util_win.o
+
+partA1.o: partA1.c
+	$(CC) -c $(CPPFLAGS) -o partA1.o partA1.c
+
 else
 # We are on Unix, build Unix specific stuff.
 # Dummy rule
@@ -28,11 +33,18 @@ partA1:
 endif
 
 # Build common stuff for A1.
-fib.o: fib.c fib.h
-	$(CC) -o fib.o -c $(CFLAGS) $(CPPFLAGS) fib.c
+# TODO: fix. Needs a seperate rule for win and linux.
+fib_linux.o: fib.c fib.h
+	$(CC) -o fib_linux.o -c $(CFLAGS) $(CPPFLAGS) fib.c
 
-thread_util.o: thread_util.c thread_util.h
-	$(CC) -o thread_util.o -c $(CFLAGS) $(CPPFLAGS) thread_util.c
+fib_win.o: fib.c fib.h
+	$(CC) -o fib_win.o -c $(CFLAGS) $(CPPFLAGS) fib.c
+
+thread_util_win.o: thread_util.c thread_util.h
+	$(CC) -o thread_util_win.o -c $(CFLAGS) $(CPPFLAGS) thread_util.c
+
+thread_util_linux.o: thread_util.c thread_util.h
+	$(CC) -o thread_util_linux.o -c $(CFLAGS) $(CPPFLAGS) thread_util.c
 
 list_movers.o : list_movers.c list.h list_data.h
 	$(CC) -o list_movers.o -c $(CFLAGS) $(CPPFLAGS) list_movers.c
@@ -77,21 +89,21 @@ shell.o: shell.c
 mytestlist: mytestlist.o liblist.a list.h
 	$(CC) -o mytestlist $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
 
-partA2: partA2.o fib.o thread_util.o
-	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib.o thread_util.o \
+partA2: partA2.o fib_linux.o thread_util_linux.o
+	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib_linux.o thread_util_linux.o \
 	-L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
 
 partA2.o: partA2.c
 	$(CC) -o partA2.o -c $(CFLAGS) $(CPPFLAGS) partA2.c $(PTHREADS_INCLUDE) -I./
 
-partA3: partA3.o fib.o thread_util.o
-	$(CC) -o partA3 $(CFLAGS) $(CPPFLAGS) partA3.o fib.o thread_util.o -lpthread
+partA3: partA3.o fib_linux.o thread_util_linux.o
+	$(CC) -o partA3 $(CFLAGS) $(CPPFLAGS) partA3.o fib_linux.o thread_util_linux.o -lpthread
 
 partA3.o: partA3.c
 	$(CC) -o partA3.o -c $(CFLAGS) $(CPPFLAGS) partA3.c
 
-partA4: partA4.o
-	$(CC) -o partA4 $(CFLAGS) $(CPPFLAGS) partA4.o fib.o thread_util.o
+partA4: partA4.o thread_util_linux.o
+	$(CC) -o partA4 $(CFLAGS) $(CPPFLAGS) partA4.o fib_linux.o thread_util_linux.o
 
 partA4.o: partA4.c
 	$(CC) -o partA4.o -c $(CFLAGS) $(CPPFLAGS) partA4.c
