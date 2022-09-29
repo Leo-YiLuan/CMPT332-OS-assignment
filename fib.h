@@ -16,6 +16,7 @@ typedef struct ThreadEntry ThreadEntry;
 struct ThreadEntry {
     uint64_t uid;
     uint64_t count;
+    uint64_t startTime; /* For partA2 only */
 };
 
 /*

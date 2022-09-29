@@ -39,24 +39,34 @@ int threadCount = 0;
 PROCESS myThread(void *param)
 {
   int i = 0;
+  time_t start = 0;
+  time_t end = 0;
+  time_t dur = 0;
+  time(&start);
+  for (i = 0; i < threadCount; i++) {
+    if (MyPid() == (PID)countArr[i].uid) {
+      countArr[i].startTime = start;
+    }
+  }
   /* call fib() with given size */
   for(i=1;i<=*(int*)param;i++){
   	fib(i);
   }
+  time(&end);
+  dur = end - start;
 
   for (i = 0; i < threadCount; i++) {
     if (MyPid() == (PID)countArr[i].uid) {
-      printf("Thread id: %ld, fib(%d), with %ld invocations.\n", MyPid(), *(int*)param, countArr[i].count);
+      printf("Thread id: %ld, fib(%d), with %ld invocations in %d sec.\n", MyPid(), *(int*)param, countArr[i].count, dur);
     }
   }
 }
-
 
 PROCESS parentThread(void *param) {
   Params *params = (Params*)param;
   int i = 0;
 
-    for (i = 0; i < params->threads; i++) {
+  for (i = 0; i < params->threads; i++) {
     threadCount += 1;
     countArr[i].uid = Create((void(*)())myThread, 1048576, NULL, (void*)&(params->size), NORM, USR);
   }
@@ -65,7 +75,10 @@ PROCESS parentThread(void *param) {
 
   for (i = 0; i < params->threads; i++) {
     if (Kill(countArr[i].uid) != PNUL) {
-      printf("Thread id: %ld, fib(%d), with %ld invocations.\n", countArr[i].uid, params->size, countArr[i].count);
+      time_t end = 0;
+      time(&end);
+      time_t dur = end - countArr[i].startTime;
+      printf("Thread id: %ld, fib(%d), with %ld invocations in %ld sec.\n", countArr[i].uid, params->size, countArr[i].count, dur);
     }
   }
 }
