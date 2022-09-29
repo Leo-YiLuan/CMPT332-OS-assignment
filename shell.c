@@ -14,9 +14,10 @@
 */
 int main() {
     char *command = NULL;
-    char **tokenArr = malloc(MIN_ALLOC_SIZE * sizeof(char*));
+    size_t maxTokenCount = MIN_ALLOC_SIZE;
+    char **tokenArr = malloc(maxTokenCount * sizeof(char*));
     size_t cmdSize = 0;
-    int tokenCount = 0;
+    size_t tokenIndex = 0;
     char *start = NULL;
     char *charPos = NULL;
 
@@ -25,7 +26,7 @@ int main() {
         /* Resetting some vars in prep for the next command */
         start = NULL;
         charPos = NULL;
-        tokenCount = 0;
+        tokenIndex = 0;
         cmdSize = 0;
         /* Grab the next command from stdin */
         getline(&command, &cmdSize, stdin);
@@ -53,13 +54,21 @@ int main() {
                     charPos += 1;
                 }
 
+                /* Count is one plus current index. */
+                if (tokenIndex + 1 > maxTokenCount) {
+                    maxTokenCount *= 2;
+                    if (!realloc(tokenArr, maxTokenCount * sizeof(char *))) {
+                        printf("Fatal error allocating memory, must quit...\n");
+                        return -1;
+                    }
+                }
                 /* Add our completed token */
-                tokenArr[tokenCount] = start;
+                tokenArr[tokenIndex] = start;
                 start = charPos;
-                tokenCount += 1;
+                tokenIndex += 1;
 
                 /* placeholder, printing tokens back to stdout */
-                printf("%s\n", tokenArr[tokenCount - 1]);
+                printf("%s\n", tokenArr[tokenIndex - 1]);
             }
 
             /* We've reached the end of the command string, done... */
