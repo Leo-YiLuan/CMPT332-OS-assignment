@@ -14,32 +14,18 @@
 #include "fib.h"
 #include "thread_util.h"
 #include <inttypes.h>
-/* Array of thread ID */
-pthread_t *idArr;
+
 /* Array of counter */
-uint64_t *countArr;
+ThreadEntry *countArr;
+int threadCount = 0;
 
 size_t PA_GetUID() {
-    return threadIdx;
+    return pthread_self();
 }
-
-/* thread variable to track it's array index */
-__thread int threadIdx = -1;
-
-/* number of threads will created */
-int threads = 0;
 
 void *myThread(void *param)
 {
   int i;
-
-  /* find the index of current thread's id */
-  for (i=0;i<threads;i++){
-    if (idArr[i] == pthread_self()) {
-      /* save it */
-      threadIdx = i;
-    }
-  }
 
   /* call fib() with given size */
   for(i=1;i<=*(int*)param;i++){
@@ -47,7 +33,7 @@ void *myThread(void *param)
   }
 
   /* skeleton program */
-  printf("Thread id: %ld, fib(%d) to fib(1) is called\n",idArr[threadIdx],
+  printf("Thread id: %ld, fib(%d) to fib(1) is called\n",pthread_self(),
   *(int*)param);
 
   pthread_exit(NULL);
@@ -57,6 +43,7 @@ int main(int argc,char **argv)
 {
     int deadline = 0;
     int size = 0;
+    int threads = 0;
     int i = 0;
      /* check arguments (usage) */
      if (! parse_args(argc,argv,&threads,&deadline,&size)) {
@@ -64,21 +51,19 @@ int main(int argc,char **argv)
      }
 
      /* allocate counter and id array */
-     countArr = (uint64_t*) malloc(threads * sizeof(uint64_t));
-     idArr = (pthread_t*) malloc(threads * sizeof(pthread_t));
+     countArr = (ThreadEntry*) malloc(threads * sizeof(ThreadEntry));
 
     /* Create threads */
     for (i=0;i<threads;i++){
-        pthread_create( &idArr[i], NULL, myThread, &size);
-
+        pthread_t thread;
+        pthread_create( &thread, NULL, myThread, &size);
+        countArr[i].uid = thread;
     }
 
     /* wait all thread finish */
      for (i = 0; i < threads; i++) {
-        pthread_join(idArr[i],NULL);
+        pthread_join(countArr[i].uid,NULL);
      }
 
      return 0;
-
-
 }
