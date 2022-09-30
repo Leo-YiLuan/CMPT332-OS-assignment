@@ -10,6 +10,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 #include "fib.h"
 #include "thread_util.h"
@@ -32,12 +33,18 @@ int threadCount = 1;
 /* Global vars needed by signal handler */
 int size = 0;
 pid_t parentProc = 0;
+time_t parentStart = 0;
 
 void handler (int signum) {
+  time_t end = 0;
+  time_t dur = 0;
   if (getpid() == parentProc) {
     return; /* Don't print, parent will be killed when its children are done. */
   }
-  printf("pid: %d early term with sig %d, fib(%d) is called with %ld invocations.\n", getpid(), signum,size, countArr[0].count);
+
+  time(&end);
+  dur = end - countArr[0].startTime;
+  printf("pid: %d early term with sig %d, fib(%d) is called with %ld invocations in %ld sec.\n", getpid(), signum,size, countArr[0].count, dur);
   exit(-1);
 }
 
@@ -73,15 +80,22 @@ int main(int argc, char **argv){
 
   /* create child processes */
   for(i = 0; i < processes; i++) {
+    time_t start = 0;
+    time_t end = 0;
+    time_t dur = 0;
     fibproc[i] = fork();
     if(fibproc[i] == 0) {
       /* in fib() process */
       /* Register child */
       sigaction(SIGALRM, &action, NULL);
+      time(&start);
+      countArr[0].startTime = start;
       for (i = 1; i <= size; i++) {
         fib(i);
       }
-      printf("pid: %d, fib(%d) called with %ld invocations. Exited normally.\n",getpid(),size, countArr[0].count);
+      time(&end);
+      dur = end - start;
+      printf("pid: %d, fib(%d) called with %ld invocations in %ld sec. Exited normally.\n",getpid(),size, countArr[0].count, dur);
       exit(0);
     }
   }
