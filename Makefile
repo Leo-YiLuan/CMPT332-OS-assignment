@@ -102,7 +102,7 @@ partA3: partA3.o fib_linux.o thread_util_linux.o
 partA3.o: partA3.c
 	$(CC) -o partA3.o -c $(CFLAGS) $(CPPFLAGS) partA3.c
 
-partA4: partA4.o thread_util_linux.o
+partA4: partA4.o fib_linux.o thread_util_linux.o
 	$(CC) -o partA4 $(CFLAGS) $(CPPFLAGS) partA4.o fib_linux.o thread_util_linux.o
 
 partA4.o: partA4.c
