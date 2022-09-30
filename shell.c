@@ -21,17 +21,18 @@ int main() {
     char **tokenArr = malloc(maxTokenCount * sizeof(char*));
     size_t cmdSize = 0;
     size_t tokenIndex = 0;
-    char *path[] = {"/usr/bin/","","",""};
+    char *path[] = {"./","/bin/","/usr/bin/",""};
+    size_t pathNum = 4;
     /*char *argv[] = {"ls",NULL};*/
     char *concatCommand;
     size_t pathLen;
     size_t cmdLen;
     int id;
-    char *test[] = {NULL};
+    size_t i=0;
 
     while (1) {
         char *strtokRes = NULL;
-        /* Resetting some vars in prep for the next command */
+        /* Resetting some vars in prep for the next cotokenArrmmand */
         tokenIndex = 0;
         cmdSize = 0;
         printf("> ");
@@ -41,7 +42,7 @@ int main() {
         tokenIndex = 0;
         /* This should never happen, but just to be safe...*/
         if (!command) { break; }
-
+        command[strlen(command)-1]='\0';
         /* Main tokenizer code. */
         tokenArr[0] = strtok(command, " ");
         if (!tokenArr[0]) {
@@ -72,20 +73,46 @@ int main() {
             for (i = 0; i < tokenIndex; i++) {
                 printf("%s\n", tokenArr[i]);
             }
+
+        }
+        if (memcmp(tokenArr[0],"/",1)==0 || memcmp(tokenArr[0],".",1)==0) {
+          printf("get to / branch %s\n",tokenArr[0] );
+
+          id = fork();
+          if (id==0) {
+            if (execv(tokenArr[0],tokenArr)) {
+              perror("");
+            }
+            exit(0);
+          }
+        }else{
+          printf("get to concat Branch \n");
+          printf("MAIN PID is %d\n", getpid() );
+
+            id = fork();
+
+            if (id==0) {
+              printf("CPID is %d\n", getpid() );
+
+              for (i = 0; i < pathNum; i++) {
+                pathLen = strlen(path[i]);
+                cmdLen = strlen(tokenArr[0]);
+                concatCommand = malloc(pathLen+cmdLen+1);
+                memmove(concatCommand, path[i], pathLen);
+                memmove(&concatCommand[pathLen],tokenArr[0],cmdLen);
+                if (execv(concatCommand,tokenArr)==-1) {
+                    if (i==pathNum-1) {
+                      perror("");
+                      exit(0);
+                    }
+                  }
+                }
+              }
+          printf("OPID is%d\n", getpid() );
+
+
         }
 
-        pathLen = strlen(path[0]);
-        cmdLen = strlen(tokenArr[0]);
-        concatCommand = malloc(pathLen+cmdLen+1);
-        memmove(concatCommand, path[0], pathLen);
-        memmove(&concatCommand[pathLen],tokenArr[0],cmdLen);
-        printf("%s\n",concatCommand );
-
-
-        id = fork();
-        if (id==0) {
-          execv(concatCommand,test);
-        }
         wait(NULL);
 
         /* Free the old cmd string now that we are done with it. */

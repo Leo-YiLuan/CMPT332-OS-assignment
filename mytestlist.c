@@ -365,7 +365,6 @@ int main(){
       int second = -45;
       int third = 0;
       int fourth = -8;
-      LIST* list5;
 
       ListAdd(list1,&first);
       ListAdd(list1,&second);
