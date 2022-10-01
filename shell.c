@@ -23,7 +23,6 @@ int main() {
     size_t tokenIndex = 0;
     char *path[] = {"./","/bin/","/usr/bin/",""};
     size_t pathNum = 4;
-    /*char *argv[] = {"ls",NULL};*/
     char *concatCommand;
     size_t pathLen;
     size_t cmdLen;
@@ -86,21 +85,21 @@ int main() {
             exit(0);
           }
         }else{
-          printf("get to concat Branch \n");
-          printf("MAIN PID is %d\n", getpid() );
-
             id = fork();
 
+            /* in child process */
             if (id==0) {
-              printf("CPID is %d\n", getpid() );
-
+              /* iterate all path in the array */
               for (i = 0; i < pathNum; i++) {
                 pathLen = strlen(path[i]);
                 cmdLen = strlen(tokenArr[0]);
                 concatCommand = malloc(pathLen+cmdLen+1);
                 memmove(concatCommand, path[i], pathLen);
                 memmove(&concatCommand[pathLen],tokenArr[0],cmdLen);
+                /* execute, if not success, keep trying by loop */
                 if (execv(concatCommand,tokenArr)==-1) {
+                  /* print error message and exit process
+                  if it's the last patg */
                     if (i==pathNum-1) {
                       perror("");
                       exit(0);
@@ -108,7 +107,6 @@ int main() {
                   }
                 }
               }
-          printf("OPID is%d\n", getpid() );
 
 
         }
