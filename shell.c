@@ -21,8 +21,7 @@ int main() {
     char **tokenArr = malloc(maxTokenCount * sizeof(char*));
     size_t cmdSize = 0;
     size_t tokenIndex = 0;
-    char *path[] = {"./","/bin/","/usr/bin/",""};
-    size_t pathNum = 4;
+    char *path[] = {"./","/bin/","/usr/bin/",NULL};
     char *concatCommand;
     size_t pathLen;
     size_t cmdLen;
@@ -90,7 +89,7 @@ int main() {
             /* in child process */
             if (id==0) {
               /* iterate all path in the array */
-              for (i = 0; i < pathNum; i++) {
+              while (path[i]!=NULL){
                 pathLen = strlen(path[i]);
                 cmdLen = strlen(tokenArr[0]);
                 concatCommand = malloc(pathLen+cmdLen+1);
@@ -100,11 +99,12 @@ int main() {
                 if (execv(concatCommand,tokenArr)==-1) {
                   /* print error message and exit process
                   if it's the last patg */
-                    if (i==pathNum-1) {
+                    if (path[i+1]==NULL) {
                       perror("");
                       exit(0);
                     }
                   }
+                i++;
                 }
               }
 
