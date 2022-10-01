@@ -124,6 +124,10 @@ int main() {
         }
         tokenArr[tokenIndex] = NULL;
 
+        /* Test if we were given a builtin command */
+        if (strcmp(tokenArr[0], "exit") == 0) {
+          exit(0);
+        }
         while(tokenArr[j] != NULL){
           if (memcmp(tokenArr[j],"|",1) == 0 && strlen(tokenArr[j]) == 1) {
             pipeCount++;
