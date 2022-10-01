@@ -8,7 +8,51 @@
 #include <sys/wait.h>
 #define MIN_ALLOC_SIZE 5
 
+void execute(char ** tokenArr, char ** path){
+  char *concatCommand;
+  size_t pathLen;
+  size_t cmdLen;
+  int id;
+  size_t i=0;
+  if (memcmp(tokenArr[0],"/",1)==0 || memcmp(tokenArr[0],".",1)==0) {
+    printf("get to / branch %s\n",tokenArr[0] );
 
+    id = fork();
+    if (id==0) {
+      if (execv(tokenArr[0],tokenArr)) {
+        perror("");
+      }
+      exit(0);
+    }
+  }else{
+      id = fork();
+
+      /* in child process */
+      if (id==0) {
+        /* iterate all path in the array */
+        while (path[i]!=NULL){
+          pathLen = strlen(path[i]);
+          cmdLen = strlen(tokenArr[0]);
+          concatCommand = malloc(pathLen+cmdLen+1);
+          memmove(concatCommand, path[i], pathLen);
+          memmove(&concatCommand[pathLen],tokenArr[0],cmdLen);
+          /* execute, if not success, keep trying by loop */
+          if (execv(concatCommand,tokenArr)==-1) {
+            /* print error message and exit process
+            if it's the last patg */
+              if (path[i+1]==NULL) {
+                perror("");
+                exit(0);
+              }
+            }
+            i++;
+          }
+        }
+
+
+  }
+
+}
 
 /* Basic skeleton program for the shell.
    Right now all it does it store the stdin into
@@ -22,11 +66,7 @@ int main() {
     size_t cmdSize = 0;
     size_t tokenIndex = 0;
     char *path[] = {"./","/bin/","/usr/bin/",NULL};
-    char *concatCommand;
-    size_t pathLen;
-    size_t cmdLen;
-    int id;
-    size_t i=0;
+
 
     while (1) {
         char *strtokRes = NULL;
@@ -63,6 +103,7 @@ int main() {
         }
         tokenArr[tokenIndex] = NULL;
 
+        execute(tokenArr,path);
 
         /* TODO: Probably where we would fork processes and set up pipes. */
         /* For now, just print tokens back to stdout... */
@@ -71,43 +112,6 @@ int main() {
             for (i = 0; i < tokenIndex; i++) {
                 printf("%s\n", tokenArr[i]);
             }
-
-        }
-        if (memcmp(tokenArr[0],"/",1)==0 || memcmp(tokenArr[0],".",1)==0) {
-          printf("get to / branch %s\n",tokenArr[0] );
-
-          id = fork();
-          if (id==0) {
-            if (execv(tokenArr[0],tokenArr)) {
-              perror("");
-            }
-            exit(0);
-          }
-        }else{
-            id = fork();
-
-            /* in child process */
-            if (id==0) {
-              /* iterate all path in the array */
-              while (path[i]!=NULL){
-                pathLen = strlen(path[i]);
-                cmdLen = strlen(tokenArr[0]);
-                concatCommand = malloc(pathLen+cmdLen+1);
-                memmove(concatCommand, path[i], pathLen);
-                memmove(&concatCommand[pathLen],tokenArr[0],cmdLen);
-                /* execute, if not success, keep trying by loop */
-                if (execv(concatCommand,tokenArr)==-1) {
-                  /* print error message and exit process
-                  if it's the last patg */
-                    if (path[i+1]==NULL) {
-                      perror("");
-                      exit(0);
-                    }
-                  }
-                i++;
-                }
-              }
-
 
         }
 
