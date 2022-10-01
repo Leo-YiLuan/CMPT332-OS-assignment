@@ -12,23 +12,16 @@ void execute(char ** tokenArr, char ** path){
   char *concatCommand;
   size_t pathLen;
   size_t cmdLen;
-  pid_t id;
   size_t i=0;
   if (memcmp(tokenArr[0],"/",1)==0 || memcmp(tokenArr[0],".",1)==0) {
-    printf("get to / branch %s\n",tokenArr[0] );
 
-    id = fork();
-    if (id==0) {
-      if (execv(tokenArr[0],tokenArr)) {
+      if (execv(tokenArr[0],tokenArr)==-1) {
         perror("");
       }
       exit(0);
-    }
-  }else{
-      id = fork();
 
-      /* in child process */
-      if (id==0) {
+  }else{
+
         /* iterate all path in the array */
         while (path[i]!=NULL){
           pathLen = strlen(path[i]);
@@ -39,38 +32,36 @@ void execute(char ** tokenArr, char ** path){
           /* execute, if not success, keep trying by loop */
           if (execv(concatCommand,tokenArr)==-1) {
             /* print error message and exit process
-            if it's the last patg */
+            if it's the last path */
+
               if (path[i+1]==NULL) {
                 perror("");
                 exit(0);
               }
             }
             i++;
-          }
+
         }
-
-
   }
 
 }
 
-void pipingExe(char** tokenArrIn, char** tokenArrOut, char** path){
+void pipingExe(char** tokenArrWr, char** tokenArrRe, char** path){
   int fd[2];
   pid_t inProcess;
   pipe(fd);
 
- inProcess = fork();
-  if (inProcess > 0) {
-    close(fd[0]);
-    dup2(fd[1],STDOUT_FILENO);
-    execute(tokenArrIn,path);
-    return;
-
-  }else if(inProcess==0){
+  inProcess = fork();
+  if (inProcess == 0) {
     close(fd[1]);
     dup2(fd[0],STDIN_FILENO);
-    execute(tokenArrOut,path);
-    return;
+    execute(tokenArrRe,path);
+
+  }else if(inProcess>0){
+    close(fd[0]);
+    dup2(fd[1],STDOUT_FILENO);
+    execute(tokenArrWr,path);
+
   }
 
 
@@ -91,6 +82,7 @@ int main() {
     size_t j = 0;
     int pipeCount = 0;
     size_t pipeIndex;
+    pid_t noPipeId;
     while (1) {
         char *strtokRes = NULL;
         /* Resetting some vars in prep for the next cotokenArrmmand */
@@ -140,12 +132,15 @@ int main() {
           fprintf(stderr,"Number of pipe character is greater than 1, "
           "can not handle\n" );
         }else if (pipeCount==1) {
-          tokenArr[pipeIndex] = NULL;
           char **tokenArrIn = malloc((pipeIndex+1) * sizeof(char*));
+          tokenArr[pipeIndex] = NULL;
           memmove(tokenArrIn,tokenArr,(pipeIndex+1)*sizeof(char*));
           pipingExe(tokenArrIn,&tokenArr[pipeIndex+1],path);
         }else{
-          execute(tokenArr,path);
+          noPipeId = fork();
+          if (noPipeId==0) {
+            execute(tokenArr,path);
+          }
         }
         wait(NULL);
 
