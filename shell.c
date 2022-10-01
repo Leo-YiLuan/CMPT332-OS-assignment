@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -6,7 +5,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#include <linux/limits.h>
+#include <errno.h>
 #define MIN_ALLOC_SIZE 5
+
+size_t cwdLen = PATH_MAX;
+char *cwd = NULL;
 
 void execute(char ** tokenArr, char ** path){
   char *concatCommand;
@@ -69,6 +74,41 @@ void pipingExe(char** tokenArrWr, char** tokenArrRe, char** path){
 
 }
 
+void update_cwd(char *prompt, size_t *promptSize) {
+  char *res = NULL;
+  size_t newPromptLen = 0;
+  memset(cwd, 0, cwdLen * sizeof(char));
+
+  do {
+    res = getcwd(cwd, cwdLen);
+    if (res == NULL) {
+      if (errno == ERANGE) {
+        cwdLen *= 2;
+        cwd = realloc(cwd, cwdLen * sizeof(char));
+        memset(cwd, 0, cwdLen * sizeof(char));
+      } else {
+        printf("Error: Could not determine cwd!\n");
+        break;
+      }
+    }
+  } while (res == NULL);
+
+  /* Update prompt */
+  /* 5 extra chars: one for null terminator, 4 for prompt decorations */
+  newPromptLen = strlen(cwd) + 5;
+  memset(prompt, 0, *promptSize);
+  if (newPromptLen > *promptSize) {
+    *promptSize = *promptSize * 2;
+    prompt = realloc(prompt, *promptSize * sizeof(char));
+    memset(prompt, 0, *promptSize);
+  }
+  memcpy(prompt+1, cwd, strlen(cwd));
+  prompt[0] = '[';
+  memcpy(&prompt[strlen(cwd)+1], "] >", strlen("] >"));
+  prompt[*promptSize - 1] = '\0';
+}
+
+
 /* Basic skeleton program for the shell.
    Right now all it does it store the stdin into
    memory, and then echo the command right back out to
@@ -87,6 +127,13 @@ int main() {
     int pipeCount = 0;
     size_t pipeIndex;
     pid_t id;
+
+    char *prompt = NULL;
+    size_t promptLen = cwdLen;
+
+    cwd = malloc(cwdLen * sizeof(char));
+    prompt = malloc(cwdLen * sizeof(char));
+
     while (1) {
         char *strtokRes = NULL;
         /* Resetting some vars in prep for the next cotokenArrmmand */
@@ -94,7 +141,8 @@ int main() {
         cmdSize = 0;
         j = 0;
         pipeCount = 0;
-        printf("> ");
+        update_cwd(prompt, &promptLen);
+        printf("%s ", prompt);
         /* Grab the next command from stdin */
         getline(&command, &cmdSize, stdin);;
 
