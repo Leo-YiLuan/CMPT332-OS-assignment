@@ -27,6 +27,7 @@
 size_t PA_GetUID() {
     return 0;
 }
+
 ThreadEntry *countArr;
 int threadCount = 1;
 
@@ -39,12 +40,14 @@ void handler (int signum) {
   time_t end = 0;
   time_t dur = 0;
   if (getpid() == parentProc) {
-    return; /* Don't print, parent will be killed when its children are done. */
+    return; /* Don't print, parent will be killed when its children are. */
   }
 
   time(&end);
   dur = end - countArr[0].startTime;
-  printf("pid: %d early term with sig %d, fib(%d) is called with %ld invocations in %ld sec.\n", getpid(), signum,size, countArr[0].count, dur);
+  printf("pid: %d early term with sig %d, fib(%d) is called "
+  "with %ld invocations in %ld sec.\n", getpid(), signum,size, 
+  countArr[0].count, dur);
   exit(-1);
 }
 
@@ -95,7 +98,8 @@ int main(int argc, char **argv){
       }
       time(&end);
       dur = end - start;
-      printf("pid: %d, fib(%d) called with %ld invocations in %ld sec. Exited normally.\n",getpid(),size, countArr[0].count, dur);
+      printf("pid: %d, fib(%d) called with %ld invocations in "
+      "%ld sec. Exited normally.\n",getpid(),size, countArr[0].count, dur);
       exit(0);
     }
   }
@@ -121,5 +125,6 @@ int main(int argc, char **argv){
     }
     kill(timerproc, SIGKILL);
   }
+
   return 0;
 }

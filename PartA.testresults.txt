@@ -9,25 +9,57 @@
 # A1 Phase 2
 */
 
+fib:
+    Argument Validation:
+    input: pass a negative value
+    output: Error in fib: value must be equal or greater than 0
+
+    ====== Argument validation test PASS. =======
+
+    Functional Testing:
+    input: 0
+    expected: 0
+    output: 0
+
+    input: 1
+    expected: 1
+    output: 1
+
+    input: 5
+    expected: 8
+    output: 8
+
+    input: 33
+    expected: 3524578
+    output: 3524578
+
+    ====== Functional testing PASS. =======
+
 PartA1:
     Argument validation:
     input: ./partA1
+    expected: error
     output: Error: Incorrect number of arguments. Usage: ./<exectuable program>
     <threads> <deadline> <size>
 
     input: ./partA1 0 0 0
+    expected: error
     output: Error: Arguments supplied must be greater than 0.
 
     input: ./partA1 0 1 1
+    expected: error
     output: Error: Arguments supplied must be greater than 0.
 
     input: ./partA1 1 0 1
+    expected: error
     output: Error: Arguments supplied must be greater than 0.
 
     input: ./partA1 1 1 0
+    expected: error
     output: Error: Arguments supplied must be greater than 0.
 
     input: ./partA1 4 4 64
+    expected: error
     output: Size is too big, not enough space to hold counts
 
     ====== Argument validation test PASS. =======
@@ -103,21 +135,36 @@ PartA2:
     Functional testing;
     input: ./partA2 4 4 4
     output:
-          Thread id: 0, fib(4) to fib(1) is called
-          Thread id: 1, fib(4) to fib(1) is called
-          Thread id: 2, fib(4) to fib(1) is called
-          Thread id: 3, fib(4) to fib(1) is called
-    (ALL 4 threads created and calls fib())
+        Thread id: 2, fib(4), with 18 invocations in 0 sec.
+        Thread id: 3, fib(4), with 18 invocations in 0 sec.
+        Thread id: 4, fib(4), with 18 invocations in 0 sec.
+        Thread id: 5, fib(4), with 18 invocations in 0 sec.
+
+        exiting threads
+    (ALL 4 threads created and finish normally)
 
     input: ./partA2 6 4 12
     output:
-          Thread id: 0, fib(12) to fib(1) is called
-          Thread id: 1, fib(12) to fib(1) is called
-          Thread id: 2, fib(12) to fib(1) is called
-          Thread id: 3, fib(12) to fib(1) is called
-          Thread id: 4, fib(12) to fib(1) is called
-          Thread id: 5, fib(12) to fib(1) is called
-    (ALL 6 threads created and calls fib())
+        Thread id: 2, fib(12), with 1204 invocations in 0 sec.
+        Thread id: 3, fib(12), with 1204 invocations in 0 sec.
+        Thread id: 4, fib(12), with 1204 invocations in 0 sec.
+        Thread id: 5, fib(12), with 1204 invocations in 0 sec.
+        Thread id: 6, fib(12), with 1204 invocations in 0 sec.
+        Thread id: 7, fib(12), with 1204 invocations in 0 sec.
+
+        exiting threads
+    (ALL 6 threads created and finish normally)
+
+    input: ./partA2 5 4 45
+    output:
+    Thread id: 2, fib(45), with 35803551 invocations in 4 sec.
+    Thread id: 3, fib(45), with 32759906 invocations in 4 sec.
+    Thread id: 4, fib(45), with 33651737 invocations in 4 sec.
+    Thread id: 5, fib(45), with 33044601 invocations in 4 sec.
+    Thread id: 6, fib(45), with 32866166 invocations in 4 sec.
+
+    exiting threads
+    (ALL 5 threads created, deadline successfully issued, time correct)
 
     ====== Functional testing PASS. =======
 
@@ -149,24 +196,34 @@ PartA3:
     Functional testing;
     input: ./partA3 4 4 4
     output:
-          Thread id: 139917292205632, fib(4) to fib(1) is called
-          Thread id: 139917267027520, fib(4) to fib(1) is called
-          Thread id: 139917275420224, fib(4) to fib(1) is called
-          Thread id: 139917283812928, fib(4) to fib(1) is called
-    (ALL 4 threads created and calls fib())
+        Thread id: 139638459860544, fib(4) to fib(1) is called with 18 
+        invocations in 0 sec.
+        Thread id: 139638451467840, fib(4) to fib(1) is called with 18 
+        invocations in 0 sec.
+        Thread id: 139638443075136, fib(4) to fib(1) is called with 18 
+        invocations in 0 sec.
+        Thread id: 139638300464704, fib(4) to fib(1) is called with 18 
+        invocations in 0 sec.
+    (ALL 4 threads created and finish successfully)
 
     input: ./partA3 8 10 10
     output:
-          Thread id: 139649940977216, fib(10) to fib(1) is called
-          Thread id: 139649915799104, fib(10) to fib(1) is called
-          Thread id: 139649907406400, fib(10) to fib(1) is called
-          Thread id: 139649924191808, fib(10) to fib(1) is called
-          Thread id: 139649787885120, fib(10) to fib(1) is called
-          Thread id: 139649932584512, fib(10) to fib(1) is called
-          Thread id: 139649899013696, fib(10) to fib(1) is called
-          Thread id: 139649890620992, fib(10) to fib(1) is called
+        Thread id: 140049386968640, fib(10) to fib(1) is called with 452 invocations in 0 sec.
+        Thread id: 140049378575936, fib(10) to fib(1) is called with 452 invocations in 0 sec.
+        Thread id: 140049370183232, fib(10) to fib(1) is called with 452 invocations in 0 sec.
+        Thread id: 140049361790528, fib(10) to fib(1) is called with 452 invocations in 0 sec.
+        Thread id: 140049353397824, fib(10) to fib(1) is called with 452 invocations in 0 sec.
+        Thread id: 140049219180096, fib(10) to fib(1) is called with 452 invocations in 0 sec.
+        Thread id: 140049345005120, fib(10) to fib(1) is called with 452 invocations in 0 sec.
+        Thread id: 140049336481344, fib(10) to fib(1) is called with 452 invocations in 0 sec.
+    (ALL 8 threads created and finish successfully)
 
-    (ALL 8 threads created and calls fib())
+    input: ./partA3 3 6 51
+    output:
+        Thread id: 140083001919296, fib(51) to fib(1) is called with 69787805 invocations in 6 sec.
+        Thread id: 140083001919296, fib(51) to fib(1) is called with 73931077 invocations in 6 sec.
+        Thread id: 140083001919296, fib(51) to fib(1) is called with 72574198 invocations in 6 sec.
+    (ALL 3 threads created, deadline works successfully, correct time)
 
     ====== Functional testing PASS. =======
 
@@ -194,36 +251,29 @@ PartA4:
     Functional testing;
     input: ./partA4 4 4 4
     output:
-          In timer process id: 70627
-          timer is called start timing
-          process: 70628 is created!
-          In process: 70628, fib(4) is called!
-          process: 70629 is created!
-          In process: 70629, fib(4) is called!
-          process: 70630 is created!
-          In process: 70630, fib(4) is called!
-          process: 70631 is created!
-          In process: 70631, fib(4) is called!
-
-    (ALL 5 processes include timer created and calls fib())
+        pid: 514081, fib(4) called with 18 invocations in 0 sec. Exited normally.
+        pid: 514082, fib(4) called with 18 invocations in 0 sec. Exited normally.
+        pid: 514083, fib(4) called with 18 invocations in 0 sec. Exited normally.
+        pid: 514084, fib(4) called with 18 invocations in 0 sec. Exited normally.
+    (ALL 4 child processes created and calls finish successfully)
 
     input: ./partA4 6 5 8
     output:
-          In timer process id: 70998
-          timer is called start timing
-          process: 70999 is created!
-          In process: 70999, fib(8) is called!
-          process: 71000 is created!
-          In process: 71000, fib(8) is called!
-          process: 71001 is created!
-          In process: 71001, fib(8) is called!
-          process: 71002 is created!
-          In process: 71002, fib(8) is called!
-          process: 71006 is created!
-          process: 71003 is created!
-          In process: 71006, fib(8) is called!
-          In process: 71003, fib(8) is called!
+        pid: 514202, fib(8) called with 166 invocations in 0 sec. Exited normally.
+        pid: 514203, fib(8) called with 166 invocations in 0 sec. Exited normally.
+        pid: 514204, fib(8) called with 166 invocations in 0 sec. Exited normally.
+        pid: 514205, fib(8) called with 166 invocations in 0 sec. Exited normally.
+        pid: 514206, fib(8) called with 166 invocations in 0 sec. Exited normally.
+        pid: 514207, fib(8) called with 166 invocations in 0 sec. Exited normally.
+    (ALL 6 child threads created and calls finish successfully)
 
-    (ALL 7 threads include timercreated and calls fib())
+    input: ./partA4 5 4 42
+    output:
+        pid: 514349 early term with sig 14, fib(42) is called with 514395825 invocations in 4 sec.
+        pid: 514350 early term with sig 14, fib(42) is called with 514463221 invocations in 4 sec.
+        pid: 514351 early term with sig 14, fib(42) is called with 514439987 invocations in 4 sec.
+        pid: 514352 early term with sig 14, fib(42) is called with 513765686 invocations in 4 sec.
+        pid: 514353 early term with sig 14, fib(42) is called with 514235906 invocations in 4 sec.
+    (ALL 5 child processes created and timer successfully terminates them early with correct time)
 
     ====== Functional testing PASS. =======

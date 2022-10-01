@@ -16,7 +16,7 @@ typedef struct ThreadEntry ThreadEntry;
 struct ThreadEntry {
     uint64_t uid;
     uint64_t count;
-    uint64_t startTime; /* For partA2 only */
+    uint64_t startTime; /* For partA2, A3, A4 only */
 };
 
 /*
@@ -25,6 +25,4 @@ struct ThreadEntry {
  * return: the nth fibonacci number.
  */
 int fib(int value);
-extern int keepRunning;
-extern ThreadEntry *countArr;
 #endif /* FIB_h */

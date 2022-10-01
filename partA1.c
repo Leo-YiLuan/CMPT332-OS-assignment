@@ -26,12 +26,14 @@ ThreadEntry *countArr;
 /* count how many times thread been created */
 int threadCount = 0;
 
+/* Info to be passed to child threads. */
 typedef struct Params Params;
 struct Params {
     int size;
     int threads;
 };
 
+/* See PartA.design.txt */
 uint64_t PA_GetUID() {
     return GetCurrentThreadId();
 }
@@ -75,8 +77,8 @@ unsigned int thread_start(void *paramP) {
     /* print information */
     for (i = 0; i < params->threads; i++) {
         if (countArr[i].uid == PA_GetUID()) {
-            printf("thread ID: %lu, up to fib(%d) count is %"PRIu64", Real time"
-            "is %ds\n",PA_GetUID(), fibEnd,countArr[i].count,timeCost);
+            printf("thread ID: %lu, up to fib(%d) count is %"PRIu64", Real" 
+            " time is %ds\n",PA_GetUID(), fibEnd,countArr[i].count,timeCost);
         }
     }
     return 0;
@@ -123,6 +125,5 @@ int main(int argc, char **argv) {
     Sleep(3000);
 
     free(countArr);
-
     return 0;
 }

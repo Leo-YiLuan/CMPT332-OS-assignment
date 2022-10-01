@@ -21,10 +21,12 @@
 
 #define TICKS_PER_SECOND 1000000 / TICKINTERVAL
 
+/* See PartA.design.txt */
 uint64_t PA_GetUID() {
     return MyPid();
 }
 
+/* Data that needs to be passed to the parent thread */
 typedef struct Params Params;
 struct Params {
   int threads;
@@ -58,7 +60,8 @@ PROCESS myThread(void *param)
 
   for (i = 0; i < threadCount; i++) {
     if (MyPid() == (PID)countArr[i].uid) {
-      printf("Thread id: %ld, fib(%d), with %ld invocations in %ld sec.\n", MyPid(), *(int*)param, countArr[i].count, dur);
+      printf("Thread id: %ld, fib(%d), with %ld invocations in "
+      "%ld sec.\n", MyPid(), *(int*)param, countArr[i].count, dur);
     }
   }
 }
@@ -69,7 +72,9 @@ PROCESS parentThread(void *param) {
 
   for (i = 0; i < params->threads; i++) {
     threadCount += 1;
-    countArr[i].uid = Create((void(*)())myThread, 1048576, NULL, (void*)&(params->size), NORM, USR);
+    /* 1 MiB of stack to handle reasonably sized fib calls. */
+    countArr[i].uid = Create((void(*)())myThread, 1048576, NULL, 
+                              &params->size, NORM, USR);
   }
 
   Sleep(params->deadline * TICKS_PER_SECOND);
@@ -80,7 +85,8 @@ PROCESS parentThread(void *param) {
       time_t dur = 0;
       time(&end);
       dur = end - countArr[i].startTime;
-      printf("Thread id: %ld, fib(%d), with %ld invocations in %ld sec.\n", countArr[i].uid, params->size, countArr[i].count, dur);
+      printf("Thread id: %ld, fib(%d), with %ld invocations in "
+      "%ld sec.\n", countArr[i].uid, params->size, countArr[i].count, dur);
     }
   }
 }
@@ -97,6 +103,7 @@ int mainp(int argc, char** argv)
   if (! parse_args(argc,argv,&threads,&deadline,&size)) {
       return -1;
   }
+
   params->threads = threads;
   params->deadline = deadline;
   params->size = size;
@@ -105,6 +112,7 @@ int mainp(int argc, char** argv)
   countArr = (ThreadEntry*) malloc(threads * sizeof(ThreadEntry));
   memset(countArr, 0, threads * sizeof(ThreadEntry));
 
+  /* Spin up the parent thread, it will do everything else. */
   Create((void(*)())parentThread, 16000, "parent", (void*)params, HIGH, USR);
 
   return 0;

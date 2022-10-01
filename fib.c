@@ -15,6 +15,7 @@
 
 extern uint64_t PA_GetUID();
 extern size_t threadCount;
+extern ThreadEntry *countArr;
 
 int fib(int value){
     size_t i = 0;
@@ -30,15 +31,12 @@ int fib(int value){
         }
     }
 
-
-    if (value == 0)
-    {
+    /* Actual fib implementation */
+    if (value == 0) {
         return 0;
-    }else if (value == 1){
+    } else if (value == 1) {
         return 1;
-    }else{
+    } else {
         return (fib(value - 1) + fib(value - 2));
     }
-
-
 }

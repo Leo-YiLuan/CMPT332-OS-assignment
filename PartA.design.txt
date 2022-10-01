@@ -11,6 +11,22 @@ PART A1:
 
 General Program Flow:
 
+UPDATED Phase3:
+Using thread local storage didn't work out, since it wasn't supported on 
+all platforms (ubc pthreads). Instead we define an extern PA_GetUID() 
+function, that is platform-specific and returns a unique identifier for 
+each thread. Then, in fib, we iterate over an array of structs that contain 
+uids and count variables, calling PA_GetUID() to compare the calling threads 
+uid with the ones stored in the array. 
+
+For Part A4, we forked processes, but didn't exec new processes for 
+simplicity. So the executable was designed to operate differently depending 
+on which forked proc it was in, and we took advantage of copy-on-write 
+functionality of fork. 
+
+
+ORIGINAL Phase 1:
+
 The main function parses the arguments passed in through argv via a seperate
 function parse_args. This is done because args between the different
 executables will not change, so we can reuse this function in every
@@ -21,6 +37,7 @@ specific mutex to ensure race conditions can't cause a thread to run one
 extra time when it shouldn't. For Part A2, we will of course need to use Kill
 as opposed to a shared global. For Part A3 returning to the use of a shard
 global seems reasonable.
+
 
 UPDATED Phase2:
 

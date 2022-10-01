@@ -20,8 +20,10 @@
 
 /* Array of counter */
 ThreadEntry *countArr;
+/* Count how many threads have been created */
 int threadCount = 0;
 
+/* See PartA.design.txt */
 size_t PA_GetUID() {
     return pthread_self();
 }
@@ -33,6 +35,7 @@ void *myThread(void *param)
   time_t end = 0;
   time_t dur = 0;
   time(&start);
+  /* Set the start time for the thread */
   for (i = 0; i < threadCount; i++) {
     if (countArr[i].uid == PA_GetUID()) {
       countArr[i].startTime = start;
@@ -46,11 +49,20 @@ void *myThread(void *param)
   time(&end);
   dur = end - start;
 
+  /* Print results for this thread. */
   for (i = 0; i < threadCount; i++) {
     if (countArr[i].uid == PA_GetUID()) {
-      /* skeleton program */
-      printf("Thread id: %ld, fib(%d) to fib(1) is called with %ld invocations in %ld sec.\n",pthread_self(),
+      printf("Thread id: %ld, fib(%d) to fib(1) is called "
+      "with %ld invocations in %ld sec.\n",pthread_self(),
       *(int*)param, countArr[i].count, dur);
+    }
+  }
+
+  /* Set our uid back to zero so the parent thread
+     knows we've finished. */
+  for (i = 0; i < threadCount; i++) {
+    if (countArr[i].uid == PA_GetUID()) {
+      countArr[i].uid = 0;
     }
   }
 
@@ -63,13 +75,13 @@ int main(int argc,char **argv)
     int size = 0;
     int threads = 0;
     int i = 0;
-     /* check arguments (usage) */
-     if (! parse_args(argc,argv,&threads,&deadline,&size)) {
-         return -1;
-     }
+    /* check arguments (usage) */
+    if (! parse_args(argc,argv,&threads,&deadline,&size)) {
+        return -1;
+    }
 
-     /* allocate counter and id array */
-     countArr = (ThreadEntry*) malloc(threads * sizeof(ThreadEntry));
+    /* allocate counter and id array */
+    countArr = (ThreadEntry*) malloc(threads * sizeof(ThreadEntry));
 
     /* Create threads */
     for (i=0;i<threads;i++){
@@ -82,17 +94,15 @@ int main(int argc,char **argv)
     sleep(deadline);
 
     /* kill threads past deadline */
-    /* Bug, not currently working. Everything else is. */
      for (i = 0; i < threads; i++) {
-      /* Don't actuall send a terminate, just do error checking.
-        This lets us confirm which threads are still alive.
-       */
-        if (pthread_kill(countArr[i].uid, 0) == 0) {
+        /* Check which threads haven't completed */
+        if (countArr[i].uid != 0) {
           time_t end = 0;
           time_t dur = 0;
           time(&end);
           dur = end - countArr[i].startTime;
-          printf("Thread id: %ld, fib(%d) to fib(1) is called with %ld invocations in %ld sec.\n",pthread_self(),
+          printf("Thread id: %ld, fib(%d) to fib(1) is called "
+          "with %ld invocations in %ld sec.\n",pthread_self(),
           size, countArr[i].count, dur);
         }
      }
