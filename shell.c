@@ -12,7 +12,7 @@ void execute(char ** tokenArr, char ** path){
   char *concatCommand;
   size_t pathLen;
   size_t cmdLen;
-  int id;
+  pid_t id;
   size_t i=0;
   if (memcmp(tokenArr[0],"/",1)==0 || memcmp(tokenArr[0],".",1)==0) {
     printf("get to / branch %s\n",tokenArr[0] );
@@ -54,6 +54,28 @@ void execute(char ** tokenArr, char ** path){
 
 }
 
+void pipingExe(char** tokenArrIn, char** tokenArrOut, char** path){
+  int fd[2];
+  pid_t inProcess;
+  pipe(fd);
+
+ inProcess = fork();
+  if (inProcess > 0) {
+    close(fd[0]);
+    dup2(fd[1],STDOUT_FILENO);
+    execute(tokenArrIn,path);
+    return;
+
+  }else if(inProcess==0){
+    close(fd[1]);
+    dup2(fd[0],STDIN_FILENO);
+    execute(tokenArrOut,path);
+    return;
+  }
+
+
+}
+
 /* Basic skeleton program for the shell.
    Right now all it does it store the stdin into
    memory, and then echo the command right back out to
@@ -66,13 +88,16 @@ int main() {
     size_t cmdSize = 0;
     size_t tokenIndex = 0;
     char *path[] = {"./","/bin/","/usr/bin/",NULL};
-
-
+    size_t j = 0;
+    int pipeCount = 0;
+    size_t pipeIndex;
     while (1) {
         char *strtokRes = NULL;
         /* Resetting some vars in prep for the next cotokenArrmmand */
         tokenIndex = 0;
         cmdSize = 0;
+        j = 0;
+        pipeCount = 0;
         printf("> ");
         /* Grab the next command from stdin */
         getline(&command, &cmdSize, stdin);;
@@ -103,18 +128,25 @@ int main() {
         }
         tokenArr[tokenIndex] = NULL;
 
-        execute(tokenArr,path);
-
-        /* TODO: Probably where we would fork processes and set up pipes. */
-        /* For now, just print tokens back to stdout... */
-        {
-            size_t i = 0;
-            for (i = 0; i < tokenIndex; i++) {
-                printf("%s\n", tokenArr[i]);
-            }
-
+        while(tokenArr[j] != NULL){
+          if (memcmp(tokenArr[j],"|",1) == 0 && strlen(tokenArr[j]) == 1) {
+            pipeCount++;
+            pipeIndex = j;
+          }
+          j++;
         }
 
+        if (pipeCount>1) {
+          fprintf(stderr,"Number of pipe character is greater than 1, "
+          "can not handle\n" );
+        }else if (pipeCount==1) {
+          tokenArr[pipeIndex] = NULL;
+          char **tokenArrIn = malloc((pipeIndex+1) * sizeof(char*));
+          memmove(tokenArrIn,tokenArr,(pipeIndex+1)*sizeof(char*));
+          pipingExe(tokenArrIn,&tokenArr[pipeIndex+1],path);
+        }else{
+          execute(tokenArr,path);
+        }
         wait(NULL);
 
         /* Free the old cmd string now that we are done with it. */
