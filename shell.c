@@ -175,33 +175,44 @@ int main() {
         /* Test if we were given a builtin command */
         if (strcmp(tokenArr[0], "exit") == 0) {
           exit(0);
-        }
-        while(tokenArr[j] != NULL){
-          if (memcmp(tokenArr[j],"|",1) == 0 && strlen(tokenArr[j]) == 1) {
-            pipeCount++;
-            pipeIndex = j;
+        } else if (strcmp(tokenArr[0], "cd") == 0) {
+          int err = 0;
+          if (tokenIndex != 2) {
+            printf("Error: Provided incorrect arg count to cd!\n");
           }
-          j++;
-        }
+          err = chdir(tokenArr[1]);
+          if (err) {
+            printf("Failed to change directory!\n");
+          }
+        } else {
+          /* Handle command execing */
+          while(tokenArr[j] != NULL){
+            if (memcmp(tokenArr[j],"|",1) == 0 && strlen(tokenArr[j]) == 1) {
+              pipeCount++;
+              pipeIndex = j;
+            }
+            j++;
+          }
 
-        if (pipeCount>1) {
-          fprintf(stderr,"Number of pipe character is greater than 1, "
-          "can not handle\n" );
-        }else if (pipeCount==1) {
-          char **tokenArrIn = malloc((pipeIndex+1) * sizeof(char*));
-          tokenArr[pipeIndex] = NULL;
-          memmove(tokenArrIn,tokenArr,(pipeIndex+1)*sizeof(char*));
-          id = fork();
-          if (id==0) {
-          pipingExe(tokenArrIn,&tokenArr[pipeIndex+1],path);
+          if (pipeCount>1) {
+            fprintf(stderr,"Number of pipe character is greater than 1, "
+            "can not handle\n" );
+          }else if (pipeCount==1) {
+            char **tokenArrIn = malloc((pipeIndex+1) * sizeof(char*));
+            tokenArr[pipeIndex] = NULL;
+            memmove(tokenArrIn,tokenArr,(pipeIndex+1)*sizeof(char*));
+            id = fork();
+            if (id==0) {
+            pipingExe(tokenArrIn,&tokenArr[pipeIndex+1],path);
+            }
+          }else{
+            id = fork();
+            if (id==0) {
+              execute(tokenArr,path);
+            }
           }
-        }else{
-          id = fork();
-          if (id==0) {
-            execute(tokenArr,path);
-          }
+          wait(NULL);
         }
-        wait(NULL);
 
         /* Free the old cmd string now that we are done with it. */
         free(command);
