@@ -26,9 +26,11 @@ void execute(char ** tokenArr, char ** path){
         while (path[i]!=NULL){
           pathLen = strlen(path[i]);
           cmdLen = strlen(tokenArr[0]);
-          concatCommand = malloc(pathLen+cmdLen+1);
+          concatCommand = malloc(pathLen+cmdLen+2);
           memmove(concatCommand, path[i], pathLen);
-          memmove(&concatCommand[pathLen],tokenArr[0],cmdLen);
+          memmove(&concatCommand[pathLen], "/",1);
+          memmove(&concatCommand[pathLen+1],tokenArr[0],cmdLen);
+          printf("%s\n",concatCommand);
           /* execute, if not success, keep trying by loop */
           if (execv(concatCommand,tokenArr)==-1) {
             /* print error message and exit process
@@ -78,11 +80,13 @@ int main() {
     char **tokenArr = malloc(maxTokenCount * sizeof(char*));
     size_t cmdSize = 0;
     size_t tokenIndex = 0;
-    char *path[] = {"./","/bin/","/usr/bin/",NULL};
+    char *path[] = {".","usr/local/bin","/usr/local/sbin",
+    "/usr/bin","/usr/sbin",NULL};
+
     size_t j = 0;
     int pipeCount = 0;
     size_t pipeIndex;
-    pid_t noPipeId;
+    pid_t id;
     while (1) {
         char *strtokRes = NULL;
         /* Resetting some vars in prep for the next cotokenArrmmand */
@@ -135,10 +139,13 @@ int main() {
           char **tokenArrIn = malloc((pipeIndex+1) * sizeof(char*));
           tokenArr[pipeIndex] = NULL;
           memmove(tokenArrIn,tokenArr,(pipeIndex+1)*sizeof(char*));
+          id = fork();
+          if (id==0) {
           pipingExe(tokenArrIn,&tokenArr[pipeIndex+1],path);
+          }
         }else{
-          noPipeId = fork();
-          if (noPipeId==0) {
+          id = fork();
+          if (id==0) {
             execute(tokenArr,path);
           }
         }
