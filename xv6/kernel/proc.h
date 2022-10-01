@@ -107,4 +107,3 @@ struct proc {
 };
 
 int numprocs();
-extern struct proc proc[NPROC];

@@ -1,18 +1,27 @@
 #include "kernel/types.h"
 #include "user.h"
 
+int testNumprocs(int n){
+  int *childrenID = malloc(sizeof(int)*n);
+  int current_runnable;
+  int i;
+  for (i = 0; i < n; i++) {
+    if (fork()==0) {
+      childrenID[i] = getpid();
+      while (1);
+    }
+  }
+  current_runnable = numprocs();
+  printf("%d|||\n", current_runnable);
+  return current_runnable;
+
+}
+
 int
 main(int argc, char *argv[])
 {
-  int pid1 = fork();
-  int pid2 = fork();
-  int pid3 = fork();
-  int pid4 = fork();
-  int pid5 = fork();
-  int pid6 = fork();
-  if (pid1 > 0 && pid2 > 0 && pid3>0 && pid4>0 &&pid5>0 && pid6>0 ) {
-    int current_runnable;
-    current_runnable = numprocs();
-    printf("%d|||\n", current_runnable);  }
+
+  testNumprocs(5);
+
   return 0;
 }
