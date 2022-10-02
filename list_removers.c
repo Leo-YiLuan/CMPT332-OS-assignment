@@ -97,6 +97,10 @@ void *ListTrim(LIST *list){
         printf("Error in procedure ListTrim(): Invalid parameter list \n");
         return NULL;
     }
+    if (list->listCount == 0) {
+        return NULL;
+    }
+
     item = list->lastNodep->item;
     removeNode = list->lastNodep;
     if (list->listCount == 1) {

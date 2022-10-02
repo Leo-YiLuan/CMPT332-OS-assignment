@@ -27,6 +27,10 @@ void *ListFirst(LIST *list){
     if (list == NULL){
         return NULL;
     }
+    if (list->listCount == 0) {
+        return NULL;
+    }
+
     list->currNodep = list->firstNodep;
 
     return list->currNodep->item;
@@ -34,6 +38,9 @@ void *ListFirst(LIST *list){
 
 void *ListLast(LIST *list){
     if (list == NULL){
+        return NULL;
+    }
+    if (list->listCount == 0) {
         return NULL;
     }
 
@@ -46,6 +53,9 @@ void *ListNext(LIST *list){
     if (list == NULL){
         return NULL;
     }
+    if (list->listCount == 0) {
+        return NULL;
+    }
     if (list->currNodep->next == NULL) {
         return NULL;
     }
@@ -56,6 +66,9 @@ void *ListNext(LIST *list){
 
 void *ListPrev(LIST *list){
     if (list == NULL){
+        return NULL;
+    }
+    if (list->listCount == 0) {
         return NULL;
     }
 
@@ -94,6 +107,10 @@ void *ListSearch(LIST *list, int (*comparator)(void *, void *),
         "Invalid parameter comparisionArg \n");
         return NULL;
     }
+    if (list->listCount == 0) {
+        return NULL;
+    }
+    
     if (comparator(list->currNodep->item,comparisionArg)) {
         return list->currNodep->item;}
 
