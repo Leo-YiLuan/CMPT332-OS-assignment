@@ -7,6 +7,8 @@ int testNumprocs(int n){
   	int tempid;
 	for (i = 0; i < n; i++) {
 		tempid = fork();
+		/* child in an infinite loop make parent possible
+ 		 * to count all process*/
 		if (tempid==0) {
 			while(1);
    	 	}else if (tempid == -1) {
@@ -27,8 +29,8 @@ int main(int argc, char *argv[])
         printf("Error: test of %d processes expect to get: %d, but"
 		" get: %d\n", totalProcs, expect, result);
  	}else{
-		printf("test is passed when number of RUNNABLE process is %d\n",
-		totalProcs);
+		printf("The return of numprocs() is: %d,  expect: %d\n",
+		result, totalProcs);
 	}
 	
     procNum=5;
@@ -40,8 +42,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("test is passed when number of RUNNABLE process is %d\n",
-		totalProcs);
+		printf("The return of numprocs() is: %d,  expect: %d\n",
+		result, totalProcs);
 	}
     procNum=10;
     expect+=10;
@@ -52,8 +54,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("test is passed when number of RUNNABLE process is %d\n",
-		totalProcs);
+		printf("The return of numprocs() is: %d,  expect: %d\n",
+		result, totalProcs);
 	}
     procNum=20;
     expect+=20;
@@ -64,8 +66,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("test is passed when number of RUNNABLE process is %d\n",
-		totalProcs);
+		printf("The return of numprocs() is: %d,  expect: %d\n",
+		result, totalProcs);
 	}
     procNum=11;
     expect+=11;
@@ -76,8 +78,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("test is passed when number of RUNNABLE process is %d\n",
-		totalProcs);
+		printf("The return of numprocs() is: %d,  expect: %d\n",
+		result, totalProcs);
 	}
     procNum=10;
     expect+=10;
@@ -88,8 +90,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("test is passed when number of RUNNABLE process is %d\n",
-		totalProcs);
+		printf("The return of numprocs() is: %d,  expect: %d\n",
+		result, totalProcs);
 	}
 	 return 0;
 }
