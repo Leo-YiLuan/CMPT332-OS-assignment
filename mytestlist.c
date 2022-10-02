@@ -29,7 +29,7 @@ int comparator(void *item1, void *item2){
 
         return -1;
     }
-    if ((int *)item1 == (int *)item2) {
+    if (*(int *)item1 == *(int *)item2) {
       return 1;
     }
     return 0;
@@ -59,12 +59,13 @@ void PrintList(LIST *list) {
     int *item;
 
     if (ListCount(list) == 0) {
-      printf("LIST IS EMPTY\n");
+      printf("[BEF -> END] (count 0)\n");
       return;
     }
     currItem = (int*)ListCurr(list);
     item = (int*)ListFirst(list);
-    printf("[");
+    printf("[BEF -> ");
+
 
     while (item) {
         printf("%d", *item);
@@ -74,7 +75,7 @@ void PrintList(LIST *list) {
         item = (int*)ListNext(list);
     }
 
-    printf("END]\n");
+    printf("END] (count: %d)\n", ListCount(list));
 
     /* Reset the cursor. */
     item = ListFirst(list);
@@ -88,321 +89,813 @@ void PrintList(LIST *list) {
 
 int main(){
     int iter = 0;
+    LIST *list = NULL;
 
-    /****** TEST ListCreate ******/
-    LIST *list1 = ListCreate();
-    LIST *list2 = ListCreate();
-    LIST *list3 = NULL;
-    if (list1) {
-        printf("ListCreate: Successfully received a new valid list.\n");
-    } else {
-        fprintf(stderr, "ERROR: ListCreate failed to create a valid list!\n");
-    }
-    printf("\n");
-    /* Allocate up all our other lists... */
-    for (iter = 1; iter < 10; iter++) {
-        ListCreate();
-    }
-    list3 = ListCreate();
-    if (!list3) {
-        printf("ListCreate: Successfully received NULL after reaching "
-       "max allocated lists.\n");
-    } else {
-        fprintf(stderr, "ERROR: ListCreate failed to return NULL after "
-        "exhausting maximum allowed lists!\n");
-    }
-    printf("\n");
-
-    /****** TEST ListAdd ******/
+    /* Test ListCreate */
     {
-        LIST *list3 = NULL;
-        int first = 5;
-        int second = 16;
-        int third = 27;
-        int fourth = 42;
-        if (ListAdd(list3, &first) == -1) {
-            printf("ListAdd: Successfully received error -1 after "
-            "passing a NULL list parameter.\n");
+        LIST *list2 = NULL;
+        list = ListCreate();
+        if (list) {
+            printf("ListCreate: Successfully constructed a new list.\n");
         } else {
-            fprintf(stderr, "Failed to receive error -1 from ListAdd after "
-            "passing a NULL list parameter!\n");
-        }
-        printf("\n");
-        if (ListAdd(list1, NULL) == -1) {
-            printf("ListAdd: Successfully received error -1 after "
-            "passing a NULL item.\n");
-        } else {
-            fprintf(stderr, "Failed to receive error -1 from ListAdd after "
-            "passing a NULL item!\n");
+            printf("ERROR: ListCreate() failed to create a new list!\n");
         }
         printf("\n");
 
-        printf("ListAdd: Add 5 to empty list: \n");
-        ListAdd(list1, &first);
-        PrintList(list1);
+        /* Allocate up all our other lists... */
+        for (iter = 1; iter < 10; iter++) {
+            ListCreate();
+        }
+        list2 = ListCreate();
+        if (!list2) {
+            printf("ListCreate: Successfully received NULL after reaching "
+            "max allocated lists.\n");
+        } else {
+            printf("ERROR: ListCreate failed to return NULL after "
+            "exhausting maximum allowed lists!\n");
+        }
         printf("\n");
-
-        printf("ListAdd: Add 16 to list with 1 element: \n");
-        ListAdd(list1, &second);
-        PrintList(list1);
-        printf("\n");
-
-
-        printf("ListAdd: Add 27 to list with multiple elems, cur at end: \n");
-        ListAdd(list1, &third);
-        PrintList(list1);
-        printf("\n");
-
-        printf("ListAdd: Add 42 to the middle of a list with multiple "
-               "elements: \n");
-        ListPrev(list1);
-        ListAdd(list1, &fourth);
-        PrintList(list1);
+    }
+    /* Test ListFree */
+    {
+        ListFree(list, itemFree);
+        list = ListCreate();
+        if (list && ListCount(list) == 0) {
+            printf("ListFree: Successfully freed a list.\n");
+        } else {
+            printf("Error: Failed to free a list with ListFree()\n");
+        }
         printf("\n");
     }
 
     {
-        int next = 0;
-        int first = 512;
-        int second = 1;
-        int third = 22;
-        int fourth = 5000;
-        if (ListInsert(NULL, &next) == -1) {
-            printf("ListInsert: Successfully received error -1 after "
-            "passing a NULL list parameter.\n");
+        int a = 5;
+        int b = 7;
+        int c = 3;
+        int d = 9;
+
+        if (ListAdd(NULL, &a) == -1) {
+            printf("ListAdd: Successfully received error code when "
+            "passing NULL\n");
         } else {
-            fprintf(stderr, "Failed to receive error -1 from ListInsert after "
-            "passing a NULL list parameter!\n");
-        }
-        printf("\n");
-        if (ListAdd(list1, NULL) == -1) {
-            printf("ListInsert: Successfully received error -1 after "
-            "passing a NULL item.\n");
-        } else {
-            fprintf(stderr, "Failed to receive error -1 from ListInsert after "
-            "passing a NULL item!\n");
+            printf("Error: Didn't receive error from ListAdd when "
+            "passing NULL\n");
         }
         printf("\n");
 
-        printf("ListInsert: Insert 0 to the middle of a list with "
-        "multiple elems:\n");
-        ListInsert(list1, &next);
-        PrintList(list1);
-        printf("\n");
-        ListRemove(list1);
-        PrintList(list1);
-
-        ListFree(list1, itemFree);
-        list1 = ListCreate();
-
-        printf("ListInsert: Insert 512 to empty list:\n");
-        ListInsert(list1, &first);
-        PrintList(list1);
+        /* ListCurr */
+        ListAdd(list, &a);
+        if (*(int*)ListCurr(list) == 5) { 
+            printf("Successfully added 5 to an empty list.\n");
+        } else {
+            printf("ERROR: Failed adding to an empty list with ListAdd()\n");
+        }
+        PrintList(list);
         printf("\n");
 
-        printf("ListInsert: Insert 1 to a list with one element:\n");
-        ListInsert(list1, &second);
-        PrintList(list1);
-        printf("\n");
-        printf("ListRemove: ================================================:\n");
-        ListRemove(list1);
-        PrintList(list1);
-        printf("\n");
-
-        printf("ListInsert: Insert 22 to a list with multiple elements, "
-        "cur at begin:\n");
-        ListInsert(list1, &third);
-        PrintList(list1);
+        ListAdd(list, &b);
+        if (*(int*)ListCurr(list) == 7) {
+            printf("Successfully added 7 to a list with 1 element.\n");
+        } else {
+            printf("ERROR: Failed adding to a list with one element with "
+            "ListAdd()\n");
+        }
+        PrintList(list);
         printf("\n");
 
-        printf("ListInsert: insert 5000 to a list with multiple elements "
-        "in the middle:\n");
-        ListNext(list1);
-        ListInsert(list1, &fourth);
-        PrintList(list1);
-        printf("\n");
-        printf("ListRemove: ================================================:\n");
-        ListRemove(list1);
-        PrintList(list1);
+        ListAdd(list, &c);
+        if (*(int*)ListCurr(list) == 3) {
+            printf("Successfully added 3 to a list with multiple elements, "
+            "cur at last.\n");
+        } else {
+            printf("ERROR: Failed adding to a list with many elements with "
+            "ListAdd()\n");
+        }
+        PrintList(list);
         printf("\n");
 
+        ListFirst(list);
+        ListAdd(list, &d);
+        if (*(int*)ListCurr(list) == 9) {
+            printf("Successfully added 9 to a list with multiple elements, "
+            "cur at begin.\n");
+        } else {
+            printf("ERROR: Failed adding to a list with many elements with "
+            "ListAdd()\n");
+        }
+        PrintList(list);
+        printf("\n");
     }
+
+    /* ListRemove */
+    {
+        int *item = NULL;
+        
+        item = ListRemove(list);
+        if (*item == 9 && *(int*)ListCurr(list) == 7) {
+            printf("ListRemove: Successfully removed 9 from the list with "
+            "many elements.\n");
+        } else {
+            printf("Error: Failed removing element from list of many "
+            "elements with ListRemove()\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListFirst(list);
+        item = ListRemove(list);
+        if (*item == 5 && *(int*)ListCurr(list) == 7) {
+            printf("ListRemove: Successfully removed first element from list "
+            "with many elements.\n");
+        } else {
+            printf("Error: Failed removing first element from list of many "
+            "elements with ListRemove()\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListLast(list);
+        item = ListRemove(list);
+        if (*item == 3 && *(int*)ListCurr(list) == 7) {
+            printf("ListRemove: Successfully removed last element from list "
+            "with multiple elements.\n");
+        } else {
+            printf("Error: Failed removing last element from list of multiple "
+            "elements with ListRemove()\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        item = ListRemove(list);
+        if (*item == 7 && ListCurr(list) == NULL) {
+            printf("ListRemove: Successfully removed only element from list "
+            "with one element.\n");
+        } else {
+            printf("Error: Failed removing only element from list with 1 "
+            "element with ListRemove()\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        item = ListRemove(list);
+        if (item == NULL) {
+            printf("ListRemove: Successfully received NULL trying to remove "
+            "from empty list.\n");
+        } else {
+            printf("Error: ListRemove on empty list did not return NULL\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    /* ListInsert */
+    {
+        int a = 0;
+        int b = -5;
+        int c = 77;
+        int d = 12;
+
+        if (ListInsert(NULL, &a) == -1) {
+            printf("ListInsert: Successfully received error code when passing "
+            "NULL\n");
+        } else {
+            printf("Error: Didn't receive error from ListInsert when passing "
+            "NULL\n");
+        }
+        printf("\n");
+
+        ListInsert(list, &a);
+        if (*(int*)ListCurr(list) == 0) {
+            printf("ListInsert: Successfully inserted into empty list.\n");
+        } else {
+            printf("Error: Failed to ListInsert into empty list.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListInsert(list, &b);
+        if (*(int*)ListCurr(list) == -5) {
+            printf("ListInsert: Successfully inserted into list with one "
+            "element.\n");
+        } else {
+            printf("Error: Failed to ListInsert into list with one "
+            "element.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListInsert(list, &c);
+        if (*(int*)ListCurr(list) == 77) {
+            printf("ListInsert: Successfully inserted into list with many "
+            "elements, cur at begin.\n");
+        } else {
+            printf("Error: Failed to ListInsert into list with many elements, "
+            "cur at begin.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListLast(list);
+        ListInsert(list, &d);
+        if (*(int*)ListCurr(list) == 12) {
+            printf("ListInsert: Successfully inserted into list with many "
+            "elements, cur at end.\n");
+        } else {
+            printf("Error: Failed to ListInsert into list with many "
+            "elements, cur at end.\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
+
+    /* ListAppend */
+    {
+        int a = 24;
+        int b = 809;
+        int c = 111;
+        int d = 3;
+        if (ListAppend(NULL, &a) == -1) {
+            printf("ListAppend: Successfully received error code when passing "
+            "NULL\n");
+        } else {
+            printf("Error: Didn't receive error from ListAppend when passing "
+            "NULL\n");
+        }
+        printf("\n");
+
+        ListAppend(list, &a);
+        if (*(int*)ListCurr(list) == 24) {
+            printf("ListAppend: Successfully appended item to empty list.\n");
+        } else {
+            printf("Error: Failed to use ListAppend on empty list\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAppend(list, &b);
+        if (*(int*)ListCurr(list) == 809) {
+            printf("ListAppend: Successfully appended item to list with 1 "
+            "item.\n");
+        } else {
+            printf("Error: Failed to use ListAppend on list with 1 "
+            "item.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAppend(list, &c);
+        if (*(int*)ListCurr(list) == 111) {
+            printf("ListAppend: Successfully appended item to list with "
+            "multiple items, cur at end.\n");
+        } else {
+            printf("Error: Failed to use ListAppend on list with "
+            "multiple items, cur at end.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListFirst(list);
+        ListAppend(list, &d);
+        if (*(int*)ListCurr(list) == 3) {
+            printf("ListAppend: Successfully appended to list with multiple "
+            "items, cur not at end.\n");
+        } else {
+            printf("Error: Failed to use ListAppend on list with multiple "
+            "items, cur not at end.\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
+
+   /* ListPrepend */
+    {
+        int a = 24;
+        int b = 809;
+        int c = 111;
+        int d = 3;
+        if (ListPrepend(NULL, &a) == -1) {
+            printf("ListPrepend: Successfully received error code when "
+            "passing NULL\n");
+        } else {
+            printf("Error: Didn't receive error from ListPrepend when "
+            "passing NULL\n");
+        }
+        printf("\n");
+
+        ListPrepend(list, &a);
+        if (*(int*)ListCurr(list) == 24) {
+            printf("ListPrepend: Successfully prepended item to empty "
+            "list.\n");
+        } else {
+            printf("Error: Failed to use ListPrepend on empty list\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListPrepend(list, &b);
+        if (*(int*)ListCurr(list) == 809) {
+            printf("ListPrepend: Successfully prepended item to list with "
+            "1 item.\n");
+        } else {
+            printf("Error: Failed to use ListPrepend on list with 1 item.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListPrepend(list, &d);
+        if (*(int*)ListCurr(list) == 3) {
+            printf("ListPrepend: Successfully prepend to list with "
+            "multiple items, cur at begin.\n");
+        } else {
+            printf("Error: Failed to use ListPrepend on list with multiple "
+            "items, cur at begin.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListLast(list);
+        ListPrepend(list, &c);
+        if (*(int*)ListCurr(list) == 111) {
+            printf("ListPrepend: Successfully prepend to list with "
+            "multiple item, cur not at begin.\n");
+        } else {
+            printf("Error: Failed to use ListPrepend on list with multiple "
+            "items, cur not at begin.\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    /* ListTrim */
+    {
+        int *item = NULL;
+
+        item = ListTrim(list);
+        if (*item == 24 && *(int*)ListCurr(list) == 809) {
+            printf("ListTrim: Successfully removed last item, cur not at "
+            "end.\n");
+        } else {
+            printf("Error: ListTrim failed to remove last item, cur not at "
+            "end.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        item = ListTrim(list);
+        if (*item == 809 && *(int*)ListCurr(list) == 3) {
+            printf("ListTrim: Successfully removed last item, cur at "
+            "end.\n");
+        } else {
+            printf("Error: ListTrim failed to remove last item, cur at "
+            "end.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        item = ListTrim(list);
+        if (*item == 3 && *(int*)ListCurr(list) == 111) {
+            printf("ListTrim: Successfully removed last item, list with 2 "
+            "elements.\n");
+        } else {
+            printf("Error: ListTrim failed to remove last item, list with 2 "
+            "elements.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        item = ListTrim(list);
+        if (*item == 111 && ListCurr(list) == NULL) {
+            printf("ListTrim: Successfully trimmed list with only 1 "
+            "element.\n");
+        } else {
+            printf("Error: ListTrim failed to trim list with only 1 "
+            "element.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        item = ListTrim(list);
+        if (item == NULL) {
+            printf("ListTrim: Successfully received NULL from empty list.\n");
+        } else {
+            printf("Error: ListTrim didn't return NULL on empty list.\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
+
+    /* ListCount */
+    {
+        int a = 2;
+        int b = 7;
+        int c = 98;
+        int d = -44;
+        int e = 42;
+        if (ListCount(list) == 0) {
+            printf("ListCount: Correctly received count for empty list.\n");
+        } else {
+            printf("Error: Did not receive count 0 for empty list.\n");
+        }
+        printf("\n");
+
+        ListAdd(list, &a);
+        if (ListCount(list) == 1) {
+            printf("ListCount: Correctly received count for list with 1 "
+            "element\n");
+        } else {
+            printf("Error: Received wrong count for list with 1 element.\n");
+        }
+        printf("\n");
+
+        ListAdd(list, &b);
+        ListPrepend(list, &c);
+        ListAppend(list, &d);
+        ListInsert(list, &e);
+        if (ListCount(list) == 5) {
+            printf("ListCount: Correctly received count for list with many "
+            "elements\n");
+        } else {
+            printf("Error: Received wrong count for list with many "
+            "elements.\n");
+        }
+        printf("\n");
+    }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
 
     {
-        int first = 2;
-        int second = 60;
-        int third = 101;
-        int fourth = -41;
-        if (ListAppend(NULL, &first) == -1) {
-            printf("ListAppend: Successfully received error -1 after "
-            "passing a NULL list parameter.\n");
+        int *item = NULL;
+        int a = 0;
+        int b = 1;
+        int c = 7;
+
+        item = ListFirst(list);
+        if (item == NULL) {
+            printf("ListFirst: Correctly received NULL from empty list.\n");
         } else {
-            fprintf(stderr, "Failed to receive error -1 from ListAppend after "
-            "passing a NULL list parameter!\n");
+            printf("Error: Failed to receive NULL calling ListFirst on empty "
+            "list.\n");
         }
+        PrintList(list);
         printf("\n");
-        if (ListAppend(list1, NULL) == -1) {
-            printf("ListAppend: Successfully received error -1 after "
-            "passing a NULL item.\n");
+
+        ListAdd(list, &a);
+        item = ListFirst(list);
+        if (*item == 0 && *(int*)ListCurr(list) == 0) {
+            printf("ListFirst: Correctly received first item 0 from list with "
+            "1 element.\n");
         } else {
-            fprintf(stderr, "Failed to receive error -1 from ListAppend after "
-            "passing a NULL item!\n");
+            printf("Error: Failed calling ListFirst on list with 1 "
+            "element.\n");
         }
+        PrintList(list);
         printf("\n");
 
-        printf("ListAppend: Insert 2 into list with many elems, "
-        "cur at end:\n");
-        ListLast(list1);
-        ListAppend(list1, &first);
-        PrintList(list1);
+        ListAdd(list, &b);
+        item = ListFirst(list);
+        if (*item == 0 && *(int*)ListCurr(list) == 0) {
+            printf("ListFirst: Correctly received first item 0 from list with "
+            "multiple elements.\n");
+        } else {
+            printf("Error: Failed calling ListFirst on list with multiple "
+            "elements.\n");
+        }
+        PrintList(list);
         printf("\n");
 
-        printf("ListAppend: Insert 60 into list with many elems, "
-        "cur not at end:\n");
-        ListPrev(list1);
-        ListPrev(list1);
-        ListAppend(list1, &second);
-        PrintList(list1);
-        printf("\n");
-
-
-
-        ListFree(list1, itemFree);
-        list1 = ListCreate();
-
-        printf("ListAppend: Insert 101 into empty list:\n");
-        ListAppend(list1, &third);
-        PrintList(list1);
-        printf("\n");
-
-        printf("ListAppend: insert -41 into list with one element:\n");
-        ListAppend(list1, &fourth);
-        PrintList(list1);
+        ListAppend(list, &c);
+        item = ListFirst(list);
+        if (*item == 0 && *(int*)ListCurr(list) == 0) {
+            printf("ListFirst: Correctly get first item 0 from list with "
+            "multiple item, \ncur not at begin.\n");
+        } else {
+            printf("Error: Failed calling ListFirst on list with multiple "
+            "elements, cur not at begin.\n");
+        }
+        PrintList(list);
         printf("\n");
     }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
 
     {
-        int first = 5147;
-        int second = -2;
-        int third = 0;
-        int fourth = -5;
-        if (ListPrepend(NULL, &first) == -1) {
-            printf("ListPrepend: Successfully received err -1 after "
-            "passing a NULL list parameter.\n");
+        int *item = NULL;
+        int a = 0;
+        int b = 1;
+        int c = 7;
+
+        item = ListLast(list);
+        if (item == NULL) {
+            printf("ListLast: Correctly received NULL from empty list.\n");
         } else {
-            fprintf(stderr, "Failed to receive err -1 from ListPrepend after "
-            "passing a NULL list parameter!\n");
+            printf("Error: Failed to receive NULL calling ListLast on empty "
+            "list.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAdd(list, &a);
+        item = ListLast(list);
+        if (*item == 0 && *(int*)ListCurr(list) == 0) {
+            printf("ListLast: Correctly received last item 0 from list with "
+            "1 element.\n");
+        } else {
+            printf("Error: Failed calling ListFirst on list with 1 "
+            "element.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListInsert(list, &b);
+        item = ListLast(list);
+        if (*item == 0 && *(int*)ListCurr(list) == 0) {
+            printf("ListLast: Correctly received last item 0 from list with "
+            "multiple elements.\n");
+        } else {
+            printf("Error: Failed calling ListLast on list with multiple "
+            "elements.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListPrepend(list, &c);
+        item = ListLast(list);
+        if (*item == 0 && *(int*)ListCurr(list) == 0) {
+            printf("ListLast: Correctly received last item 0 from list with "
+            "multiple elements, \ncur not at begin.\n");
+        } else {
+            printf("Error: Failed calling ListLast on list with multiple "
+            "elements, cur not at begin.\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
+
+    {
+        int *item = NULL;
+        int a = 55;
+        int b = 6;
+        int c = 9;
+
+        item = ListNext(list);
+        if (item == NULL) {
+            printf("ListNext: Successfully received NULL from an empty "
+            "list.\n");
+        } else {
+            printf("Error: Didn't receive NULL from empty list calling "
+            "ListNext\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAdd(list, &a);
+        item = ListNext(list);
+        if (item == NULL && ListCurr(list) == NULL) {
+            printf("ListNext: Successfully received NULL from list with 1 "
+            "element.\n");
+        } else {
+            printf("Error: Didn't receive NULL from list with 1 element "
+            "calling ListNext\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAdd(list, &b);
+        ListFirst(list);
+        item = ListNext(list);
+        if (*item == 6 && *(int*)ListCurr(list) == 6) {
+            printf("ListNext: Successfully received correct element from "
+            "list with 2 elements, \ncur at begin.\n");
+        } else {
+            printf("Error: Didn't receive correct from list with 2 "
+            "elements, cur at begin calling ListNext\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAdd(list, &c);
+        ListFirst(list);
+        ListNext(list);
+        item = ListNext(list);
+        if (*item == 9 && *(int*)ListCurr(list) == 9) {
+            printf("ListNext: Successfully received correct element from "
+            "middle of list.\n");
+        } else {
+            printf("Error: Didn't receive correct item from middle of list "
+            "calling ListNext\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
+
+    {
+        int *item = NULL;
+        int a = 55;
+        int b = 6;
+        int c = 9;
+
+        item = ListPrev(list);
+        if (item == NULL) {
+            printf("ListPrev: Successfully received NULL from an empty "
+            "list.\n");
+        } else {
+            printf("Error: Didn't receive NULL from empty list calling "
+            "ListPrev\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAdd(list, &a);
+        item = ListPrev(list);
+        if (item == NULL && ListCurr(list) == NULL) {
+            printf("ListPrev: Successfully received NULL from list with "
+            "1 element.\n");
+        } else {
+            printf("Error: Didn't receive NULL from list with 1 element "
+            "calling ListPrev\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAdd(list, &b);
+        ListLast(list);
+        item = ListPrev(list);
+        if (*item == 55 && *(int*)ListCurr(list) == 55) {
+            printf("ListPrev: Successfully received correct element from "
+            "list with 2 elements, \ncur at end.\n");
+        } else {
+            printf("Error: Didn't receive correct from list with 2 "
+            "elements, cur at end calling ListPrev\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListPrepend(list, &c);
+        ListLast(list);
+        ListPrev(list);
+        item = ListPrev(list);
+        if (*item == 9 && *(int*)ListCurr(list) == 9) {
+            printf("ListPrev: Successfully received correct element from "
+            "middle of list.\n");
+        } else {
+            printf("Error: Didn't receive correct item from middle of list "
+            "calling ListPrev\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
+
+    /* ListCurr */
+    {
+        int *item = NULL;
+        int a = 1;
+        int b = 0;
+        int c = 42;
+        
+        item = ListCurr(list);
+        if (item == NULL) {
+            printf("ListCurr: Correctly received NULL from empty list.\n");
+        } else {
+            printf("Error: Failed to receive NULL from empty list calling "
+            "ListCurr\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAdd(list, &a);
+        item = ListCurr(list);
+        if (*item == 1) {
+            printf("ListCurr: Correctly received element from list with "
+            "only 1 item.\n");
+        } else {
+            printf("Error: Failed to receive corret element from list "
+            "with 1 item.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListAdd(list, &b);
+        ListAdd(list, &c);
+        item = ListCurr(list);
+        if (*item == 42) {
+            printf("ListCurr: Correctly received element from list with "
+            "many items.\n");
+        } else {
+            printf("Error: Failed to receive correct element from list with "
+            "many items.\n");
+        }
+        PrintList(list);
+        printf("\n");
+    }
+
+    ListFree(list, itemFree);
+    list = ListCreate();
+
+    /* ListSearch */
+    {
+        int find = 42;
+        int *found = NULL;
+        int a = 7;
+        int b = 0;
+        int c = 12;
+        int d = 42;
+        int e = 90;
+
+        found = (int*)ListSearch(list, &comparator, &find);
+        if (found == NULL) {
+            printf("ListSearch: Correctly searched an empty list.\n");
+        } else {
+            printf("Unexpected Behavior calling ListSearch on empty list.\n");
         }
         printf("\n");
-        if (ListPrepend(list1, NULL) == -1) {
-            printf("ListPrepend: Successfully received err -1 after "
-            "passing a NULL item.\n");
+        
+        find = 7;
+        ListAdd(list, &a);
+        found = ListSearch(list, &comparator, &find);
+        if (*found == 7) {
+            printf("ListSearch: Correctly found element in list with 1 "
+            "item.\n");
         } else {
-            fprintf(stderr, "Failed to receive err -1 from ListPrepend after "
-            "passing a NULL item!\n");
+            printf("Error: Failed to search list with 1 item\n");
         }
         printf("\n");
 
-        ListFirst(list1);
-        printf("ListPrepend: Insert 5147 into list with many elems, "
-        "cur at begin:\n");
-        ListPrepend(list1, &first);
-        PrintList(list1);
+        find = 42;
+        found = ListSearch(list, &comparator, &find);
+        if (found == NULL) {
+            printf("ListSearch: Correctly failed to find nonexistent "
+            "element in list with 1 item.\n");
+        } else {
+            printf("Error: Failed searching list with 1 item\n");
+        }
         printf("\n");
 
-        ListNext(list1);
-        printf("ListPrepend: Insert -2 into list with many elems, "
-        "cur not at begin:\n");
-        ListPrepend(list1, &second);
-        PrintList(list1);
+        ListAdd(list, &b);
+        ListPrepend(list, &c);
+        ListAdd(list, &d);
+        ListAppend(list, &e);
+        found = ListSearch(list, &comparator, &find);
+        if (found == NULL) {
+            printf("ListSearch: Correctly failed to find element that is "
+            "before cursor.\n");
+        } else {
+            printf("Error: Failed searching list when element to find is "
+            "before cursor\n");
+        }
         printf("\n");
 
-
-        ListFree(list1, itemFree);
-        list1 = ListCreate();
-
-        printf("ListPrepend: Insert 0 into list with no elems:\n");
-        ListPrepend(list1, &third);
-        PrintList(list1);
-        printf("\n");
-        ListRemove(list1);
-        printf("\n");
-
-        printf("ListPrepend: Insert -5 into list with one elem:\n");
-        ListPrepend(list1, &fourth);
-        PrintList(list1);
+        ListFirst(list);
+        found = ListSearch(list, &comparator, &find);
+        if (*found == 42) {
+            printf("ListSearch: Correctly found element in list with "
+            "many items\n");
+        } else {
+            printf("Error: Failed searching list with many items\n");
+        }
         printf("\n");
     }
-    {
 
-      int first = 6687;
-      int second = -45;
-      int third = 0;
-      int fourth = -8;
-      ListAdd(list1,&first);
-      ListAdd(list1,&second);
-      ListAdd(list1,&third);
-      ListAdd(list1,&fourth);
-      PrintList(list1);
-      ListTrim(list1);
-      PrintList(list1);
-
-      ListPrev(list1);
-      ListPrev(list1);
-      PrintList(list1);
-      ListTrim(list1);
-      PrintList(list1);
-      ListTrim(list1);
-      ListTrim(list1);
-      PrintList(list1);
-      ListTrim(list1);
-      PrintList(list1);
-
-    }
-    {
-
-      int first = 6687;
-      int second = -45;
-      int third = 0;
-      int fourth = -8;
-
-      ListAdd(list1,&first);
-      ListAdd(list1,&second);
-      ListAdd(list1,&third);
-      ListAdd(list1,&fourth);
-      ListFirst(list1);
-      ListSearch(list1,comparator,&second);
-      PrintList(list1);
-      ListSearch(list1,comparator,&first);
-      PrintList(list1);
-      ListAdd(list2, &first);
-      ListAdd(list2, &second);
-      ListAdd(list2, &third);
-      PrintList(list2);
-
-      ListConcat(list1,list2);
-      PrintList(list1);
-    }
+    /* Test exhausting all allocations */
     {
         int i = 0;
         int max = 1001;
-        ListFree(list1, itemFree);
-        list1 = ListCreate(list1);
+        ListFree(list, itemFree);
+        list = ListCreate(list);
 
         for (i = 0; i < 1000; i++) {
             numbers[i] = i;
-            if (ListAdd(list1, &numbers[i]) == -1) {
+            if (ListAdd(list, &numbers[i]) == -1) {
                 fprintf(stderr, "ERROR: Filling a list with every available"
                         " node failed! %d\n", i);
                 break;
             }
         }
 
-        if (ListAdd(list1, &max) == -1) {
+        if (ListAdd(list, &max) == -1) {
             printf("Successfully received error when trying to add node "
             "after exhausting all nodes.\n");
         } else {
-            fprintf(stderr, "ERROR: Didn't receive -1 when trying to allocate "
+            printf("ERROR: Didn't receive -1 when trying to allocate "
             "more nodes than exist!\n");
         }
     }

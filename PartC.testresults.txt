@@ -9,77 +9,173 @@
 # A1 Phase 2
 */
 
-ListCreate: Successfully received a new valid list.
+ListCreate: Successfully constructed a new list.
 
 ListCreate: Successfully received NULL after reaching max allocated lists.
 
-ListAdd: Successfully received error -1 after passing a NULL list parameter.
+ListFree: Successfully freed a list.
 
-ListAdd: Successfully received error -1 after passing a NULL item.
+ListAdd: Successfully received error code when passing NULL
 
-ListAdd: Add 5 to empty list:
-[5* -> END]
+Successfully added 5 to an empty list.
+[BEF -> 5* -> END] (count: 1)
 
-ListAdd: Add 16 to list with 1 element:
-[5 -> 16* -> END]
+Successfully added 7 to a list with 1 element.
+[BEF -> 5 -> 7* -> END] (count: 2)
 
-ListAdd: Add 27 to list with multiple elems, cur at end:
-[5 -> 16 -> 27* -> END]
+Successfully added 3 to a list with multiple elements, cur at last.
+[BEF -> 5 -> 7 -> 3* -> END] (count: 3)
 
-ListAdd: Add 42 to the middle of a list with multiple elements (cur was at 16):
-[5 -> 16 -> 42* -> 27 -> END]
+Successfully added 9 to a list with multiple elements, cur at begin.
+[BEF -> 5 -> 9* -> 7 -> 3 -> END] (count: 4)
 
-ListInsert: Successfully received error -1 after passing a NULL list parameter.
+ListRemove: Successfully removed 9 from the list with many elements.
+[BEF -> 5 -> 7* -> 3 -> END] (count: 3)
 
-ListInsert: Successfully received error -1 after passing a NULL item.
+ListRemove: Successfully removed first element from list with many elements.
+[BEF -> 7* -> 3 -> END] (count: 2)
 
-ListInsert: Insert 0 to the middle of a list with multiple elems:
-[5 -> 16 -> 0* -> 42 -> 27 -> END]
+ListRemove: Successfully removed last element from list with multiple elements.
+[BEF -> 7* -> END] (count: 1)
 
-ListInsert: Insert 512 to empty list:
-[512* -> END]
+ListRemove: Successfully removed only element from list with one element.
+[BEF -> END] (count 0)
 
-ListInsert: Insert 1 to a list with one element:
-[1* -> 512 -> END]
+ListRemove: Successfully received NULL trying to remove from empty list.
+[BEF -> END] (count 0)
 
-ListInsert: Insert 22 to a list with multiple elements, cur at begin:
-[22* -> 1 -> 512 -> END]
+ListInsert: Successfully received error code when passing NULL
 
-ListInsert: insert 5000 to a list with multiple elements in the middle 
-(cur was at 1):
-[22 -> 5000* -> 1 -> 512 -> END]
+ListInsert: Successfully inserted into empty list.
+[BEF -> 0* -> END] (count: 1)
 
-ListAppend: Successfully received error -1 after passing a NULL list parameter.
+ListInsert: Successfully inserted into list with one element.
+[BEF -> -5* -> 0 -> END] (count: 2)
 
-ListAppend: Successfully received error -1 after passing a NULL item.
+ListInsert: Successfully inserted into list with many elements, cur at begin.
+[BEF -> 77* -> -5 -> 0 -> END] (count: 3)
 
-ListAppend: Insert 2 into list with many elems, cur at end:
-[22 -> 5000 -> 1 -> 512 -> 2* -> END]
+ListInsert: Successfully inserted into list with many elements, cur at end.
+[BEF -> 77 -> -5 -> 12* -> 0 -> END] (count: 4)
 
-ListAppend: Insert 60 into list with many elems, cur not at end:
-[22 -> 5000 -> 1 -> 512 -> 2 -> 60* -> END]
+ListAppend: Successfully received error code when passing NULL
 
-ListAppend: Insert 101 into empty list:
-[101* -> END]
+ListAppend: Successfully appended item to empty list.
+[BEF -> 24* -> END] (count: 1)
 
-ListAppend: insert -41 into list with one element:
-[101 -> -41* -> END]
+ListAppend: Successfully appended item to list with 1 item.
+[BEF -> 24 -> 809* -> END] (count: 2)
 
-ListPrepend: Successfully received err -1 after passing a NULL list parameter.
+ListAppend: Successfully appended item to list with multiple items, cur at end.
+[BEF -> 24 -> 809 -> 111* -> END] (count: 3)
 
-ListPrepend: Successfully received err -1 after passing a NULL item.
+ListAppend: Successfully appended to list with multiple items, cur not at end.
+[BEF -> 24 -> 809 -> 111 -> 3* -> END] (count: 4)
 
-ListPrepend: Insert 5147 into list with many elems, cur at begin:
-[5147* -> 101 -> -41 -> END]
+ListPrepend: Successfully received error code when passing NULL
 
-ListPrepend: Insert -2 into list with many elems, cur not at begin:
-[-2* -> 5147 -> 101 -> -41 -> END]
+ListPrepend: Successfully prepended item to empty list.
+[BEF -> 24* -> END] (count: 1)
 
-ListPrepend: Insert 0 into list with no elems:
-[0* -> END]
+ListPrepend: Successfully prepended item to list with 1 item.
+[BEF -> 809* -> 24 -> END] (count: 2)
 
-ListPrepend: Insert -5 into list with one elem:
-[-5* -> 0 -> END]
+ListPrepend: Successfully prepend to list with multiple items, cur at begin.
+[BEF -> 3* -> 809 -> 24 -> END] (count: 3)
 
-Successfully received error when trying to add node after exhausting 
-all free nodes.
+ListPrepend: Successfully prepend to list with multiple item, cur not at begin.
+[BEF -> 111* -> 3 -> 809 -> 24 -> END] (count: 4)
+
+ListTrim: Successfully removed last item, cur not at end.
+[BEF -> 111 -> 3 -> 809* -> END] (count: 3)
+
+ListTrim: Successfully removed last item, cur at end.
+[BEF -> 111 -> 3* -> END] (count: 2)
+
+ListTrim: Successfully removed last item, list with 2 elements.
+[BEF -> 111* -> END] (count: 1)
+
+ListTrim: Successfully trimmed list with only 1 element.
+[BEF -> END] (count 0)
+
+ListTrim: Successfully received NULL from empty list.
+[BEF -> END] (count 0)
+
+ListCount: Correctly received count for empty list.
+
+ListCount: Correctly received count for list with 1 element
+
+ListCount: Correctly received count for list with many elements
+
+ListFirst: Correctly received NULL from empty list.
+[BEF -> END] (count 0)
+
+ListFirst: Correctly received first item 0 from list with 1 element.
+[BEF -> 0* -> END] (count: 1)
+
+ListFirst: Correctly received first item 0 from list with multiple elements.
+[BEF -> 0* -> 1 -> END] (count: 2)
+
+ListFirst: Correctly get first item 0 from list with multiple item, 
+cur not at begin.
+[BEF -> 0* -> 1 -> 7 -> END] (count: 3)
+
+ListLast: Correctly received NULL from empty list.
+[BEF -> END] (count 0)
+
+ListLast: Correctly received last item 0 from list with 1 element.
+[BEF -> 0* -> END] (count: 1)
+
+ListLast: Correctly received last item 0 from list with multiple elements.
+[BEF -> 1 -> 0* -> END] (count: 2)
+
+ListLast: Correctly received last item 0 from list with multiple elements, 
+cur not at begin.
+[BEF -> 7 -> 1 -> 0* -> END] (count: 3)
+
+ListNext: Successfully received NULL from an empty list.
+[BEF -> END] (count 0)
+
+Error: Didn't receive NULL from list with 1 element calling ListNext
+[BEF -> 55* -> END] (count: 1)
+
+ListNext: Successfully received correct element from list with 2 elements, 
+cur at begin.
+[BEF -> 55 -> 6* -> END] (count: 2)
+
+ListNext: Successfully received correct element from middle of list.
+[BEF -> 55 -> 6 -> 9* -> END] (count: 3)
+
+ListPrev: Successfully received NULL from an empty list.
+[BEF -> END] (count 0)
+
+Error: Didn't receive NULL from list with 1 element calling ListPrev
+[BEF -> 55* -> END] (count: 1)
+
+ListPrev: Successfully received correct element from list with 2 elements, 
+cur at end.
+[BEF -> 55* -> 6 -> END] (count: 2)
+
+ListPrev: Successfully received correct element from middle of list.
+[BEF -> 9* -> 55 -> 6 -> END] (count: 3)
+
+ListCurr: Correctly received NULL from empty list.
+[BEF -> END] (count 0)
+
+ListCurr: Correctly received element from list with only 1 item.
+[BEF -> 1* -> END] (count: 1)
+
+ListCurr: Correctly received element from list with many items.
+[BEF -> 1 -> 0 -> 42* -> END] (count: 3)
+
+ListSearch: Correctly searched an empty list.
+
+ListSearch: Correctly found element in list with 1 item.
+
+ListSearch: Correctly failed to find nonexistent element in list with 1 item.
+
+ListSearch: Correctly failed to find element that is before cursor.
+
+ListSearch: Correctly found element in list with many items
+
+Successfully received error when trying to add node after exhausting all nodes.
