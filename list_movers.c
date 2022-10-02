@@ -71,6 +71,9 @@ void *ListCurr(LIST *list){
     if (list == NULL){
         return NULL;
     }
+    if (list->listCount == 0) {
+        return NULL;
+    }
 
     return list->currNodep->item;
 }

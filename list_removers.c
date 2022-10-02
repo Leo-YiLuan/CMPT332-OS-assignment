@@ -25,6 +25,10 @@ void *ListRemove(LIST *list){
         printf("Error in procedure ListRemove(): Invalid parameter list \n");
         return NULL;
     }
+    if (list->listCount == 0) {
+        return NULL;
+    }
+    
     item = list->currNodep->item;
     removeNode  = list->currNodep;
     if (list->listCount==1) {
