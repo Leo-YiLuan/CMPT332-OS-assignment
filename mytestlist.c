@@ -106,10 +106,12 @@ void PrintList(LIST *list) {
 int main(){
     int iter = 0;
     LIST *list = NULL;
-
+    /* for ListConcat() testing */
+    LIST *list3 = ListCreate();
     /* Test ListCreate */
     {
-        LIST *list2 = NULL;
+        LIST *list2 = ListCreate();
+
         list = ListCreate();
         if (list) {
             printf("ListCreate: Successfully constructed a new list.\n");
@@ -991,11 +993,143 @@ int main(){
     }
     /* ListConcat() */
     {
-      /* TO DO ListConcat() testing
-        ====================================================================
-        =====================================================================
-        =================================================================
-      */
+      int a = 10;
+      int b = 12;
+
+      /* test case that both lists are not empty */
+      int expectListCount;
+      int expectCurrItem = 42;
+      int expectLastItem = 10;
+
+      printf("\n=====First Test Case of ListConcat()=====\n\n");
+
+      ListAdd(list3,&a);
+      expectListCount = ListCount(list) + ListCount(list3);
+      printf("First list: \n");
+      PrintList(list);
+      printf("Second list: \n");
+      PrintList(list3);
+
+      ListConcat(list,list3);
+      if (expectListCount == ListCount(list)
+          && *(int *)list->lastNodep->item == expectLastItem
+          && *(int*)list->currNodep->item == expectCurrItem
+          && ListCount(list3)==0){
+          printf("\nThe count and last node pointer of Concat List is correct,"
+           " when both list are not empty, also check correctness by "
+           "observation \n\n" );
+          printf("First list after concat: \n" );
+          PrintList(list);
+      }else{
+        printf("Failure of concat two list that all have items, \n"
+        "expect Current item: %d, get: %d \n"
+        "expect Last item: %d, get: %d \n"
+        "expect List Count: %d, get: %d\n"
+        , expectCurrItem, *(int*)list->currNodep->item
+        , expectLastItem, *(int *)list->lastNodep->item
+        , expectListCount, ListCount(list));
+      }
+
+      printf("\n=====Next Test Case=====\n");
+      /* test case that only second list is empty */
+
+      ListRemove(list3);
+      expectListCount = ListCount(list) + ListCount(list3);
+
+      expectCurrItem = 42;
+      expectLastItem = 10;
+      printf("First list: \n");
+      PrintList(list);
+      printf("Second list: \n");
+      PrintList(list3);
+
+      ListConcat(list,list3);
+      if (expectListCount == ListCount(list)
+          && *(int *)list->lastNodep->item == expectLastItem
+          && *(int*)list->currNodep->item == expectCurrItem
+          && ListCount(list3)==0){
+          printf("\nThe count and last node pointer of Concat List is correct,"
+           " when only first list have item, also check correctness by"
+           " observation \n\n" );
+          printf("First list after concat: \n" );
+          PrintList(list);
+      }else{
+      printf("Failure of concat two list that only first list is not empty,\n"
+        "expect Current item: %d, get: %d \n"
+        "expect Last item: %d, get: %d \n"
+        "expect List Count: %d, get: %d\n"
+        , expectCurrItem, *(int*)list->currNodep->item
+        , expectLastItem, *(int *)list->lastNodep->item
+        , expectListCount, ListCount(list));
+      }
+
+      printf("\n=====Next Test Case=====\n");
+      /* test case that only first list is empty */
+
+      ListFree(list,itemFree);
+      list = ListCreate();
+      ListAdd(list3,&a);
+      ListAdd(list3,&b);
+      ListPrev(list3);
+      expectListCount = ListCount(list) + ListCount(list3);
+
+      expectCurrItem = 10;
+      expectLastItem = 12;
+      printf("First list: \n");
+      PrintList(list);
+      printf("Second list: \n");
+      PrintList(list3);
+      /* In this test case first list is empty, so the current pointer
+      after concat will set to the current pointer of second list */
+      ListConcat(list,list3);
+      if (expectListCount == ListCount(list)
+          && *(int *)list->lastNodep->item == expectLastItem
+          && *(int*)list->currNodep->item == expectCurrItem
+          && ListCount(list3)==0){
+          printf("\nThe count and last node pointer of Concat List is correct,"
+           " when onlt second list is not empty, also check correctness by"
+           " observation \n\n" );
+          printf("First list after concat: \n" );
+          PrintList(list);
+      }else{
+          printf("Failure of concat two list that only second list is not "
+          "empty, \n"
+          "expect Current item: %d, get: %d \n"
+          "expect Last item: %d, get: %d \n"
+          "expect List Count: %d, get: %d\n"
+          , expectCurrItem, *(int*)list->currNodep->item
+          , expectLastItem, *(int *)list->lastNodep->item
+          , expectListCount, ListCount(list));
+      }
+
+        printf("\n=====Next Test Case=====\n");
+        /* concat two empty list */
+        ListFree(list,itemFree);
+        ListFree(list3,itemFree);
+        list = ListCreate();
+        list3 = ListCreate();
+        expectListCount = ListCount(list) + ListCount(list3);
+
+        printf("First list: \n");
+        PrintList(list);
+        printf("Second list: \n");
+        PrintList(list3);
+        /* In this test case first list is empty, so the current pointer
+        after concat will set to the current pointer of second list */
+        ListConcat(list,list3);
+        if (expectListCount == ListCount(list) && ListCount(list3)==0){
+         printf("\nThe count is correct when both lists are empty,"
+              " also check correctness by observation \n\n" );
+            printf("First list after concat: \n" );
+            PrintList(list);
+        }else{
+            printf("Failure of concat two list that both are empty,\n"
+            "expect number of item in list: %d, get: %d"
+            , expectListCount, ListCount(list));
+        }
+
+      printf("\n++++++++ Function test is over ++++++++\n");
+
 
     }
 
@@ -1004,6 +1138,7 @@ int main(){
         int i = 0;
         int max = 1001;
         ListFree(list, itemFree);
+        ListFree(list3,itemFree);
         list = ListCreate(list);
 
         for (i = 0; i < 1000; i++) {

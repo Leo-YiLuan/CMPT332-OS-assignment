@@ -199,4 +199,51 @@ ListSearch: Correctly failed to find element that is before cursor.
 
 ListSearch: Correctly found element in list with many items
 
+
+=====First Test Case of ListConcat()=====
+
+First list:
+[BEF -> 12 -> 42* -> 7 -> 0 -> 90 -> END] (count: 5)
+Second list:
+[BEF -> 10* -> END] (count: 1)
+
+The count and last node pointer of Concat List is correct, when both list are not empty, also check correctness by observation
+
+First list after concat:
+[BEF -> 12 -> 42* -> 7 -> 0 -> 90 -> 10 -> END] (count: 6)
+
+=====Next Test Case=====
+First list:
+[BEF -> 12 -> 42* -> 7 -> 0 -> 90 -> 10 -> END] (count: 6)
+Second list:
+[BEF -> END] (count 0)
+
+The count and last node pointer of Concat List is correct, when only first list have item, also check correctness by observation
+
+First list after concat:
+[BEF -> 12 -> 42* -> 7 -> 0 -> 90 -> 10 -> END] (count: 6)
+
+=====Next Test Case=====
+First list:
+[BEF -> END] (count 0)
+Second list:
+[BEF -> 10* -> 12 -> END] (count: 2)
+
+The count and last node pointer of Concat List is correct, when onlt second list is not empty, also check correctness by observation
+
+First list after concat:
+[BEF -> 10* -> 12 -> END] (count: 2)
+
+=====Next Test Case=====
+First list:
+[BEF -> END] (count 0)
+Second list:
+[BEF -> END] (count 0)
+
+The count is correct when both lists are empty, also check correctness by observation
+
+First list after concat:
+[BEF -> END] (count 0)
+
+++++++++ Function test is over ++++++++
 Successfully received error when trying to add node after exhausting all nodes.

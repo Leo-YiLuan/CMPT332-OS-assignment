@@ -203,7 +203,7 @@ int ListAppend(LIST *list, void *item){
     memset(node, 0, sizeof(NODE));
 
     if (list->listCount == 0) {
-        /* Empty list, just add the node simply. 8*/
+        /* Empty list, just add the node simply. */
         list->currNodep = node;
         list->lastNodep = node;
         list->firstNodep = node;
@@ -247,7 +247,6 @@ int ListPrepend(LIST *list, void *item){
     } else {
         node->next = list->firstNodep;
         list->firstNodep->prev = node;
-
         list->firstNodep = node;
         list->currNodep = node;
     }
@@ -268,10 +267,33 @@ void ListConcat(LIST *list1, LIST *list2){
         return;
     }
 
-    list1->lastNodep->next = list2->firstNodep;
-    list2->firstNodep->prev = list1->lastNodep;
-    list1->lastNodep = list2->lastNodep;
-    memset(list2,0,sizeof(LIST));
-    *(LIST**)list2 = freeLists;
-    freeLists = list2;
+    /* when list2 is empty just free list2*/
+    if (list2->listCount == 0) {
+      memset(list2,0,sizeof(LIST));
+      *(LIST**)list2 = freeLists;
+      freeLists = list2;
+
+    /* when list1 is empty copy list2 to list1, free list2 */
+    }else if (list1->listCount == 0) {
+      list1->firstNodep = list2->firstNodep;
+      list1->lastNodep = list2->lastNodep;
+      /* Not sure what to do with Node pointer when List 1 is empty */
+      list1->currNodep = list2->currNodep;
+      list1->listCount = list2->listCount;
+      list1->state = list2->state;
+      memset(list2,0,sizeof(LIST));
+      *(LIST**)list2 = freeLists;
+      freeLists = list2;
+
+    /* when both list1 list2 are not empty, free list2 */
+    }else{
+      list1->lastNodep->next = list2->firstNodep;
+      list2->firstNodep->prev = list1->lastNodep;
+      list1->lastNodep = list2->lastNodep;
+      list1->listCount += list2->listCount;
+
+      memset(list2,0,sizeof(LIST));
+      *(LIST**)list2 = freeLists;
+      freeLists = list2;
+    }
 }
