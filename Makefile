@@ -19,7 +19,6 @@ ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
 # assignment.
 partA1: partA1.o fib_win.o thread_util_win.o
-	# TODO: Fix. partA1.c should be a seperate rule. 
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o partA1 partA1.o fib_win.o thread_util_win.o
 
 partA1.o: partA1.c
@@ -46,23 +45,20 @@ thread_util_win.o: thread_util.c thread_util.h
 thread_util_linux.o: thread_util.c thread_util.h
 	$(CC) -o thread_util_linux.o -c $(CFLAGS) $(CPPFLAGS) thread_util.c
 
-list_movers.o : list_movers.c list.h list_data.h
+list_movers.o : list_movers.c list.h
 	$(CC) -o list_movers.o -c $(CFLAGS) $(CPPFLAGS) list_movers.c
 
-list_adders.o : list_adders.c list.h list_data.h
+list_adders.o : list_adders.c list.h
 	$(CC) -o list_adders.o -c $(CFLAGS) $(CPPFLAGS) list_adders.c
 
-list_removers.o : list_removers.c list.h list_data.h
+list_removers.o : list_removers.c list.h
 	$(CC) -o list_removers.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
-
-list_data.o: list_data.c list_data.h
-	$(CC) -o list_data.o -c $(CFLAGS) $(CPPFLAGS) list_data.c
 
 mytestlist.o: mytestlist.c list.h
 	$(CC) -o mytestlist.o -c $(CFLAGS) $(CPPFLAGS) mytestlist.c
 
-liblist.a : list_adders.o list_movers.o list_removers.o list_data.o
-	ar -r liblist.a list_movers.o list_adders.o list_removers.o list_data.o
+liblist.a : list_adders.o list_movers.o list_removers.o
+	ar -r liblist.a list_movers.o list_adders.o list_removers.o
 
 
 

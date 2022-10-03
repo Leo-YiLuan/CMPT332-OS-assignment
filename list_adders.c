@@ -12,7 +12,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "list_data.h"
+/* Static allocation pool */
+LIST lists[MAX_LISTS];
+LIST *freeLists = &lists[0];
+
+NODE nodes[MAX_NODES];
+NODE *freeNodes = &nodes[0];
 
 LIST* ListCreate(){
     static int initialized = 0;

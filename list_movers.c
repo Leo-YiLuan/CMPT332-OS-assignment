@@ -11,6 +11,15 @@
 #include <stdio.h>
 #include "list.h"
 
+/*
+ For extended info on how our stacks of free lists/nodes works,
+ please see the partC documentation.
+*/
+extern LIST lists[MAX_LISTS];
+extern LIST *freeLists;
+extern NODE nodes[MAX_NODES];
+extern NODE *freeNodes;
+
 /**
  *  These function just test parameters, no functional implemented
  *  All the comments or designs are in list.h and partC.design.txt

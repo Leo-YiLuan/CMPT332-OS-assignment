@@ -12,7 +12,14 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "list_data.h"
+/*
+ For extended info on how our stacks of free lists/nodes works,
+ please see the partC documentation.
+*/
+extern LIST lists[MAX_LISTS];
+extern LIST *freeLists;
+extern NODE nodes[MAX_NODES];
+extern NODE *freeNodes;
 
 
 void *ListRemove(LIST *list){

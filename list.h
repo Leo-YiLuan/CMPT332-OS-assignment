@@ -13,6 +13,9 @@
 #ifndef __LIST_H__
 #define __LIST_H__
 
+#define MAX_LISTS 10
+#define MAX_NODES 1000
+
 /* BEFORE means the current pointer is before the first node
  * NORMAL means the current pointer is in the list (NOT NULL)
  * BEFORE means the current pointer is after the last node
