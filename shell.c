@@ -59,13 +59,16 @@ void pipingExe(char** tokenArrWr, char** tokenArrRe, char** path){
   pipe(fd);
 
   inProcess = fork();
+  /* in children process*/
   if (inProcess == 0) {
     close(fd[1]);
+    /* dulpicate stdin with pipe read*/
     dup2(fd[0],STDIN_FILENO);
     execute(tokenArrRe,path);
-
+  /* in parent process */
   }else if(inProcess>0){
     close(fd[0]);
+    /* dulpicate stdout with pipe write*/
     dup2(fd[1],STDOUT_FILENO);
     execute(tokenArrWr,path);
 

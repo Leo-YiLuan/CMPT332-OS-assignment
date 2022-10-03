@@ -145,7 +145,7 @@ int main(){
 
         /* ListCurr */
         ListAdd(list, &a);
-        if (*(int*)ListCurr(list) == 5) { 
+        if (*(int*)ListCurr(list) == 5) {
             printf("Successfully added 5 to an empty list.\n");
         } else {
             printf("ERROR: Failed adding to an empty list with ListAdd()\n");
@@ -190,7 +190,7 @@ int main(){
     /* ListRemove */
     {
         int *item = NULL;
-        
+
         item = ListRemove(list);
         if (*item == 9 && *(int*)ListCurr(list) == 7) {
             printf("ListRemove: Successfully removed 9 from the list with "
@@ -674,7 +674,9 @@ int main(){
         PrintList(list);
         printf("\n");
 
+        ListFirst(list);
         ListAdd(list, &b);
+
         ListFirst(list);
         item = ListNext(list);
         if (*item == 6 && *(int*)ListCurr(list) == 6) {
@@ -710,8 +712,8 @@ int main(){
         int a = 55;
         int b = 6;
         int c = 9;
+        PrintList(list);
 
-        item = ListPrev(list);
         if (item == NULL) {
             printf("ListPrev: Successfully received NULL from an empty "
             "list.\n");
@@ -721,7 +723,6 @@ int main(){
         }
         PrintList(list);
         printf("\n");
-
         ListAdd(list, &a);
         item = ListPrev(list);
         if (item == NULL && ListCurr(list) == NULL) {
@@ -733,9 +734,21 @@ int main(){
         }
         PrintList(list);
         printf("\n");
+        
+/*==============SEG FAULT caused by PrintLIST here===============*/
+        item = ListNext(list);
+        if (*item == 55 && *(int *)ListCurr(list) == 55) {
+            printf("ListNext: Successfully received item when current pointer"
+            "at BEFORE the first node.\n");
+        } else {
+            printf("Error: Didn't receive NULL from list with 1 element "
+            "calling ListPrev\n");
+        }
+        PrintList(list);
+        printf("\n");
 
-        ListAdd(list, &b);
         ListLast(list);
+        ListAdd(list, &b);
         item = ListPrev(list);
         if (*item == 55 && *(int*)ListCurr(list) == 55) {
             printf("ListPrev: Successfully received correct element from "
@@ -771,7 +784,7 @@ int main(){
         int a = 1;
         int b = 0;
         int c = 42;
-        
+
         item = ListCurr(list);
         if (item == NULL) {
             printf("ListCurr: Correctly received NULL from empty list.\n");
@@ -828,11 +841,11 @@ int main(){
             printf("Unexpected Behavior calling ListSearch on empty list.\n");
         }
         printf("\n");
-        
+
         find = 7;
         ListAdd(list, &a);
         found = ListSearch(list, &comparator, &find);
-        if (*found == 7) {
+        if (*found == 7 && *(int*)ListCurr(list)==7) {
             printf("ListSearch: Correctly found element in list with 1 "
             "item.\n");
         } else {
@@ -842,20 +855,22 @@ int main(){
 
         find = 42;
         found = ListSearch(list, &comparator, &find);
-        if (found == NULL) {
+
+        if (found == NULL && ListCurr(list) == NULL) {
             printf("ListSearch: Correctly failed to find nonexistent "
             "element in list with 1 item.\n");
         } else {
             printf("Error: Failed searching list with 1 item\n");
         }
         printf("\n");
-
         ListAdd(list, &b);
         ListPrepend(list, &c);
         ListAdd(list, &d);
         ListAppend(list, &e);
+
+        ListLast(list);
         found = ListSearch(list, &comparator, &find);
-        if (found == NULL) {
+        if (found == NULL && ListCurr(list)==NULL) {
             printf("ListSearch: Correctly failed to find element that is "
             "before cursor.\n");
         } else {
@@ -866,7 +881,7 @@ int main(){
 
         ListFirst(list);
         found = ListSearch(list, &comparator, &find);
-        if (*found == 42) {
+        if (*found == 42 && *(int*)ListCurr(list)== 42) {
             printf("ListSearch: Correctly found element in list with "
             "many items\n");
         } else {

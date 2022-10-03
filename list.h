@@ -13,6 +13,12 @@
 #ifndef __LIST_H__
 #define __LIST_H__
 
+/* BEFORE means the current pointer is before the first node
+ * NORMAL means the current pointer is in the list (NOT NULL)
+ * BEFORE means the current pointer is after the last node
+ */
+enum LIST_STATE {BEFORE=1, NORMAL=0, AFTER=2};
+
 /**
  * NODE structure that saves item, pointer to next and pointer to prev
  * nodeSize is used to check memory usage
@@ -37,6 +43,7 @@ struct LIST
     NODE *firstNodep;
     NODE *lastNodep;
     int listCount;
+		enum LIST_STATE state;
 };
 
 /*

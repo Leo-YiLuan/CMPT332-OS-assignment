@@ -55,6 +55,7 @@ LIST* ListCreate(){
     list = freeLists;
     freeLists = *(LIST**)freeLists;
     memset(list, 0, sizeof(LIST));
+    list->state = NORMAL;
 
     return list;
 }
@@ -71,6 +72,9 @@ int ListAdd(LIST *list,void *item){
 
     if (freeNodes == NULL) {
         /* Out of memory! */
+        return -1;
+    }
+    if (list->state != NORMAL) {
         return -1;
     }
     /* Grab a new node */
@@ -120,6 +124,9 @@ int ListInsert(LIST *list, void *item){
         /* Out of memory! */
         return -1;
     }
+    if (list->state != NORMAL) {
+        return -1;
+    }
     /* Grab a new node */
     node = freeNodes;
     freeNodes = *(NODE**)freeNodes;
@@ -160,6 +167,7 @@ int ListAppend(LIST *list, void *item){
         /* Out of memory! */
         return -1;
     }
+    list->state = NORMAL;
     /* Grab a new node */
     node = freeNodes;
     freeNodes = *(NODE**)freeNodes;
@@ -196,6 +204,7 @@ int ListPrepend(LIST *list, void *item){
         /* Out of memory! */
         return -1;
     }
+    list->state = NORMAL;
     /* Grab a new node */
     node = freeNodes;
     freeNodes = *(NODE**)freeNodes;

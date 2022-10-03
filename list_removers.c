@@ -14,10 +14,7 @@
 
 #include "list_data.h"
 
-/**
- *  These functions just test parameters, no functional implemented
- *  All the comments or designs are in list.h and partC.design.txt
- */
+
 void *ListRemove(LIST *list){
     void *item;
     NODE *removeNode;
@@ -28,7 +25,7 @@ void *ListRemove(LIST *list){
     if (list->listCount == 0) {
         return NULL;
     }
-    
+
     item = list->currNodep->item;
     removeNode  = list->currNodep;
     if (list->listCount==1) {

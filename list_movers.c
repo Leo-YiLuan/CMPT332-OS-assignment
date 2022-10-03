@@ -30,7 +30,7 @@ void *ListFirst(LIST *list){
     if (list->listCount == 0) {
         return NULL;
     }
-
+    list->state = NORMAL;
     list->currNodep = list->firstNodep;
 
     return list->currNodep->item;
@@ -43,7 +43,7 @@ void *ListLast(LIST *list){
     if (list->listCount == 0) {
         return NULL;
     }
-
+    list->state = NORMAL;
     list->currNodep = list->lastNodep;
 
     return list->currNodep->item;
@@ -56,7 +56,21 @@ void *ListNext(LIST *list){
     if (list->listCount == 0) {
         return NULL;
     }
+    /* if in NULL pointer after the last one */
+    if (list->state == AFTER) {
+        return NULL;
+    }
+    /* if in NULL pointer BEFORE the first one
+       set current node pointer to first node*/
+    if (list->state == BEFORE) {
+        list->currNodep = list->firstNodep;
+        list->state = NORMAL;
+        return list->firstNodep->item;
+    }
+    /* if at last node, set state to AFTER and return NULL*/
     if (list->currNodep->next == NULL) {
+        list->state = AFTER;
+        list->currNodep = NULL;
         return NULL;
     }
 
@@ -71,8 +85,21 @@ void *ListPrev(LIST *list){
     if (list->listCount == 0) {
         return NULL;
     }
-
+    /* if in NULL pointer before the first one */
+    if (list->state == BEFORE) {
+        return NULL;
+    }
+    /* if in NULL pointer after the last one
+       set current node pointer to last node*/
+    if (list->state == AFTER) {
+        list->currNodep = list->lastNodep;
+        list->state = NORMAL;
+        return list->lastNodep->item;
+    }
+    /* if at first node, set state to BEFORE and return NULL*/
     if (list->currNodep->prev == NULL) {
+        list->state = BEFORE;
+        list->currNodep = NULL;
         return NULL;
     }
 
@@ -85,6 +112,9 @@ void *ListCurr(LIST *list){
         return NULL;
     }
     if (list->listCount == 0) {
+        return NULL;
+    }
+    if (list->currNodep == NULL) {
         return NULL;
     }
 
@@ -110,14 +140,29 @@ void *ListSearch(LIST *list, int (*comparator)(void *, void *),
     if (list->listCount == 0) {
         return NULL;
     }
-    
-    if (comparator(list->currNodep->item,comparisionArg)) {
-        return list->currNodep->item;}
-
-    if (list->currNodep == list->lastNodep) {
-
-          return NULL;
+    /* if the current pointer is NULL after the lastNode */
+    if (list->state == AFTER) {
+        return NULL;
     }
+    /* if the current pointer is NULL before the firstnode
+       start searching from first node */
+    if (list->state == BEFORE) {
+       list->currNodep = list->firstNodep;
+       list->state = NORMAL;
+    }
+
+    /* base case that found item */
+    if (comparator(list->currNodep->item,comparisionArg)) {
+        return list->currNodep->item;
+    }
+
+    /* base case that did not find item */
+    if (list->currNodep == list->lastNodep) {
+        list->currNodep = NULL;
+        list->state = AFTER;
+        return NULL;
+    }
+
     list->currNodep = list->currNodep->next;
     return ListSearch(list,comparator,comparisionArg);
 }
