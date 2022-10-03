@@ -820,8 +820,8 @@ int main(){
         }
         PrintList(list);
         printf("\n");
+
         ListAdd(list, &a);
-        /*==============SEG FAULT caused by PrintLIST here===============*/
         ListNext(list);
         item = ListPrev(list);
         if (*item == 55 && *(int *)ListCurr(list) == 55) {
