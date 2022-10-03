@@ -57,6 +57,7 @@ void PrintList(LIST *list) {
 
     int *currItem;
     int *item;
+    enum LIST_STATE state = list->state;
 
     if (ListCount(list) == 0) {
       printf("[BEF -> END] (count 0)\n");
@@ -64,7 +65,11 @@ void PrintList(LIST *list) {
     }
     currItem = (int*)ListCurr(list);
     item = (int*)ListFirst(list);
-    printf("[BEF -> ");
+    printf("[");
+    if (state == BEFORE) {
+      printf("*");
+    }
+    printf("BEF -> ");
 
 
     while (item) {
@@ -74,17 +79,28 @@ void PrintList(LIST *list) {
 
         item = (int*)ListNext(list);
     }
-
+    if (state == AFTER) {
+      printf("*");
+    }
     printf("END] (count: %d)\n", ListCount(list));
 
     /* Reset the cursor. */
-    item = ListFirst(list);
-    while (item) {
-        if (ListCurr(list) == currItem) {
-            break;
-        }
+    if (state == BEFORE) {
+        ListFirst(list);
+        ListPrev(list);
+    }else if (state == AFTER) {
+        ListLast(list);
+        ListNext(list);
+    }else{
+        item = ListFirst(list);
+        while (item) {
+            if (ListCurr(list) == currItem) {
+                break;
+              }
         item = ListNext(list);
+      }
     }
+
 }
 
 int main(){
@@ -532,7 +548,7 @@ int main(){
 
     ListFree(list, itemFree);
     list = ListCreate();
-
+    /* test ListFirst */
     {
         int *item = NULL;
         int a = 0;
@@ -588,7 +604,7 @@ int main(){
 
     ListFree(list, itemFree);
     list = ListCreate();
-
+    /* Test ListLast */
     {
         int *item = NULL;
         int a = 0;
@@ -644,7 +660,7 @@ int main(){
 
     ListFree(list, itemFree);
     list = ListCreate();
-
+    /* Test ListNext */
     {
         int *item = NULL;
         int a = 55;
@@ -663,6 +679,18 @@ int main(){
         printf("\n");
 
         ListAdd(list, &a);
+        ListPrev(list);
+        item = ListNext(list);
+        if (*item == 55 && *(int *)ListCurr(list) == 55) {
+            printf("ListNext: Successfully received first item when current"
+            " pointer BEFORE the first node.\n");
+        } else {
+         printf("Error: Didn't get the first node when at the BEFORE position "
+            "calling ListNext\n");
+        }
+        PrintList(list);
+        printf("\n");
+
         item = ListNext(list);
         if (item == NULL && ListCurr(list) == NULL) {
             printf("ListNext: Successfully received NULL from list with 1 "
@@ -706,7 +734,7 @@ int main(){
 
     ListFree(list, itemFree);
     list = ListCreate();
-
+    /* test ListPrev */
     {
         int *item = NULL;
         int a = 55;
@@ -724,6 +752,20 @@ int main(){
         PrintList(list);
         printf("\n");
         ListAdd(list, &a);
+        /*==============SEG FAULT caused by PrintLIST here===============*/
+        ListNext(list);
+        item = ListPrev(list);
+        if (*item == 55 && *(int *)ListCurr(list) == 55) {
+          printf("ListPrev: Successfully received last item when current "
+          "pointer AFTER the last node.\n");
+        } else {
+          printf("Error: Didn't get the last node when at the AFTER position "
+          "calling ListPrev\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+
         item = ListPrev(list);
         if (item == NULL && ListCurr(list) == NULL) {
             printf("ListPrev: Successfully received NULL from list with "
@@ -734,18 +776,7 @@ int main(){
         }
         PrintList(list);
         printf("\n");
-        
-/*==============SEG FAULT caused by PrintLIST here===============*/
-        item = ListNext(list);
-        if (*item == 55 && *(int *)ListCurr(list) == 55) {
-            printf("ListNext: Successfully received item when current pointer"
-            "at BEFORE the first node.\n");
-        } else {
-            printf("Error: Didn't receive NULL from list with 1 element "
-            "calling ListPrev\n");
-        }
-        PrintList(list);
-        printf("\n");
+
 
         ListLast(list);
         ListAdd(list, &b);
