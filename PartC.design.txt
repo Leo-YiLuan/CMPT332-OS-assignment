@@ -269,8 +269,13 @@ functions:
     firstNode's prev node in list 2 as lastNode in list 1, set lastNode pointer
     in list 1 to lastNode in list 2.
     list1->listCount = list1->listCount + list2->listCount.
-    if list1 or list2 is NULL, just set list1's pointer points to
-    the non-NULL list.
+
+    if list1 or list2 is Empty, just set list1's pointer points to
+    the non-NULL list
+    (when only list1 is empty, set current pointer as list2's currpointer)
+    Because it not make sense to set concated list's current points to null
+    in this situation.
+
     Have to check if memory space is enough to add list2 to list1.
         PRECONDITION: the list1 and list2 is created, list1 have enough space
         to do the operation.

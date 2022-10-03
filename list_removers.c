@@ -32,16 +32,19 @@ void *ListRemove(LIST *list){
     if (list->listCount == 0) {
         return NULL;
     }
+    /* if not in the list (At BEFORE or AFTER) do nothing */
     if (list->state != NORMAL) {
       return NULL;
     }
     item = list->currNodep->item;
     removeNode  = list->currNodep;
+    /* only one node */
     if (list->listCount==1) {
       *(NODE**)removeNode = freeNodes;
       freeNodes = removeNode;
       memset(list,0,sizeof(LIST));
     }
+    /* when at last node */
     else if (list->currNodep == list->lastNodep) {
         list->currNodep = removeNode->prev;
         list->listCount--;
@@ -49,6 +52,7 @@ void *ListRemove(LIST *list){
         list->currNodep->next = NULL;
         *(NODE**)removeNode = freeNodes;
         freeNodes = removeNode;
+    /* when at first node */
     }else if (list->currNodep == list->firstNodep){
         list->currNodep = removeNode->next;
         list->listCount--;
@@ -56,6 +60,7 @@ void *ListRemove(LIST *list){
         list->currNodep->prev = NULL;
         *(NODE**)removeNode = freeNodes;
         freeNodes = removeNode;
+    /* when in middle */
     }else{
         list->currNodep = removeNode->next;
         list->listCount--;
