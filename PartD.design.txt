@@ -1,0 +1,54 @@
+/*
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A1 Phase 2
+*/
+
+Idea:
+    add functions numprocs() in proc.c and SYS_numprocs() in sysproc.c.
+    SYS_numprocs() just return the return of numprocs().
+    numprocs() acquire a lock and iterate all processes in the table and check
+    how many processes are RUNNABLE. release the lock after iteration.
+
+    To make the process RUNNABLE match the number of process I created, I
+    changed CUPS in Makefile line 14 from 3 to 1.
+
+
+Functions:
+    numprocs():
+        Iterate all process in the process table and find the total number of
+        RUNNABLE processes.
+    PRECONDITION: None;
+
+    FUNCITONING:  Get the number of processes that's in RUNNABLE state
+
+    POSTCONDITION: NONE
+
+    RETURNS: An uint64 represents the count of RUNNABLE processes.
+
+    SYS_numprocs():
+        call the numprocs() and return it's return values
+
+    PRECONDITION: None;
+
+    FUNCITONING:  Call numprocs() and Get the number of processes that's in
+    RUNNABLE state (provided a syscall entry function of numprocs())
+
+    POSTCONDITION: NONE
+
+    RETURNS: An uint64 represents the count of RUNNABLE processes. (the return
+    value of numprocs())
+
+Add numprocs to syscall:
+
+    Add ```extern uint64 sys_numprocs(void);```
+    and ```[SYS_numprocs] sys_numprocs,```
+    in syscall table in syscall.c
+
+    And also add numprocs() to user.h to allow the test program access that
+    function
