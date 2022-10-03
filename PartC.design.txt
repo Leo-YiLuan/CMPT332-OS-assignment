@@ -15,8 +15,11 @@ Structures:
     allocated to the node.
 
     LIST Structure is designed to hold 3 NODE values (current, first, last)
-    and 2 integer, one is the count of list, the other is the memory allocated
-    to list.
+    , 1 integer (the count of list) and a flag to check where the current node
+    pointer points to. If it points to the previous node of first one, flag
+    is set to BEFORE(Caused by using ListPrev()), if it points to the next node
+    of last one, flag is set to AFTER(Caused by using ListNext()), otherwise,
+    the flag set to NORMAL.
 
 
 For memory allocation: (Updated for Part 2)
@@ -50,7 +53,8 @@ functions:
         FUNCITONING:  Makes a new, empty list, and returns its reference on
         success. Returns a NULL pointer on failure.
 
-        POSTCONDITION: allocated static memory space to a list;
+        POSTCONDITION: allocated static memory space to a list; State flag set
+        to NORMAL.
 
         RETURNS: A pointer that represents the empty list. NULL if failure;
 
@@ -75,7 +79,7 @@ functions:
         the first node to the current node.
 
         POSTCONDITION: the pointer of currNodep has changed to point
-        the first node
+        the first node. State flag set to NORMAL.
 
         RETURNS: A pointer points to the first node in the list
 
@@ -91,7 +95,7 @@ functions:
         the last node to the current node.
 
         POSTCONDITION: the pointer currNodep has changed to point
-        the last node in the list
+        the last node in the list. State flag set to NORMAL.
 
         RETURNS: A pointer points to the last node in the list
 
@@ -105,10 +109,13 @@ functions:
 
         FUNCITONING: advances the list's current node by one, and returns a
         pointer to the new current item. If this operation attempts to advance
-        the current item beyond the end of the list, a NULL pointer is returned
+        the current item beyond the end of the list, a NULL pointer is
+        returned.
+        If current node pointer is at last node, set state flag to AFTER.
+        If the state flag is BEFORE, set it to NORMAL and return the firstnode.
 
         POSTCONDITION: the pointer currNodep has changed to point
-        the next node
+        the next node or NULL, may changed the flag
 
         RETURNS: An pointer points to the next node in the list
         or NULL if there is no next node
@@ -126,9 +133,11 @@ functions:
         pointer to the new current item. If this operation attempts to back
         up the current item beyond the start of the list, a NULL pointer
         is returned
+        If current node pointer is at first node, set state flag to BEFORE.
+        If the state flag is AFTER, set it to NORMAL and return the lastNode.
 
         POSTCONDITION: the pointer currNodep has changed to point
-        the previous node
+        the previous node. State flag may be changed
 
         RETURNS: A pointer of the new current node(prev node) in the
         list or NULL if no prev node
@@ -207,7 +216,7 @@ functions:
         FUNCITONING: adds the item to the end of the list, and makes
         the new item the current one. Returns 0 on success, -1 on failure.
         POSTCONDITION: a new node is added to the list, listCount +1.
-        remaining space -1
+        remaining space -1, set flag to NORMAL
         RETURNS: A integer that 0 on success, 1 on failure.
 
     ListPrepend():
@@ -227,7 +236,7 @@ functions:
         the current one. Returns 0 on success, -1 on failure.
 
         POSTCONDITION: a new node is added to the list, listCount +1.
-        remaining space -1
+        remaining space -1. Set flag to NORMAL.
 
         RETURNS: A integer that 0 on success, 1 on failure.
 
@@ -313,6 +322,9 @@ functions:
      and List return the pointer to that node and left currNodep at
      the matched node. If never match, returns NULL pointer
      and left currNodep at the last node.
+     If the current pointer points to node before the first node, start from
+     the first node.
+     If the current pointer points to node after the last node, do nothing.
         PRECONDITION: the list is created, the comparator is not NULL,
         the comparisonArg is not NULL
 
@@ -327,6 +339,6 @@ functions:
         current node if found, NULL if not found.
 
         POSTCONDITION: the current node pointer of the list will be changed
-        to last node or the matched node.
+        to last node or the matched node. Flag may be changed.
 
         RETURNS: A pointer points to match node or NULL.

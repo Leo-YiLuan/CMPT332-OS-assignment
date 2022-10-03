@@ -116,7 +116,7 @@ ListFirst: Correctly received first item 0 from list with 1 element.
 ListFirst: Correctly received first item 0 from list with multiple elements.
 [BEF -> 0* -> 1 -> END] (count: 2)
 
-ListFirst: Correctly get first item 0 from list with multiple item, 
+ListFirst: Correctly get first item 0 from list with multiple item,
 cur not at begin.
 [BEF -> 0* -> 1 -> 7 -> END] (count: 3)
 
@@ -129,30 +129,39 @@ ListLast: Correctly received last item 0 from list with 1 element.
 ListLast: Correctly received last item 0 from list with multiple elements.
 [BEF -> 1 -> 0* -> END] (count: 2)
 
-ListLast: Correctly received last item 0 from list with multiple elements, 
+ListLast: Correctly received last item 0 from list with multiple elements,
 cur not at begin.
 [BEF -> 7 -> 1 -> 0* -> END] (count: 3)
 
 ListNext: Successfully received NULL from an empty list.
 [BEF -> END] (count 0)
 
-Error: Didn't receive NULL from list with 1 element calling ListNext
+ListNext: Successfully received first item when current pointer BEFORE the
+first node.
 [BEF -> 55* -> END] (count: 1)
 
-ListNext: Successfully received correct element from list with 2 elements, 
+ListNext: Successfully received NULL from list with 1 element.
+[BEF -> 55 -> *END] (count: 1)
+
+ListNext: Successfully received correct element from list with 2 elements,
 cur at begin.
 [BEF -> 55 -> 6* -> END] (count: 2)
 
 ListNext: Successfully received correct element from middle of list.
 [BEF -> 55 -> 6 -> 9* -> END] (count: 3)
 
+[BEF -> END] (count 0)
 ListPrev: Successfully received NULL from an empty list.
 [BEF -> END] (count 0)
 
-Error: Didn't receive NULL from list with 1 element calling ListPrev
+ListPrev: Successfully received last item when current pointer AFTER the last
+node.
 [BEF -> 55* -> END] (count: 1)
 
-ListPrev: Successfully received correct element from list with 2 elements, 
+ListPrev: Successfully received NULL from list with 1 element.
+[*BEF -> 55 -> END] (count: 1)
+
+ListPrev: Successfully received correct element from list with 2 elements,
 cur at end.
 [BEF -> 55* -> 6 -> END] (count: 2)
 
