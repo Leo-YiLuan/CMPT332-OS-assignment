@@ -25,7 +25,9 @@ void *ListRemove(LIST *list){
     if (list->listCount == 0) {
         return NULL;
     }
-
+    if (list->state != NORMAL) {
+      return NULL;
+    }
     item = list->currNodep->item;
     removeNode  = list->currNodep;
     if (list->listCount==1) {

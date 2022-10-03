@@ -162,6 +162,9 @@ functions:
     If the next pointer was NULL, also set it to lastNodep in the list. If next
     is not NULL, set the new node's address to the next node's prev pointer
     and set the new node's next pointer as the next node's address.
+    If current at BEFORE, do same thing as ListPrepend()
+    If current at AFTER, do same thing as ListAppend()
+
         PRECONDITION: the list is created, item is not NULL and have memory
         space
 
@@ -185,6 +188,8 @@ functions:
     next pointer. If prev was NULL, also set it to firstNodep in the list.
     If prev is not NULL, set the new node's address to prev node's next
     and set the new node's prev as prev node's address.
+    If current at BEFORE, do same thing as ListPrepend()
+    If current at AFTER, do same thing as ListAppend()
         PRECONDITION: the list is created, item is not NULL and has
         memory space.
 

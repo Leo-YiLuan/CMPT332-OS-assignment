@@ -149,7 +149,7 @@ int main(){
         int b = 7;
         int c = 3;
         int d = 9;
-
+        int e = 19;
         if (ListAdd(NULL, &a) == -1) {
             printf("ListAdd: Successfully received error code when "
             "passing NULL\n");
@@ -164,17 +164,19 @@ int main(){
         if (*(int*)ListCurr(list) == 5) {
             printf("Successfully added 5 to an empty list.\n");
         } else {
-            printf("ERROR: Failed adding to an empty list with ListAdd()\n");
+            printf("ERROR: Failed adding to an empty list \n");
         }
         PrintList(list);
         printf("\n");
 
+        ListPrev(list);
         ListAdd(list, &b);
         if (*(int*)ListCurr(list) == 7) {
-            printf("Successfully added 7 to a list with 1 element.\n");
+            printf("Successfully added 7 to a list with 1 element and current"
+            " points to BEFORE.\n");
         } else {
             printf("ERROR: Failed adding to a list with one element with "
-            "ListAdd()\n");
+            "ListAdd() when current points to BEFORE \n");
         }
         PrintList(list);
         printf("\n");
@@ -190,14 +192,27 @@ int main(){
         PrintList(list);
         printf("\n");
 
-        ListFirst(list);
+        ListLast(list);
+        ListNext(list);
         ListAdd(list, &d);
         if (*(int*)ListCurr(list) == 9) {
             printf("Successfully added 9 to a list with multiple elements, "
-            "cur at begin.\n");
+            "when current points to AFTER.\n");
         } else {
             printf("ERROR: Failed adding to a list with many elements with "
-            "ListAdd()\n");
+            "ListAdd() when current points to AFTER\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListFirst(list);
+        ListAdd(list, &e);
+        if (*(int*)ListCurr(list) == 19) {
+            printf("Successfully added 19 to a list with multiple elements, "
+            "when current points to first\n");
+        } else {
+            printf("ERROR: Failed adding to a list with many elements with "
+            "ListAdd() when current points to first\n");
         }
         PrintList(list);
         printf("\n");
@@ -208,7 +223,19 @@ int main(){
         int *item = NULL;
 
         item = ListRemove(list);
-        if (*item == 9 && *(int*)ListCurr(list) == 7) {
+        if (*item == 19 && *(int*)ListCurr(list) == 3) {
+            printf("ListRemove: Successfully removed 19 from the list with "
+            "many elements.\n");
+        } else {
+            printf("Error: Failed removing element from list of many "
+            "elements with ListRemove()\n");
+        }
+        PrintList(list);
+        printf("\n");
+        ListLast(list);
+
+        item = ListRemove(list);
+        if (*item == 9 && *(int*)ListCurr(list) == 5) {
             printf("ListRemove: Successfully removed 9 from the list with "
             "many elements.\n");
         } else {
@@ -220,7 +247,7 @@ int main(){
 
         ListFirst(list);
         item = ListRemove(list);
-        if (*item == 5 && *(int*)ListCurr(list) == 7) {
+        if (*item == 7 && *(int*)ListCurr(list) == 3) {
             printf("ListRemove: Successfully removed first element from list "
             "with many elements.\n");
         } else {
@@ -232,7 +259,7 @@ int main(){
 
         ListLast(list);
         item = ListRemove(list);
-        if (*item == 3 && *(int*)ListCurr(list) == 7) {
+        if (*item == 5 && *(int*)ListCurr(list) == 3) {
             printf("ListRemove: Successfully removed last element from list "
             "with multiple elements.\n");
         } else {
@@ -242,8 +269,36 @@ int main(){
         PrintList(list);
         printf("\n");
 
+        ListNext(list);
+
         item = ListRemove(list);
-        if (*item == 7 && ListCurr(list) == NULL) {
+        if (item == NULL && ListCurr(list) == NULL) {
+            printf("ListRemove: Successfully get NULL return when current "
+            "points to AFTER.\n");
+        } else {
+            printf("Error: Failed removing only element from list with 1 "
+            "element with ListRemove() when current points to AFTER\n");
+        }
+        PrintList(list);
+        printf("\n");
+        ListPrev(list);
+
+        ListPrev(list);
+        item = ListRemove(list);
+        if (item == NULL && ListCurr(list) == NULL) {
+            printf("ListRemove: Successfully get NULL return when current "
+            "points to BEFORE.\n");
+        } else {
+            printf("Error: Failed removing only element from list with 1 "
+            "element with ListRemove() when current points to BEFORE\n");
+        }
+        PrintList(list);
+        printf("\n");
+        ListNext(list);
+
+
+        item = ListRemove(list);
+        if (*item == 3 && ListCurr(list) == NULL) {
             printf("ListRemove: Successfully removed only element from list "
             "with one element.\n");
         } else {
@@ -270,7 +325,7 @@ int main(){
         int b = -5;
         int c = 77;
         int d = 12;
-
+        int e = 19;
         if (ListInsert(NULL, &a) == -1) {
             printf("ListInsert: Successfully received error code when passing "
             "NULL\n");
@@ -289,13 +344,14 @@ int main(){
         PrintList(list);
         printf("\n");
 
+        ListPrev(list);
         ListInsert(list, &b);
         if (*(int*)ListCurr(list) == -5) {
             printf("ListInsert: Successfully inserted into list with one "
-            "element.\n");
+            "element. And when current points to BEFORE\n");
         } else {
             printf("Error: Failed to ListInsert into list with one "
-            "element.\n");
+            "element when current points to BEFORE.\n");
         }
         PrintList(list);
         printf("\n");
@@ -319,6 +375,19 @@ int main(){
         } else {
             printf("Error: Failed to ListInsert into list with many "
             "elements, cur at end.\n");
+        }
+        PrintList(list);
+        printf("\n");
+
+        ListLast(list);
+        ListNext(list);
+        ListInsert(list, &e);
+        if (*(int*)ListCurr(list) == 19) {
+            printf("ListInsert: Successfully inserted into list with many "
+            "elements, cur at end. when current points to AFTER\n");
+        } else {
+            printf("Error: Failed to ListInsert into list with many "
+            "elements, cur at end. when current points to AFTER\n");
         }
         PrintList(list);
         printf("\n");
@@ -919,6 +988,15 @@ int main(){
             printf("Error: Failed searching list with many items\n");
         }
         printf("\n");
+    }
+    /* ListConcat() */
+    {
+      /* TO DO ListConcat() testing
+        ====================================================================
+        =====================================================================
+        =================================================================
+      */
+
     }
 
     /* Test exhausting all allocations */

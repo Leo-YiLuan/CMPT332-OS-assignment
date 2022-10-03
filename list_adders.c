@@ -74,26 +74,39 @@ int ListAdd(LIST *list,void *item){
         /* Out of memory! */
         return -1;
     }
-    if (list->state != NORMAL) {
-        return -1;
-    }
     /* Grab a new node */
     node = freeNodes;
     freeNodes = *(NODE**)freeNodes;
     memset(node, 0, sizeof(NODE));
-
     /* Where to insert? */
     if (list->listCount == 0) {
         /* List is empty, add to end! */
         list->currNodep = node;
         list->firstNodep = node;
         list->lastNodep = node;
-    } else {
+    }
+    /* current node befor the first node */
+    else if (list->state == BEFORE) {
+        node->next = list->firstNodep;
+        list->firstNodep->prev = node;
+        list->firstNodep = node;
+        list->currNodep = node;
+        node->item = item;
+
+    /* current node after the last node */
+    }else if (list->state == AFTER) {
+        node->prev = list->lastNodep;
+        node->next = NULL;
+
+        list->lastNodep->next = node;
+        list->lastNodep = node;
+        list->currNodep = node;
+      }
+      else {
         NODE *after = list->currNodep->next;
         NODE *before = list->currNodep;
         node->prev = before;
         node->next = after;
-
         before->next = node;
         /*
          Semi-special case: behavior differs depending on whether
@@ -104,7 +117,7 @@ int ListAdd(LIST *list,void *item){
 
         list->currNodep = node;
     }
-
+    list->state = NORMAL;
     list->listCount += 1;
     node->item = item;
 
@@ -124,9 +137,7 @@ int ListInsert(LIST *list, void *item){
         /* Out of memory! */
         return -1;
     }
-    if (list->state != NORMAL) {
-        return -1;
-    }
+
     /* Grab a new node */
     node = freeNodes;
     freeNodes = *(NODE**)freeNodes;
@@ -138,7 +149,25 @@ int ListInsert(LIST *list, void *item){
         list->currNodep = node;
         list->firstNodep = node;
         list->lastNodep = node;
-    } else {
+    }
+    /* current node befor the first node */
+    else if (list->state == BEFORE) {
+        node->next = list->firstNodep;
+        list->firstNodep->prev = node;
+        list->firstNodep = node;
+        list->currNodep = node;
+        node->item = item;
+
+    /* current node after the last node */
+    }else if (list->state == AFTER) {
+        node->prev = list->lastNodep;
+        node->next = NULL;
+
+        list->lastNodep->next = node;
+        list->lastNodep = node;
+        list->currNodep = node;
+      }
+      else {
         NODE *before = list->currNodep->prev;
         NODE *after = list->currNodep;
         node->prev = before;
@@ -151,7 +180,7 @@ int ListInsert(LIST *list, void *item){
     list->listCount += 1;
     list->currNodep = node;
     node->item = item;
-
+    list->state = NORMAL;
     return 0;
 }
 
