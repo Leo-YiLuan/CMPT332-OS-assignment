@@ -24,7 +24,7 @@ int testNumprocs(int n){
    	 	}else if (tempid == -1) {
    			printf("Fail to create new process\n" );
    		}
-  	}	
+  	}
   	return numprocs();
 }
 
@@ -39,10 +39,10 @@ int main(int argc, char *argv[])
         printf("Error: test of %d processes expect to get: %d, but"
 		" get: %d\n", totalProcs, expect, result);
  	}else{
-		printf("The return of numprocs() is: %d,  expect: %d\n",
-		result, totalProcs);
+		printf("Success: The return of numprocs() is: %d,  expect: %d when 0 "
+    "process created\n", result, totalProcs);
 	}
-	
+
     procNum=5;
     expect+=5;
     result=testNumprocs(procNum);
@@ -52,7 +52,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("The return of numprocs() is: %d,  expect: %d\n",
+		printf("Success: The return of numprocs() is: %d,  expect: %d when 5"
+    " more processes created\n",
 		result, totalProcs);
 	}
     procNum=10;
@@ -64,7 +65,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("The return of numprocs() is: %d,  expect: %d\n",
+		printf("Success: The return of numprocs() is: %d,  expect: %d when 10 "
+    "more processes created\n",
 		result, totalProcs);
 	}
     procNum=20;
@@ -76,7 +78,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("The return of numprocs() is: %d,  expect: %d\n",
+		printf("Success: The return of numprocs() is: %d,  expect: %d when 20 "
+    "more processes created\n",
 		result, totalProcs);
 	}
     procNum=11;
@@ -88,7 +91,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("The return of numprocs() is: %d,  expect: %d\n",
+		printf("Success: The return of numprocs() is: %d,  expect: %d when 11"
+    " more processes created\n",
 		result, totalProcs);
 	}
     procNum=10;
@@ -100,7 +104,8 @@ int main(int argc, char *argv[])
 		" but get: %d\n", totalProcs, expect, result);
  	}
 	else{
-		printf("The return of numprocs() is: %d,  expect: %d\n",
+		printf("Success: The return of numprocs() is: %d,  expect: %d when 10 "
+    "more processes created\n",
 		result, totalProcs);
 	}
 	 return 0;
