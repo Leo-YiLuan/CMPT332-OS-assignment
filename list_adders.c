@@ -282,7 +282,12 @@ void ListConcat(LIST *list1, LIST *list2){
     }else if (list1->listCount == 0) {
       list1->firstNodep = list2->firstNodep;
       list1->lastNodep = list2->lastNodep;
-      /* Not sure what to do with Node pointer when List 1 is empty */
+      /* When list1 is empty, it's current pointer will be NULL,
+        in that case, I made list2's current pointer as the
+        concated list's current pointer
+
+        make concated list exactly same as list2
+        */
       list1->currNodep = list2->currNodep;
       list1->listCount = list2->listCount;
       list1->state = list2->state;

@@ -201,10 +201,12 @@ int main() {
             fprintf(stderr,"Number of pipe character is greater than 1, "
             "can not handle\n" );
           }else if (pipeCount==1) {
+            /* split the list in to two */
             char **tokenArrIn = malloc((pipeIndex+1) * sizeof(char*));
             tokenArr[pipeIndex] = NULL;
             memmove(tokenArrIn,tokenArr,(pipeIndex+1)*sizeof(char*));
             id = fork();
+            /*send the split list to two processes respectivly */
             if (id==0) {
             pipingExe(tokenArrIn,&tokenArr[pipeIndex+1],path);
             }
