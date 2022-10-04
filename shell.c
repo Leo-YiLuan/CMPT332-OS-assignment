@@ -35,7 +35,6 @@ void execute(char ** tokenArr, char ** path){
           memmove(concatCommand, path[i], pathLen);
           memmove(&concatCommand[pathLen], "/",1);
           memmove(&concatCommand[pathLen+1],tokenArr[0],cmdLen);
-          printf("%s\n",concatCommand);
           /* execute, if not success, keep trying by loop */
           if (execv(concatCommand,tokenArr)==-1) {
             /* print error message and exit process

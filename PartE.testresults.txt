@@ -1,0 +1,27 @@
+/*
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A1 Phase 2
+*/
+
+
+[/student/mam552/CMPT332/RemoteRepo] > partA2   
+No such file or directory
+[/student/mam552/CMPT332/RemoteRepo] > ./partA2 2 2 10
+Thread id: 2, fib(10), with 452 invocations in 0 sec.
+Thread id: 3, fib(10), with 452 invocations in 0 sec.
+
+exiting threads
+[/student/mam552/CMPT332/RemoteRepo] > cd /student/cmpt332
+[/student/cmpt332] > ls
+2019  images   os161     pthreads.2010.tar  pthreads.tar.gz.OLD  qemu   rtt           rtt.2017.tar     rtt.tar.2005.gz  tempthreads  xv6       xv6-2018  xv6-orig  xv6-TESTING-A3
+2020  markers  pthreads  pthreads.tar.gz    pthreads.tony.tar    riscv  rtt.2016.tar  rtt.2018.tar.gz  sample-ISO       ubuntu       xv6-2017  xv6-2022  xv6-TEMP
+[/student/cmpt332] > cd ../mam552/
+[/student/mam552] > fakeCommand
+No such file or directory
+[/student/mam552] > exit
