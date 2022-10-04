@@ -10,7 +10,7 @@
 */
 
 
-[/student/mam552/CMPT332/RemoteRepo] > partA2   
+[/student/mam552/CMPT332/RemoteRepo] > partA2
 No such file or directory
 [/student/mam552/CMPT332/RemoteRepo] > ./partA2 2 2 10
 Thread id: 2, fib(10), with 452 invocations in 0 sec.
@@ -18,10 +18,40 @@ Thread id: 3, fib(10), with 452 invocations in 0 sec.
 
 exiting threads
 [/student/mam552/CMPT332/RemoteRepo] > cd /student/cmpt332
-[/student/cmpt332] > ls
-2019  images   os161     pthreads.2010.tar  pthreads.tar.gz.OLD  qemu   rtt           rtt.2017.tar     rtt.tar.2005.gz  tempthreads  xv6       xv6-2018  xv6-orig  xv6-TESTING-A3
-2020  markers  pthreads  pthreads.tar.gz    pthreads.tony.tar    riscv  rtt.2016.tar  rtt.2018.tar.gz  sample-ISO       ubuntu       xv6-2017  xv6-2022  xv6-TEMP
-[/student/cmpt332] > cd ../mam552/
+[/student/cmpt332] > ls -la
+total 10692
+drwxr-sr-x   22 dwm138 cmpt332    4096 Sep 27 16:11 .
+drwxr-xr-x 2662 root   root     126976 Sep 30 22:22 ..
+drwxr-s---   43 dwm138 cmpt332   20480 Oct  2  2020 2019
+drwxr-s---    3 dwm138 cmpt332    4096 Aug 16 11:50 2020
+-rwxr--r--    1 dwm138 faculty    8196 Oct 27  2020 .DS_Store
+drwxrwxr-x    3 dwm138 cmpt332    4096 Dec  2  2019 images
+drwxrws---    9 dwm138 cmpt332    4096 Sep 30 16:47 markers
+drwxr-s---   11 dwm138 cmpt332    4096 Apr  8  2015 os161
+drwxrwsr-x    4 dwm138 cmpt332    4096 Sep 26 12:38 pthreads
+-rw-r--r--    1 dwm138 cmpt332  563200 Sep 21  2010 pthreads.2010.tar
+-rw-r--r--    1 dwm138 cmpt332   29003 Oct 17  2017 pthreads.tar.gz
+-rw-rw----    1 dwm138 cmpt332   44467 Sep 10  2010 pthreads.tar.gz.OLD
+-rw-r-----    1 dwm138 cmpt332  133120 Oct 22  2018 pthreads.tony.tar
+drwxrwsr-x    7 dwm138 cmpt332    4096 Nov  9  2020 qemu
+drwxrwsr-x   11 dwm138 cmpt332    4096 Sep  7  2021 riscv
+drwxrwsr-x    8 dwm138 cmpt332    4096 Sep 16 16:15 rtt
+-rwxr--r--    1 dwm138 cmpt332 4075520 Oct 25  2010 rtt.2016.tar
+-rwxrw-r--    1 dwm138 cmpt332  710144 Oct 16  2018 rtt.2017.tar
+-rw-r--r--    1 dwm138 cmpt332 3141120 Oct 19  2018 rtt.2018.tar.gz
+-rw-r--r--    1 dwm138 cmpt332 2025228 Sep 10  2010 rtt.tar.2005.gz
+drwxrwxr-x    2 dwm138 cmpt332    4096 Nov 28  2019 sample-ISO
+drwxr-xr-x    4 dwm138 faculty    4096 Sep 11  2018 .TemporaryItems
+drwxr-x---    3 dwm138 cmpt332    4096 Oct 17  2017 tempthreads
+drwxr-sr-x    4 dwm138 cmpt332    4096 Nov 11  2020 ubuntu
+drwxrwsr-x    9 dwm138 cmpt332    4096 Sep 21 11:53 xv6
+drwxr-xr-x    5 dwm138 cmpt332    4096 Nov 20  2017 xv6-2017
+drwxr-sr-x    3 dwm138 cmpt332    4096 Aug 30  2019 xv6-2018
+drwxrwsr-x    5 dwm138 cmpt332    4096 Sep 19 21:15 xv6-2022
+drwxrws---    3 dwm138 cmpt332    4096 Nov 15  2019 xv6-orig
+drwxrwx---    3 dwm138 cmpt332    4096 Nov 12  2019 xv6-TEMP
+drwxrwx---    3 dwm138 cmpt332    4096 Nov 15  2019 xv6-TESTING-A3
+[/student/cmpt332] > cd ../mam552
 [/student/mam552] > fakeCommand
 No such file or directory
 [/student/mam552] > exit

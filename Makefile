@@ -86,14 +86,16 @@ mytestlist: mytestlist.o liblist.a list.h
 	$(CC) -o mytestlist $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
 
 partA2: partA2.o fib_linux.o thread_util_linux.o
-	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib_linux.o thread_util_linux.o \
-	-L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
+	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib_linux.o \
+	thread_util_linux.o -L/student/cmpt332/pthreads/lib/Linuxx86_64 \
+	-lpthreads
 
 partA2.o: partA2.c
 	$(CC) -o partA2.o -c $(CFLAGS) $(CPPFLAGS) partA2.c $(PTHREADS_INCLUDE) -I./
 
 partA3: partA3.o fib_linux.o thread_util_linux.o
-	$(CC) -o partA3 $(CFLAGS) $(CPPFLAGS) partA3.o fib_linux.o thread_util_linux.o -lpthread
+	$(CC) -o partA3 $(CFLAGS) $(CPPFLAGS) partA3.o fib_linux.o \
+	thread_util_linux.o -lpthread
 
 partA3.o: partA3.c
 	$(CC) -o partA3.o -c $(CFLAGS) $(CPPFLAGS) partA3.c

@@ -13,10 +13,10 @@ The basic design involves a loop driven by an infinite loop that prints a
 prompt and waits for lines from stdin. When it receives a new command, the
 tokenizer (via strtok()) splits the command into tokens for later processing by
 the shell. The tokenizer can handle an arbitrary length of tokens per command,
-by dynamically reallocating space in the token array as needed. The token array 
-is null-terminated to conform with how exec calls determine the end of an array
-of arguments. The prompt and cd builtin uses unistd.h to interface with the
-POSIX OS API. The exit builtin is very simple and just calls exit().
+by dynamically reallocating space in the token array as needed. The token 
+array is null-terminated to conform with how exec calls determine the end of 
+an array of arguments. The prompt and cd builtin uses unistd.h to interface 
+with the POSIX OS API. The exit builtin is very simple and just calls exit().
 
   execute():
       If the path is included in the command, directly path that to execv().

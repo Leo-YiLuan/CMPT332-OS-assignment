@@ -25,10 +25,12 @@ Successfully added 7 to a list with 1 element and current points to BEFORE.
 Successfully added 3 to a list with multiple elements, cur at last.
 [BEF -> 7 -> 3* -> 5 -> END] (count: 3)
 
-Successfully added 9 to a list with multiple elements, when current points to AFTER.
+Successfully added 9 to a list with multiple elements, when current points 
+to AFTER.
 [BEF -> 7 -> 3 -> 5 -> 9* -> END] (count: 4)
 
-Successfully added 19 to a list with multiple elements, when current points to first
+Successfully added 19 to a list with multiple elements, when current points 
+to first
 [BEF -> 7 -> 19* -> 3 -> 5 -> 9 -> END] (count: 5)
 
 ListRemove: Successfully removed 19 from the list with many elements.
@@ -60,7 +62,8 @@ ListInsert: Successfully received error code when passing NULL
 ListInsert: Successfully inserted into empty list.
 [BEF -> 0* -> END] (count: 1)
 
-ListInsert: Successfully inserted into list with one element. And when current points to BEFORE
+ListInsert: Successfully inserted into list with one element. And when current
+points to BEFORE
 [BEF -> -5* -> 0 -> END] (count: 2)
 
 ListInsert: Successfully inserted into list with many elements, cur at begin.
@@ -69,7 +72,8 @@ ListInsert: Successfully inserted into list with many elements, cur at begin.
 ListInsert: Successfully inserted into list with many elements, cur at end.
 [BEF -> 77 -> -5 -> 12* -> 0 -> END] (count: 4)
 
-ListInsert: Successfully inserted into list with many elements, cur at end. when current points to AFTER
+ListInsert: Successfully inserted into list with many elements, cur at end, 
+when current points to AFTER
 [BEF -> 77 -> -5 -> 12 -> 0 -> 19* -> END] (count: 5)
 
 ListAppend: Successfully received error code when passing NULL
@@ -150,7 +154,8 @@ cur not at begin.
 ListNext: Successfully received NULL from an empty list.
 [BEF -> END] (count 0)
 
-ListNext: Successfully received first item when current pointer BEFORE the first node.
+ListNext: Successfully received first item when current pointer BEFORE the 
+first node.
 [BEF -> 55* -> END] (count: 1)
 
 ListNext: Successfully received NULL from list with 1 element.
@@ -167,7 +172,8 @@ ListNext: Successfully received correct element from middle of list.
 ListPrev: Successfully received NULL from an empty list.
 [BEF -> END] (count 0)
 
-ListPrev: Successfully received last item when current pointer AFTER the last node.
+ListPrev: Successfully received last item when current pointer AFTER the 
+last node.
 [BEF -> 55* -> END] (count: 1)
 
 ListPrev: Successfully received NULL from list with 1 element.
@@ -207,7 +213,8 @@ First list:
 Second list:
 [BEF -> 10* -> END] (count: 1)
 
-The count and last node pointer of Concat List is correct, when both list are not empty, also check correctness by observation
+The count and last node pointer of Concat List is correct, when 
+both list are not empty, also check correctness by observation
 
 First list after concat:
 [BEF -> 12 -> 42* -> 7 -> 0 -> 90 -> 10 -> END] (count: 6)
@@ -218,7 +225,8 @@ First list:
 Second list:
 [BEF -> END] (count 0)
 
-The count and last node pointer of Concat List is correct, when only first list have item, also check correctness by observation
+The count and last node pointer of Concat List is correct, when 
+only first list have item, also check correctness by observation
 
 First list after concat:
 [BEF -> 12 -> 42* -> 7 -> 0 -> 90 -> 10 -> END] (count: 6)
@@ -229,7 +237,8 @@ First list:
 Second list:
 [BEF -> 10* -> 12 -> END] (count: 2)
 
-The count and last node pointer of Concat List is correct, when onlt second list is not empty, also check correctness by observation
+The count and last node pointer of Concat List is correct, when 
+only second list is not empty, also check correctness by observation
 
 First list after concat:
 [BEF -> 10* -> 12 -> END] (count: 2)
@@ -240,7 +249,8 @@ First list:
 Second list:
 [BEF -> END] (count 0)
 
-The count is correct when both lists are empty, also check correctness by observation
+The count is correct when both lists are empty, also check correctness by 
+observation
 
 First list after concat:
 [BEF -> END] (count 0)

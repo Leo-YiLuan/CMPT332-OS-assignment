@@ -9,8 +9,13 @@
 # A1 Phase 2
 */
 Success: The return of numprocs() is: 0,  expect: 0 when 0 process created
-Success: The return of numprocs() is: 5,  expect: 5 when 5 more processes created
-Success: The return of numprocs() is: 15,  expect: 15 when 10 more processes created
-Success: The return of numprocs() is: 35,  expect: 35 when 20 more processes created
-Success: The return of numprocs() is: 46,  expect: 46 when 11 more processes created
-Success: The return of numprocs() is: 56,  expect: 56 when 10 more processes created
+Success: The return of numprocs() is: 5,  expect: 5 when 5 more processes 
+created
+Success: The return of numprocs() is: 15,  expect: 15 when 10 more processes 
+created
+Success: The return of numprocs() is: 35,  expect: 35 when 20 more processes 
+created
+Success: The return of numprocs() is: 46,  expect: 46 when 11 more processes 
+created
+Success: The return of numprocs() is: 56,  expect: 56 when 10 more processes 
+created
