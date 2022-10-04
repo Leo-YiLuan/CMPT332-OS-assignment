@@ -123,8 +123,8 @@ int main() {
     char **tokenArr = malloc(maxTokenCount * sizeof(char*));
     size_t cmdSize = 0;
     size_t tokenIndex = 0;
-    char *path[] = {".","usr/local/bin","/usr/local/sbin",
-    "/usr/bin","/usr/sbin",NULL};
+    char *path[] = {"/bin","/usr/local/bin","/student/binfo/bin",
+    "/usr/local/sbin", "/usr/bin","/usr/sbin",NULL};
 
     size_t j = 0;
     int pipeCount = 0;
