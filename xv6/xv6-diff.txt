@@ -1,0 +1,119 @@
+/*
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A1 Phase 2
+*/
+
+diff --git a/xv6/Makefile b/xv6/Makefile
+index 4e0afe5..27b4761 100644
+--- a/xv6/Makefile
++++ b/xv6/Makefile
+
+@@ -132,13 +132,14 @@ UPROGS=\
+ 	$U/_grind\
+ 	$U/_wc\
+ 	$U/_zombie\
++	$U/_test_numprocs\
+
+
+ ifndef CPUS
+-CPUS := 3
++CPUS := 1
+ endif
+
+-
+diff --git a/xv6/kernel/proc.c b/xv6/kernel/proc.c
+index cc50132..ca14f92 100644
+--- a/xv6/kernel/proc.c
++++ b/xv6/kernel/proc.c
+
++
++
++}
++int numprocs(){
++  uint64 procCount=0;
++  struct proc *p;
++
++  for(p = proc; p < &proc[NPROC]; p++){
++    acquire(&p->lock);
++    if(p->state == RUNNABLE)
++      procCount++;
++    release(&p->lock);
++  }
++  return procCount;
+ }
+
+diff --git a/xv6/kernel/proc.h b/xv6/kernel/proc.h
++
++int numprocs();
+diff --git a/xv6/kernel/syscall.c b/xv6/kernel/syscall.c
+
+index 5ae08cc..8ecf32a 100644
+--- a/xv6/kernel/syscall.c
++++ b/xv6/kernel/syscall.c
+@@ -94,6 +94,7 @@ extern uint64 sys_getpid(void);
+ extern uint64 sys_sbrk(void);
+ extern uint64 sys_sleep(void);
+ extern uint64 sys_uptime(void);
++extern uint64 sys_numprocs(void);
+ extern uint64 sys_open(void);
+ extern uint64 sys_write(void);
+ extern uint64 sys_mknod(void);
+
+@@ -119,6 +120,7 @@ static uint64 (*syscalls[])(void) = {
+ [SYS_sbrk]    sys_sbrk,
+ [SYS_sleep]   sys_sleep,
+ [SYS_uptime]  sys_uptime,
++[SYS_numprocs] sys_numprocs,
+ [SYS_open]    sys_open,
+ [SYS_write]   sys_write,
+ [SYS_mknod]   sys_mknod,
+
+diff --git a/xv6/kernel/syscall.h b/xv6/kernel/syscall.h
+index 95eab25..071adf5 100644
+--- a/xv6/kernel/syscall.h
++++ b/xv6/kernel/syscall.h
+@@ -20,3 +20,4 @@
+ #define SYS_link   19
+ #define SYS_mkdir  20
+ #define SYS_close  21
++#define SYS_numprocs 22
+
+diff --git a/xv6/kernel/sysproc.c b/xv6/kernel/sysproc.c
+index 63b9f42..c3994f2 100644
+--- a/xv6/kernel/sysproc.c
++++ b/xv6/kernel/sysproc.c
+
++
++uint64
++sys_numprocs(void){
++  return numprocs();
++}
+
+diff --git a/xv6/user/user.h b/xv6/user/user.h
+index ea1d5a5..be8adf7 100644
+--- a/xv6/user/user.h
++++ b/xv6/user/user.h
+@@ -22,6 +22,7 @@ int getpid(void);
+ char* sbrk(int);
+ int sleep(int);
+ int uptime(void);
++int numprocs(void);
+
+ /* ulib.c */
+ int stat(const char*, struct stat*);
+diff --git a/xv6/user/usys.pl b/xv6/user/usys.pl
+index 01e426e..0c789c2 100755
+--- a/xv6/user/usys.pl
++++ b/xv6/user/usys.pl
+
+@@ -36,3 +36,4 @@ entry("getpid");
+ entry("sbrk");
+ entry("sleep");
+ entry("uptime");
++entry("numprocs");
