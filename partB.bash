@@ -59,8 +59,8 @@ do
     readarray -d " " arr < <(echo -n "$line")
     if [ ${arr[0]} -lt 0 ] || [ ${arr[1]} -lt 0 ] || [ ${arr[2]} -lt 0 ]
     then
-        printf "Error: Input $1 must be non-negative...\n"
-        return 1
+        printf "Error: Input must be non-negative...\n"
+        continue
     fi
     ./$binary ${arr[0]} ${arr[1]} ${arr[2]}
 
