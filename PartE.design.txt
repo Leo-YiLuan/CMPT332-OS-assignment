@@ -9,11 +9,58 @@
 # A1 Phase 2
 */
 
-The basic design involves a loop driven by an infinite loop that prints a prompt
-and waits for lines from stdin. When it receives a new command, the tokenizer
-(via strtok()) splits the command into tokens for later processing by the shell.
-The tokenizer can handle an arbitrary length of tokens per command, by dynamically
-reallocating space in the token array as needed. The token array is null-terminated
-to conform with how exec calls determine the end of an array of arguments. The 
-prompt and cd builtin uses unistd.h to interface with the POSIX OS API. The exit
-builtin is very simple and just calls exit().
+The basic design involves a loop driven by an infinite loop that prints a
+prompt and waits for lines from stdin. When it receives a new command, the
+tokenizer (via strtok()) splits the command into tokens for later processing by
+the shell. The tokenizer can handle an arbitrary length of tokens per command,
+by dynamically reallocating space in the token array as needed. The token array 
+is null-terminated to conform with how exec calls determine the end of an array
+of arguments. The prompt and cd builtin uses unistd.h to interface with the
+POSIX OS API. The exit builtin is very simple and just calls exit().
+
+  execute():
+      If the path is included in the command, directly path that to execv().
+      Use a while loop to iterate through all PATH hard coded in the path array
+      and concatenate the path and command using memmove(). Path that concated
+      command to the c-library function execv(). Try command in every path, if
+      failed(return == -1), try next path. Print error message after tried all
+      PATH.
+
+      PARAMETERS:
+            char **tokenArr: an string array that contains command user
+            typed in shell.
+            char **path: the path the command will be searched from.
+
+      PRECONDITION: NONE;
+
+      FUNCITONING:  execute command(program) in hard coded path.
+
+      POSTCONDITION: NONE.
+
+      RETURNS: NONE.
+
+For the part of implementing pipe feature. First, detect if there is only one
+pipe character in the command. If so, split the command bypipe character using
+memmove(), and send them to the execute() function after adding NULL to the end
+of first half command.
+
+  pipingExe():
+      use pipe() to create a pipe, fork() a child process that read output
+      form parent and use it as input. To implement that, use dup2() to
+      duplicate stdin in child with pipe read, and stdout in parent with
+      pipe write. stdout(parent) -> pipe write -> pipe read -> stdin(child).
+      call execute() with parameter of two splitted commands after pipe setup.
+
+      PARAMETERS:
+            char **tokenArrWr: an string array that contains command user
+            typed in shell. use to write to the pipe
+            char **tokenArrRe: an string array that contains command user
+            typed in shell. use to read from the pipe
+            char **path: the path the command will be searched from.
+            PRECONDITION: NONE;
+
+            FUNCITONING:  pipe command 1 with command 2.
+
+            POSTCONDITION: NONE.
+
+            RETURNS: NONE.
