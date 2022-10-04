@@ -64,3 +64,14 @@ of first half command.
             POSTCONDITION: NONE.
 
             RETURNS: NONE.
+
+
+    update_cwd: 
+        Determines the current working directory of the process, and 
+        updates the prompt to reflect the new current working directory,
+        if such a change had occured. 
+    PARAMS:
+        char *prompt: A pointer that will point to memory containing the 
+        new current working directory. 
+        size_t *promptSize: An integer that will be set to the new length 
+        of the prompt string. 
