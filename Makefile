@@ -13,7 +13,7 @@ CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 PTHREADS_INCLUDE=-I/student/cmpt332/pthreads/
 
 .PHONY : all
-all: mytestlist partA1 partA2 partA3 partA4 shell
+all: mytestlist-Linuxx86_64 testlist-Linuxx86_64 partA1 partA2 partA3 partA4 shell
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
@@ -57,13 +57,18 @@ list_removers.o : list_removers.c list.h
 mytestlist.o: mytestlist.c list.h
 	$(CC) -o mytestlist.o -c $(CFLAGS) $(CPPFLAGS) mytestlist.c
 
+testlist.o: testlist.c list.h
+	$(CC) -o testlist.o -c $(CFLAGS) $(CPPFLAGS) testlist.c
+
 liblist.a : list_adders.o list_movers.o list_removers.o
 	ar -r liblist.a list_movers.o list_adders.o list_removers.o
 
 
 
 ifeq ($(OS), Windows_NT)
-mytestlist:
+testlist-Linuxx86_64:
+	@echo "On Windows, but assignment spec says PartC is linux only, skipping..."
+mytestlist-Linuxx86_64:
 	@echo "On Windows, but assignment spec says PartC is linux only, skipping..."
 partA2:
 	@echo "On Windows, partA2 skipping..."
@@ -82,8 +87,11 @@ shell: shell.o
 shell.o: shell.c
 	$(CC) -o shell.o $(CPPFLAGS) $(CFLAGS) -c shell.c
 
-mytestlist: mytestlist.o liblist.a list.h
-	$(CC) -o mytestlist $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
+testlist-Linuxx86_64: testlist.o liblist.a list.h
+	$(CC) -o testlist-Linuxx86_64 $(CFLAGS) $(CPPFLAGS) testlist.o -L. -llist
+
+mytestlist-Linuxx86_64: mytestlist.o liblist.a list.h
+	$(CC) -o mytestlist-Linuxx86_64 $(CFLAGS) $(CPPFLAGS) mytestlist.o -L. -llist
 
 partA2: partA2.o fib_linux.o thread_util_linux.o
 	$(CC) -o partA2 $(CFLAGS) $(CPPFLAGS) partA2.o  fib_linux.o \
