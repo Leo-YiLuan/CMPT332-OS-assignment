@@ -1,0 +1,27 @@
+/*
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A1 Phase 2
+*/
+
+A few things that we should include in our test results 
+to demonstrate correctness:
+
+1. Test executing a command in the local dir, with "./"
+2. Test executing a command in the local dir, without 
+"./. Should fail as dot is not in the hardcoded path 
+array. 
+3. Test executing a command with parameters, to test 
+correct tokenization.
+4. Test commands of different lengths, to test 
+correct fetching of the line. 
+5. Test executing a command found within the hardcoded 
+path array. 
+6. Test cd both with and without absolute paths.
+7. Test cd with a nonexistent path. 
+7. Test exit. 

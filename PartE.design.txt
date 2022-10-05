@@ -71,7 +71,19 @@ of first half command.
         updates the prompt to reflect the new current working directory,
         if such a change had occured. 
     PARAMS:
-        char *prompt: A pointer that will point to memory containing the 
+        char **prompt: A pointer that will point to memory containing the 
         new current working directory. 
         size_t *promptSize: An integer that will be set to the new length 
         of the prompt string. 
+
+
+    get_line:
+        Gets a single line from stdin, excluding newline but including 
+        null terminator. 
+    PARAMS:
+        char **command: A pointer that will point to memory containing 
+        the new line. 
+        size_t bufSize: The size, in bytes, of the memory pointed to 
+        by command. If the new line is larger than bufSize, command 
+        is reallocated to fit and the new bufSize is written into 
+        the parameter. 

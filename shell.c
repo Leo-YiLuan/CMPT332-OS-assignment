@@ -76,7 +76,7 @@ void pipingExe(char** tokenArrWr, char** tokenArrRe, char** path){
 
 }
 
-void update_cwd(char *prompt, size_t *promptSize) {
+void update_cwd(char **prompt, size_t *promptSize) {
   char *res = NULL;
   size_t newPromptLen = 0;
   memset(cwd, 0, cwdLen * sizeof(char));
@@ -98,38 +98,38 @@ void update_cwd(char *prompt, size_t *promptSize) {
   /* Update prompt */
   /* 5 extra chars: one for null terminator, 4 for prompt decorations */
   newPromptLen = strlen(cwd) + 5;
-  memset(prompt, 0, *promptSize);
+  memset(*prompt, 0, *promptSize);
   if (newPromptLen > *promptSize) {
     *promptSize = *promptSize * 2;
-    prompt = realloc(prompt, *promptSize * sizeof(char));
-    memset(prompt, 0, *promptSize);
+    *prompt = realloc(*prompt, *promptSize * sizeof(char));
+    memset(*prompt, 0, *promptSize);
   }
-  memcpy(prompt+1, cwd, strlen(cwd));
-  prompt[0] = '[';
-  memcpy(&prompt[strlen(cwd)+1], "] >", strlen("] >"));
-  prompt[*promptSize - 1] = '\0';
+  memcpy(*prompt+1, cwd, strlen(cwd));
+  (*prompt)[0] = '[';
+  memcpy(&(*prompt)[strlen(cwd)+1], "] >", strlen("] >"));
+  (*prompt)[*promptSize - 1] = '\0';
 }
 
-void get_line(char *command, size_t *bufSize) {
+void get_line(char **command, size_t *bufSize) {
   size_t idx = 0;
 
-  memset(command, 0, *bufSize);
+  memset(*command, 0, *bufSize);
 
   while (1) {
     char ch = (char)getchar();
     
     if (idx + 1 >= *bufSize) {
-      *bufSize *= 2;
-      command = realloc(command, *bufSize);
+      *bufSize = *bufSize * 2;
+      *command = realloc(*command, *bufSize);
     }
 
     if (ch == '\n') {
-      command[idx] = '\0';
+      (*command)[idx] = '\0';
       idx += 1;
       break;
     }
 
-    command[idx] = ch;
+    (*command)[idx] = ch;
     idx += 1;
   }
   *bufSize = idx + 1;
@@ -168,10 +168,10 @@ int main() {
         tokenIndex = 0;
         j = 0;
         pipeCount = 0;
-        update_cwd(prompt, &promptLen);
+        update_cwd(&prompt, &promptLen);
         printf("%s ", prompt);
         /* Grab the next command from stdin */
-        get_line(command, &cmdSize);
+        get_line(&command, &cmdSize);
 
         tokenIndex = 0;
         /* This should never happen, but just to be safe...*/
