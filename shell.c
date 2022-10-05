@@ -110,6 +110,31 @@ void update_cwd(char *prompt, size_t *promptSize) {
   prompt[*promptSize - 1] = '\0';
 }
 
+void get_line(char *command, size_t *bufSize) {
+  size_t idx = 0;
+
+  memset(command, 0, *bufSize);
+
+  while (1) {
+    char ch = (char)getchar();
+    
+    if (idx + 1 >= *bufSize) {
+      *bufSize *= 2;
+      command = realloc(command, *bufSize);
+    }
+
+    if (ch == '\n') {
+      command[idx] = '\0';
+      idx += 1;
+      break;
+    }
+
+    command[idx] = ch;
+    idx += 1;
+  }
+  *bufSize = idx + 1;
+}
+
 
 /* Basic skeleton program for the shell.
    Right now all it does it store the stdin into
@@ -120,7 +145,7 @@ int main() {
     char *command = NULL;
     size_t maxTokenCount = MIN_ALLOC_SIZE;
     char **tokenArr = malloc(maxTokenCount * sizeof(char*));
-    size_t cmdSize = 0;
+    size_t cmdSize = MIN_ALLOC_SIZE * sizeof(char);
     size_t tokenIndex = 0;
     char *path[] = {"/bin","/usr/local/bin","/student/binfo/bin",
     "/usr/local/sbin", "/usr/bin","/usr/sbin",NULL};
@@ -133,6 +158,7 @@ int main() {
     char *prompt = NULL;
     size_t promptLen = cwdLen;
 
+    command = malloc(cmdSize);
     cwd = malloc(cwdLen * sizeof(char));
     prompt = malloc(cwdLen * sizeof(char));
 
@@ -140,18 +166,16 @@ int main() {
         char *strtokRes = NULL;
         /* Resetting some vars in prep for the next cotokenArrmmand */
         tokenIndex = 0;
-        cmdSize = 0;
         j = 0;
         pipeCount = 0;
         update_cwd(prompt, &promptLen);
         printf("%s ", prompt);
         /* Grab the next command from stdin */
-        getline(&command, &cmdSize, stdin);;
+        get_line(command, &cmdSize);
 
         tokenIndex = 0;
         /* This should never happen, but just to be safe...*/
         if (!command) { break; }
-        command[strlen(command)-1]='\0';
         /* Main tokenizer code. */
         tokenArr[0] = strtok(command, " ");
         if (!tokenArr[0]) {
@@ -217,10 +241,6 @@ int main() {
           }
           wait(NULL);
         }
-
-        /* Free the old cmd string now that we are done with it. */
-        free(command);
-        command = NULL;
     }
 
     /* Shouldn't matter, but might as well do it. */
