@@ -24,4 +24,5 @@ correct fetching of the line.
 path array. 
 6. Test cd both with and without absolute paths.
 7. Test cd with a nonexistent path. 
-7. Test exit. 
+8. Test pipes, both 1 and many pipe tokens. 
+9. Test exit. 

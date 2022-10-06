@@ -13,7 +13,8 @@ CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 PTHREADS_INCLUDE=-I/student/cmpt332/pthreads/
 
 .PHONY : all
-all: mytestlist-Linuxx86_64 testlist-Linuxx86_64 partA1 partA2 partA3 partA4 shell
+all: mytestlist-Linuxx86_64 testlist-Linuxx86_64 partA1 partA2 partA3 \
+partA4 shell
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows

@@ -24,7 +24,7 @@ drwxr-s---  3 dwm138 cmpt332    4096 Aug 16 11:50 2020
 drwxrwxr-x  3 dwm138 cmpt332    4096 Dec  2  2019 images
 drwxrws--- 10 dwm138 cmpt332    4096 Oct  5 11:58 markers
 drwxr-s--- 11 dwm138 cmpt332    4096 Apr  8  2015 os161
-drwxrwsr-x  4 dwm138 cmpt332    4096 Oct  5 11:09 pthreads
+drwxrwsr-x  4 dwm138 cmpt332    4096 Oct  5 15:18 pthreads
 -rw-r--r--  1 dwm138 cmpt332  563200 Sep 21  2010 pthreads.2010.tar
 -rw-r--r--  1 dwm138 cmpt332   29003 Oct 17  2017 pthreads.tar.gz
 -rw-rw----  1 dwm138 cmpt332   44467 Sep 10  2010 pthreads.tar.gz.OLD
@@ -52,14 +52,10 @@ Failed to change directory!
 [/student/mam552] > cd CMPT332/RemoteRepo
 [/student/mam552/CMPT332/RemoteRepo] > make
 Not on Windows, skipping partA1...
-[/student/mam552/CMPT332/RemoteRepo] > exit
-[/student/yil160/CMPT332/A1] > ls | wc -l
-45
-[/student/yil160/CMPT332/A1] > ls | wc | ls
+[/student/mam552/CMPT332/RemoteRepo] > ls | wc -l
+58
+[/student/mam552/CMPT332/RemoteRepo] > ls | wc | ls
 Number of pipe character is greater than 1, can not handle
-
-[/student/yil160/CMPT332/A1] > ls |wc -l
-ls: cannot access '|wc': No such file or directory
-
-[/student/yil160/CMPT332/A1] > Fakecommand
+[/student/mam552/CMPT332/RemoteRepo] > fakeCommand
 No such file or directory
+[/student/mam552/CMPT332/RemoteRepo] > exit
