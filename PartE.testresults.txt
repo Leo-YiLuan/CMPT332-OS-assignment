@@ -53,3 +53,13 @@ Failed to change directory!
 [/student/mam552/CMPT332/RemoteRepo] > make
 Not on Windows, skipping partA1...
 [/student/mam552/CMPT332/RemoteRepo] > exit
+[/student/yil160/CMPT332/A1] > ls | wc -l
+45
+[/student/yil160/CMPT332/A1] > ls | wc | ls
+Number of pipe character is greater than 1, can not handle
+
+[/student/yil160/CMPT332/A1] > ls |wc -l
+ls: cannot access '|wc': No such file or directory
+
+[/student/yil160/CMPT332/A1] > Fakecommand
+No such file or directory
