@@ -82,7 +82,7 @@ shell:
 else
 
 shell: shell.o
-	$(CC) -o shell $(CFLAGS) $(CPPFLAGS) shell.o 
+	$(CC) -o shell $(CFLAGS) $(CPPFLAGS) shell.o
 
 shell.o: shell.c
 	$(CC) -o shell.o $(CPPFLAGS) $(CFLAGS) -c shell.c
@@ -109,11 +109,13 @@ partA3.o: partA3.c
 	$(CC) -o partA3.o -c $(CFLAGS) $(CPPFLAGS) partA3.c
 
 partA4: partA4.o fib_linux.o thread_util_linux.o
-	$(CC) -o partA4 $(CFLAGS) $(CPPFLAGS) partA4.o fib_linux.o thread_util_linux.o
+	$(CC) -o partA4 $(CFLAGS) $(CPPFLAGS) partA4.o fib_linux.o \
+	thread_util_linux.o
 
 partA4.o: partA4.c
 	$(CC) -o partA4.o -c $(CFLAGS) $(CPPFLAGS) partA4.c
 endif
 
 clean:
-	rm -f *.o liblist.a mytestlist partA1 partA2 partA3 partA4 shell
+	rm -f *.o liblist.a mytestlist partA1 partA2 partA3 partA4 shell \
+	mytestlist-Linuxx86_64 testlist-Linuxx86_64

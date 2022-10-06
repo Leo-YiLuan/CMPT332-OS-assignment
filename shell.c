@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <linux/limits.h>
 #include <errno.h>
+#include <fcntl.h>
 #define MIN_ALLOC_SIZE 5
 
 size_t cwdLen = PATH_MAX;
@@ -52,29 +53,6 @@ void execute(char ** tokenArr, char ** path){
 
 }
 
-void pipingExe(char** tokenArrWr, char** tokenArrRe, char** path){
-  int fd[2];
-  pid_t inProcess;
-  pipe(fd);
-
-  inProcess = fork();
-  /* in children process*/
-  if (inProcess == 0) {
-    close(fd[1]);
-    /* dulpicate stdin with pipe read*/
-    dup2(fd[0],STDIN_FILENO);
-    execute(tokenArrRe,path);
-  /* in parent process */
-  }else if(inProcess>0){
-    close(fd[0]);
-    /* dulpicate stdout with pipe write*/
-    dup2(fd[1],STDOUT_FILENO);
-    execute(tokenArrWr,path);
-
-  }
-
-
-}
 
 void update_cwd(char **prompt, size_t *promptSize) {
   char *res = NULL;
@@ -117,7 +95,7 @@ void get_line(char **command, size_t *bufSize) {
 
   while (1) {
     char ch = (char)getchar();
-    
+
     if (idx + 1 >= *bufSize) {
       *bufSize = *bufSize * 2;
       *command = realloc(*command, *bufSize);
@@ -164,6 +142,7 @@ int main() {
 
     while (1) {
         char *strtokRes = NULL;
+
         /* Resetting some vars in prep for the next cotokenArrmmand */
         tokenIndex = 0;
         j = 0;
@@ -224,6 +203,10 @@ int main() {
             fprintf(stderr,"Number of pipe character is greater than 1, "
             "can not handle\n" );
           }else if (pipeCount==1) {
+            /* two file descriptors points to same file.
+            one for write , one for read */
+            int fdwrite = open("./temp.txt", O_CREAT|O_WRONLY, 0777);
+            int fdread = open("./temp.txt", O_RDONLY, 0x777);
             /* split the list in to two */
             char **tokenArrIn = malloc((pipeIndex+1) * sizeof(char*));
             tokenArr[pipeIndex] = NULL;
@@ -231,8 +214,19 @@ int main() {
             id = fork();
             /*send the split list to two processes respectivly */
             if (id==0) {
-            pipingExe(tokenArrIn,&tokenArr[pipeIndex+1],path);
+              dup2(fdwrite,STDOUT_FILENO);
+              execute(tokenArrIn,path);
             }
+
+            wait(NULL);
+
+            id = fork();
+            if (id == 0) {
+              dup2(fdread,STDIN_FILENO);
+              execute(&tokenArr[pipeIndex+1],path);
+            }
+            wait(NULL);
+            remove("./temp.txt");
           }else{
             id = fork();
             if (id==0) {
