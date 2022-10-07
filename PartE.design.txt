@@ -13,9 +13,9 @@ The basic design involves a loop driven by an infinite loop that prints a
 prompt and waits for lines from stdin. When it receives a new command, the
 tokenizer (via strtok()) splits the command into tokens for later processing by
 the shell. The tokenizer can handle an arbitrary length of tokens per command,
-by dynamically reallocating space in the token array as needed. The token 
-array is null-terminated to conform with how exec calls determine the end of 
-an array of arguments. The prompt and cd builtin uses unistd.h to interface 
+by dynamically reallocating space in the token array as needed. The token
+array is null-terminated to conform with how exec calls determine the end of
+an array of arguments. The prompt and cd builtin uses unistd.h to interface
 with the POSIX OS API. The exit builtin is very simple and just calls exit().
 
   execute():
@@ -40,9 +40,13 @@ with the POSIX OS API. The exit builtin is very simple and just calls exit().
       RETURNS: NONE.
 
 For the part of implementing pipe feature. First, detect if there is only one
-pipe character in the command. If so, split the command bypipe character using
+pipe character in the command. If so, split the command by pipe character using
 memmove(), and send them to the execute() function after adding NULL to the end
-of first half command.
+of first half command. fork() and call pipingExe(). Fork again, the leading
+command execute in parents process, after duplicate stdout to pipe file
+descriptor [1] using dup2(). The seconds command execute in child process
+after duplicate stdin to pipe file descriptor [0] using dup2()
+
 
   pipingExe():
       use pipe() to create a pipe, fork() a child process that read output
@@ -66,24 +70,24 @@ of first half command.
             RETURNS: NONE.
 
 
-    update_cwd: 
-        Determines the current working directory of the process, and 
+    update_cwd:
+        Determines the current working directory of the process, and
         updates the prompt to reflect the new current working directory,
-        if such a change had occured. 
+        if such a change had occured.
     PARAMS:
-        char **prompt: A pointer that will point to memory containing the 
-        new current working directory. 
-        size_t *promptSize: An integer that will be set to the new length 
-        of the prompt string. 
+        char **prompt: A pointer that will point to memory containing the
+        new current working directory.
+        size_t *promptSize: An integer that will be set to the new length
+        of the prompt string.
 
 
     get_line:
-        Gets a single line from stdin, excluding newline but including 
-        null terminator. 
+        Gets a single line from stdin, excluding newline but including
+        null terminator.
     PARAMS:
-        char **command: A pointer that will point to memory containing 
-        the new line. 
-        size_t bufSize: The size, in bytes, of the memory pointed to 
-        by command. If the new line is larger than bufSize, command 
-        is reallocated to fit and the new bufSize is written into 
-        the parameter. 
+        char **command: A pointer that will point to memory containing
+        the new line.
+        size_t bufSize: The size, in bytes, of the memory pointed to
+        by command. If the new line is larger than bufSize, command
+        is reallocated to fit and the new bufSize is written into
+        the parameter.
