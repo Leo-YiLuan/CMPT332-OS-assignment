@@ -22,16 +22,16 @@ total 10544
 drwxr-s--- 43 dwm138 cmpt332   20480 Oct  2  2020 2019
 drwxr-s---  3 dwm138 cmpt332    4096 Aug 16 11:50 2020
 drwxrwxr-x  3 dwm138 cmpt332    4096 Dec  2  2019 images
-drwxrws--- 10 dwm138 cmpt332    4096 Oct  5 11:58 markers
+drwxrws--- 11 dwm138 cmpt332    4096 Oct  7 11:09 markers
 drwxr-s--- 11 dwm138 cmpt332    4096 Apr  8  2015 os161
-drwxrwsr-x  4 dwm138 cmpt332    4096 Oct  5 11:09 pthreads
+drwxrwsr-x  4 dwm138 cmpt332    4096 Oct  7 10:40 pthreads
 -rw-r--r--  1 dwm138 cmpt332  563200 Sep 21  2010 pthreads.2010.tar
 -rw-r--r--  1 dwm138 cmpt332   29003 Oct 17  2017 pthreads.tar.gz
 -rw-rw----  1 dwm138 cmpt332   44467 Sep 10  2010 pthreads.tar.gz.OLD
 -rw-r-----  1 dwm138 cmpt332  133120 Oct 22  2018 pthreads.tony.tar
 drwxrwsr-x  7 dwm138 cmpt332    4096 Nov  9  2020 qemu
 drwxrwsr-x 11 dwm138 cmpt332    4096 Sep  7  2021 riscv
-drwxrwsr-x  8 dwm138 cmpt332    4096 Sep 16 16:15 rtt
+drwxrwsr-x  8 dwm138 cmpt332    4096 Oct  6 14:01 rtt
 -rwxr--r--  1 dwm138 cmpt332 4075520 Oct 25  2010 rtt.2016.tar
 -rwxrw-r--  1 dwm138 cmpt332  710144 Oct 16  2018 rtt.2017.tar
 -rw-r--r--  1 dwm138 cmpt332 3141120 Oct 19  2018 rtt.2018.tar.gz
@@ -52,4 +52,10 @@ Failed to change directory!
 [/student/mam552] > cd CMPT332/RemoteRepo
 [/student/mam552/CMPT332/RemoteRepo] > make
 Not on Windows, skipping partA1...
+[/student/mam552/CMPT332/RemoteRepo] > ls | wc -l
+52
+[/student/mam552/CMPT332/RemoteRepo] > ls | wc | ls
+Number of pipe character is greater than 1, can not handle
+[/student/mam552/CMPT332/RemoteRepo] > fakeCommand
+No such file or directory
 [/student/mam552/CMPT332/RemoteRepo] > exit
