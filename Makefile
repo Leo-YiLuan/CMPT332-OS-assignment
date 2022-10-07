@@ -13,13 +13,15 @@ CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 PTHREADS_INCLUDE=-I/student/cmpt332/pthreads/
 
 .PHONY : all
-all: mytestlist-Linuxx86_64 testlist-Linuxx86_64 partA1 partA2 partA3 partA4 shell
+all: mytestlist-Linuxx86_64 testlist-Linuxx86_64 partA1 partA2 partA3 \
+partA4 partE
 
 ifeq ($(OS), Windows_NT)
 # We are on Windows/MSYS, build the windows
 # assignment.
 partA1: partA1.o fib_win.o thread_util_win.o
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o partA1 partA1.o fib_win.o thread_util_win.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o partA1 partA1.o fib_win.o \
+	thread_util_win.o
 
 partA1.o: partA1.c
 	$(CC) -c $(CPPFLAGS) -o partA1.o partA1.c
@@ -76,16 +78,16 @@ partA3:
 	@echo "On Windows, partA3 skipping..."
 partA4:
 	@echo "On Windows, partA4 skipping..."
-shell:
-	@echo "On Windows, don't build shell..."
+partE:
+	@echo "On Windows, don't build partE..."
 
 else
 
-shell: shell.o
-	$(CC) -o shell $(CFLAGS) $(CPPFLAGS) shell.o 
+partE: partE.o
+	$(CC) -o partE $(CFLAGS) $(CPPFLAGS) partE.o 
 
-shell.o: shell.c
-	$(CC) -o shell.o $(CPPFLAGS) $(CFLAGS) -c shell.c
+partE.o: partE.c
+	$(CC) -o partE.o $(CPPFLAGS) $(CFLAGS) -c partE.c
 
 testlist-Linuxx86_64: testlist.o liblist.a list.h
 	$(CC) -o testlist-Linuxx86_64 $(CFLAGS) $(CPPFLAGS) testlist.o -L. -llist
@@ -116,4 +118,4 @@ partA4.o: partA4.c
 endif
 
 clean:
-	rm -f *.o liblist.a mytestlist partA1 partA2 partA3 partA4 shell
+	rm -f *.o liblist.a mytestlist partA1 partA2 partA3 partA4 partE
