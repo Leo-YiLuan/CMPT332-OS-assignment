@@ -12,6 +12,10 @@
    *********** reader-writer.c ***********
 */
 
+/* Student Notes:
+  Changed signature of reader and writer to PROCESS instead of PID return type.
+*/
+
 
 #include <stdio.h>
 
@@ -22,7 +26,7 @@
 
 #define SLEEPMAX 20
 
-PID reader(void *arg)
+PROCESS reader(void *arg)
 {
   long myId;
   
@@ -40,7 +44,7 @@ PID reader(void *arg)
     }
 }
 
-PID writer(void *arg)
+PROCESS writer(void *arg)
 {
   long myId;
   myId = (long) arg;
