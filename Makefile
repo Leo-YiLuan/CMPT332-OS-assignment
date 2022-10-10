@@ -10,9 +10,26 @@
 CC=gcc
 CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
+PTHREADS_DIR=/student/cmpt332/pthreads/
+PTHREADS_LIB=/student/cmpt332/pthreads/lib/Linuxx86_64/
 
 .PHONY : all
-all: liblist.a
+all: reader_writer_test
+
+reader_writer_test: libMonitor.a liblist.a reader_writer.o reader_writer_monitor.o
+	$(CC) -o reader_writer_test $(CFLAGS) $(CPPFLAGS) -L. -L$(PTHREADS_LIB) reader_writer.o reader_writer_monitor.o -llist -lMonitor -lpthreads
+
+libMonitor.a: Monitor.o
+	ar -r libMonitor.a Monitor.o
+
+Monitor.o: Monitor.c Monitor.h
+	$(CC) -o Monitor.o -c $(CFLAGS) $(CPPFLAGS) Monitor.c 
+
+reader_writer_monitor.o: reader_writer_monitor.c 
+	$(CC) -o reader_writer_monitor.o -c $(CFLAGS) $(CPPFLAGS) -I. reader_writer_monitor.c 
+
+reader_writer.o: reader_writer.c reader_writer_monitor.h
+	$(CC) -o reader_writer.o -c $(CFLAGS) $(CPPFLAGS) -I$(PTHREADS_DIR) -I. reader_writer.c 
 
 liblist.a : list_adders.o list_movers.o list_removers.o
 	ar -r liblist.a list_movers.o list_adders.o list_removers.o
@@ -27,4 +44,4 @@ list_removers.o : list_removers.c list.h
 	$(CC) -o list_removers.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
 
 clean:
-	rm -f *.o liblist.a
+	rm -f *.o liblist.a libMonitor.a
