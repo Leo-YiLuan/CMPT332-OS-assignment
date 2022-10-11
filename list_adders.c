@@ -70,9 +70,6 @@ int ListAdd(LIST *list,void *item){
     NODE *node = NULL;
     if (list == NULL){
         return -1;
-    }else if (item == NULL)
-    {
-        return -1;
     }
 
     if (freeNodes == NULL) {
@@ -133,9 +130,6 @@ int ListInsert(LIST *list, void *item){
     NODE *node = NULL;
     if (list == NULL){
         return -1;
-    }else if (item == NULL)
-    {
-        return -1;
     }
 
     if (freeNodes == NULL) {
@@ -193,9 +187,6 @@ int ListAppend(LIST *list, void *item){
     NODE *node = NULL;
     if (list == NULL){
         return -1;
-    }else if (item == NULL)
-    {
-        return -1;
     }
     if (freeNodes == NULL) {
         /* Out of memory! */
@@ -229,9 +220,6 @@ int ListAppend(LIST *list, void *item){
 int ListPrepend(LIST *list, void *item){
     NODE *node = NULL;
     if (list == NULL){
-        return -1;
-    }else if (item == NULL)
-    {
         return -1;
     }
     if (freeNodes == NULL) {

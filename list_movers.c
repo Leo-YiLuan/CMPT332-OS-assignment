@@ -140,11 +140,6 @@ void *ListSearch(LIST *list, int (*comparator)(void *, void *),
         printf("Error in procedure ListSearch(): "
         "Invalid parameter comparator() \n");
         return NULL;
-    }else if (comparisionArg == NULL)
-    {
-        printf("Error in procedure ListSearch(): "
-        "Invalid parameter comparisionArg \n");
-        return NULL;
     }
     if (list->listCount == 0) {
         return NULL;
