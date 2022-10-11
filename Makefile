@@ -17,13 +17,13 @@ PTHREADS_LIB=/student/cmpt332/pthreads/lib/Linuxx86_64/
 all: reader_writer_test
 
 reader_writer_test: libMonitor.a liblist.a reader_writer.o reader_writer_monitor.o
-	$(CC) -o reader_writer_test $(CFLAGS) $(CPPFLAGS) -L. -L$(PTHREADS_LIB) reader_writer.o reader_writer_monitor.o -llist -lMonitor -lpthreads
+	$(CC) -o reader_writer_test $(CFLAGS) $(CPPFLAGS) -L. -L$(PTHREADS_LIB) reader_writer.o reader_writer_monitor.o -lMonitor -lpthreads -llist
 
 libMonitor.a: Monitor.o
 	ar -r libMonitor.a Monitor.o
 
 Monitor.o: Monitor.c Monitor.h
-	$(CC) -o Monitor.o -c $(CFLAGS) $(CPPFLAGS) Monitor.c 
+	$(CC) -o Monitor.o -c $(CFLAGS) $(CPPFLAGS) -I$(PTHREADS_DIR) Monitor.c 
 
 reader_writer_monitor.o: reader_writer_monitor.c 
 	$(CC) -o reader_writer_monitor.o -c $(CFLAGS) $(CPPFLAGS) -I. reader_writer_monitor.c 

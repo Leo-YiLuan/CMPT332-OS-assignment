@@ -59,14 +59,13 @@ PROCESS writer(void *arg)
       printf("%ld stop write\n", myId);
       Sleep((int) (rand() % SLEEPMAX*6));
     }
-  
 }
 
 int mainp()
 {
     PID tempPid, temp2, temp3;
     setbuf(stdout, 0);
-
+    Initialize();
     srand(71);
 
     tempPid = Create((void(*)()) reader, 16000, "R1", (void *) 1000, 
