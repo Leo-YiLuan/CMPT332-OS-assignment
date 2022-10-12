@@ -12,6 +12,8 @@ CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
 PTHREADS_DIR=/student/cmpt332/pthreads/
 PTHREADS_LIB=/student/cmpt332/pthreads/lib/Linuxx86_64/
+RTTHREADS_DIR=/student/cmpt332/rtt/include/
+RTTHREADS_LIB=/student/cmpt332/rtt/lib/Linuxx86_64/
 
 .PHONY : all
 all: reader_writer_test
@@ -23,13 +25,19 @@ libMonitor.a: Monitor.o
 	ar -r libMonitor.a Monitor.o
 
 Monitor.o: Monitor.c Monitor.h
-	$(CC) -o Monitor.o -c $(CFLAGS) $(CPPFLAGS) -I$(PTHREADS_DIR) Monitor.c 
+	$(CC) -o Monitor.o -c $(CFLAGS) $(CPPFLAGS) -I$(PTHREADS_DIR) Monitor.c
 
-reader_writer_monitor.o: reader_writer_monitor.c 
-	$(CC) -o reader_writer_monitor.o -c $(CFLAGS) $(CPPFLAGS) -I. reader_writer_monitor.c 
+reader_writer_monitor.o: reader_writer_monitor.c
+	$(CC) -o reader_writer_monitor.o -c $(CFLAGS) $(CPPFLAGS) -I. reader_writer_monitor.c
 
 reader_writer.o: reader_writer.c reader_writer_monitor.h
-	$(CC) -o reader_writer.o -c $(CFLAGS) $(CPPFLAGS) -I$(PTHREADS_DIR) -I. reader_writer.c 
+	$(CC) -o reader_writer.o -c $(CFLAGS) $(CPPFLAGS) -I$(PTHREADS_DIR) -I. reader_writer.c
+
+s-chat.o: s-chat.c
+	$(CC) -o s-chat.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) -I/usr/include/tripc -I. s-chat.c
+
+s-chat: s-chat.o
+	$(CC) -o s-chat $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) s-chat.o -lRtt -ltripc -llist
 
 liblist.a : list_adders.o list_movers.o list_removers.o
 	ar -r liblist.a list_movers.o list_adders.o list_removers.o
