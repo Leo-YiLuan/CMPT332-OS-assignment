@@ -1,0 +1,20 @@
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A2
+
+
+The monitor will use a client-Server IPC setup. Client threads message 
+a server thread (via the standard Monitor procedures) with requests 
+such as enter, leave, signal, wait. Clients block during Send calls to
+the server thread, the server thread determines what must be done, and 
+eventually unblocks the client thread with a reply. 
+
+For example, MonEnter() will send a REQUEST_ENTER message to the server 
+thread. The server thread processes the message, and places the client 
+in a wait queue, only replying to the client thread when its time for 
+the client thread to enter the monitor. 
