@@ -43,7 +43,7 @@ s-chat.o: s-chat.c
 
 s-chat: s-chat.o
 	$(CC) -o s-chat $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) s-chat.o -ltirpc -lRtt -llist
- 
+
 liblist.a : list_adders.o list_movers.o list_removers.o
 	ar -r liblist.a list_movers.o list_adders.o list_removers.o
 
