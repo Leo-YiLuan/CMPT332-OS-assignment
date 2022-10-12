@@ -52,4 +52,4 @@ list_removers.o : list_removers.c list.h
 	$(CC) -o list_removers.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
 
 clean:
-	rm -f *.o liblist.a libMonitor.a reader_writer_test
+	rm -f *.o liblist.a libMonitor.a reader_writer_test s-chat
