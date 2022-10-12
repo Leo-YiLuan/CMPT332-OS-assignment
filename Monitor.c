@@ -1,3 +1,14 @@
+/*
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A2
+*/
+
 #include "Monitor.h"
 
 #include "list.h"
@@ -28,8 +39,8 @@ struct Monitor {
 
 Monitor monitor = {0};
 
-void MonMain(void *arg) {
-    // Basic structural layout for the server thread. 
+void MonMain() {
+    /* Basic structural layout for the server thread. */
     while (1) {
         PID sender = PNUL;
         int len = 0;
@@ -40,6 +51,8 @@ void MonMain(void *arg) {
             case REQUEST_ENTER:
                 ListCount(monitor.enterQueue);
                 ListAdd(monitor.enterQueue, (void*)sender);
+                break;
+            case REQUEST_LEAVE:
                 break;
             case WAIT:
                 ListAdd(monitor.waitQueues[msg->condition], (void*)sender);
@@ -68,9 +81,10 @@ void MonServer(size_t numConditions) {
         }
     }
 
-    monitor.serverThread = Create((void(*)()) MonMain, 16000, "Monitor", (void*)100, HIGH, USR);
+    monitor.serverThread = Create((void(*)()) MonMain, 16000, "Monitor", 
+                                  (void*)100, HIGH, USR);
     if (monitor.serverThread == PNUL) {
-        printf("Fatal error attempting to construct thread during monitor init.\n");
+        printf("Error attempting to construct thread during monitor init.\n");
         exit(0);
     }
 }

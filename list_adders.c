@@ -6,7 +6,7 @@
 # NSID: yil160
 # STUDENT NUMBER: 11253856
 # CMPT 332 2022
-# A1 Phase 2
+# A2
 */
 #include "list.h"
 #include <stdio.h>

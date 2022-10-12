@@ -10,28 +10,33 @@
 CC=gcc
 CFLAGS=-g
 CPPFLAGS=-std=gnu90 -Wall -pedantic -Wextra
-PTHREADS_DIR=/student/cmpt332/pthreads/
-PTHREADS_LIB=/student/cmpt332/pthreads/lib/Linuxx86_64/
+PARTB_INCLUDE=-I/student/cmpt332/pthreads/ -I.
+PARTB_LIBS=-L. -L/student/cmpt332/pthreads/lib/Linuxx86_64/
 RTTHREADS_DIR=/student/cmpt332/rtt/include/
 RTTHREADS_LIB=/student/cmpt332/rtt/lib/Linuxx86_64/
+
+RWT_DEPS=libMonitor.a liblist.a reader_writer.o reader_writer_monitor.o
 
 .PHONY : all
 all: reader_writer_test s-chat
 
-reader_writer_test: libMonitor.a liblist.a reader_writer.o reader_writer_monitor.o
-	$(CC) -o reader_writer_test $(CFLAGS) $(CPPFLAGS) -L. -L$(PTHREADS_LIB) reader_writer.o reader_writer_monitor.o -lMonitor -lpthreads -llist
+reader_writer_test: $(RWT_DEPS)
+	$(CC) -o reader_writer_test $(CFLAGS) $(CPPFLAGS) $(PARTB_LIBS) \
+	reader_writer.o reader_writer_monitor.o -lMonitor -lpthreads -llist
 
 libMonitor.a: Monitor.o
 	ar -r libMonitor.a Monitor.o
 
 Monitor.o: Monitor.c Monitor.h
-	$(CC) -o Monitor.o -c $(CFLAGS) $(CPPFLAGS) -I$(PTHREADS_DIR) Monitor.c
+	$(CC) -o Monitor.o -c $(CFLAGS) $(CPPFLAGS) $(PARTB_INCLUDE) Monitor.c 
 
-reader_writer_monitor.o: reader_writer_monitor.c
-	$(CC) -o reader_writer_monitor.o -c $(CFLAGS) $(CPPFLAGS) -I. reader_writer_monitor.c
+reader_writer_monitor.o: reader_writer_monitor.c 
+	$(CC) -o reader_writer_monitor.o -c $(CFLAGS) $(CPPFLAGS) -I. \
+	reader_writer_monitor.c 
 
 reader_writer.o: reader_writer.c reader_writer_monitor.h
-	$(CC) -o reader_writer.o -c $(CFLAGS) $(CPPFLAGS) -I$(PTHREADS_DIR) -I. reader_writer.c
+	$(CC) -o reader_writer.o -c $(CFLAGS) $(CPPFLAGS) $(PARTB_INCLUDE) \
+	reader_writer.c 
 
 s-chat.o: s-chat.c
 	$(CC) -o s-chat.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) -I/usr/include/tirpc -I. s-chat.c
