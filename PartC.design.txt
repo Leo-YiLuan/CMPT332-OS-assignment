@@ -22,10 +22,29 @@ RT_Thread:
           2. receiveMsg(): Receive message from client
           3. rKeyboard(): Read from user input
           4. pStdout(): Print to stdout (console)
-          
+
     Make two LIST queues, one store sending message, the other store received
     message. Use RttP() and RttV() to protect two queue (mutex). Make send and
     receive as two consumer and producers problem. For sending, read from
     Keyboard as a producer, send to server as a consumer. For receiving, read
     from server as a producer, print to console as consumer. Use producer and
     consumer semaphores solution to solve the racing condition.
+
+SEM full = 0;  (# of items available for consumption)
+SEM mutex = 1;
+Producer:
+  while (1) {
+    P(mutex);
+    received from client / put one message to send Queue
+    V(mutex);
+    V(full)
+  }
+Consumer:
+  while(1) {
+    P(full);
+    P(mutex);
+    send to server / get one message from send Queue and print
+    V(mutex);
+  }
+Note: since our LIST have 1000 notes available, checking empty space may not
+needed.

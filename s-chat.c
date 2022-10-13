@@ -40,6 +40,8 @@ void mainp(int argc, char** argv){
     /* Create semaphores for received and sending queue */
     RttAllocSem(&recSem, 1, RTTFCFS);
     RttAllocSem(&sendSem, 1, RTTFCFS);
+    RttAllocSem(&recSemHave, 0, RTTFCFS);
+    RttAllocSem(&sendSemHave, 0, RTTFCFS);
 
     /* Check the usage */
     if (argc != 4) {
