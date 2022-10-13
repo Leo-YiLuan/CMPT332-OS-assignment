@@ -1,0 +1,31 @@
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A2
+
+
+Socket:
+    use gethostname() to get current host name. then use gethostbyname() to get
+    ip address of local ip and the guest ip. Have two port address now, one
+    called client the other called server. The s-chat.c always get message from
+    client and send message to server. And one's server is other's client,
+    vise versa. Use bind() to bind socket descriptor with client and server
+    address respectively.
+
+RT_Thread:
+    Create four rt-threads:
+          1. sendMsg(): Send message to server
+          2. receiveMsg(): Receive message from client
+          3. rKeyboard(): Read from user input
+          4. pStdout(): Print to stdout (console)
+          
+    Make two LIST queues, one store sending message, the other store received
+    message. Use RttP() and RttV() to protect two queue (mutex). Make send and
+    receive as two consumer and producers problem. For sending, read from
+    Keyboard as a producer, send to server as a consumer. For receiving, read
+    from server as a producer, print to console as consumer. Use producer and
+    consumer semaphores solution to solve the racing condition.

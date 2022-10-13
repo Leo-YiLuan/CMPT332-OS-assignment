@@ -1,3 +1,13 @@
+/*
+  NAME: Matthew Munro
+  NSID: mam552
+  STUDENT NUMBER: 11291769
+  NAME: Yi Luan
+  NSID: yil160
+  STUDENT NUMBER: 11253856
+  CMPT 332 2022
+  A2*/
+
 #include <rtthreads.h>
 #include <stdio.h>
 #include "list.h"
@@ -27,17 +37,25 @@ void mainp(int argc, char** argv){
     receivedQueue = ListCreate();
     sendQueue = ListCreate();
 
+    /* Create semaphores for received and sending queue */
+    RttAllocSem(&recSem, 1, RTTFCFS);
+    RttAllocSem(&sendSem, 1, RTTFCFS);
+
+    /* Check the usage */
     if (argc != 4) {
       fprintf(stderr, "Error:  Incorrect number of arguments. Usage: "
       "s-chat <Your port> <Guest machine name> <Guest ports>\n");
       exit(0);
     }
+
+    /* setUp rt thread variable */
     rttime.seconds = 1;
     rttime.microseconds = 1000;
     rtschattr.startingtime = rttime;
     rtschattr.priority = 0;
     rtschattr.deadline=rttime;
 
+    /* set up server */
     portServeNum = atoi(argv[3]);
     sockfdServ = socket(AF_INET, SOCK_DGRAM, 0);
     serHost = gethostbyname(argv[2]);
@@ -47,7 +65,7 @@ void mainp(int argc, char** argv){
     bind(sockfdServ, (const struct sockaddr *)&servaddr, sizeof(servaddr));
 
 
-
+    /* set up client */
     portClientNum = atoi(argv[1]);
     sockfdCli = socket(AF_INET, SOCK_DGRAM, 0);
     gethostname(hostBuffer, sizeof(hostBuffer));
@@ -57,9 +75,7 @@ void mainp(int argc, char** argv){
     cliaddr.sin_addr = *((struct in_addr*) cliHost->h_addr);
     bind(sockfdCli, (const struct sockaddr *)&cliaddr, sizeof(cliaddr));
 
-    RttAllocSem(&recSem, 1, RTTFCFS);
-    RttAllocSem(&sendSem, 1, RTTFCFS);
-
+    /* Create the four threads */
     RttCreate(&rttid ,sendMsg ,16000, "send", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,receiveMsg ,16000, "send", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,rKeyboard ,16000, "send", NULL, rtschattr, RTTUSR);
@@ -70,13 +86,14 @@ void mainp(int argc, char** argv){
 
 void sendMsg() {
   while (1) {
-    void* sendBuffer;
+    char* sendBuffer;
     RttP(sendSemHave);
-    sendBuffer = ListTrim(sendQueue);
-    sendto(sockfdServ, (const char *)sendBuffer, strlen(sendBuffer),
+    RttP(sendSem);
+    sendBuffer = (char* )ListTrim(sendQueue);
+    sendto(sockfdServ, sendBuffer, strlen(sendBuffer),
     MSG_CONFIRM, (const struct sockaddr *) &servaddr,
     sizeof(servaddr));
-    RttP(sendSem);
+
     RttV(sendSem);
   }
 }
@@ -110,7 +127,7 @@ void rKeyboard() {
 void pStdout() {
   while (1) {
     char *printBuffer;
-    RttV(recSemHave);
+    RttP(recSemHave);
     RttP(recSem);
     printBuffer = (char*)ListTrim(receivedQueue);
     printf("%p\n", printBuffer);
