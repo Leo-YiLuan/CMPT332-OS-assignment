@@ -60,7 +60,17 @@ void mainp(int argc, char** argv){
     /* set up server */
     portServeNum = atoi(argv[3]);
     sockfdServ = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfdServ  == -1){
+		close(sockfdServ);
+		fprintf(stderr, "Error, get socket file descripter failed");
+		exit(EXIT_FAILURE);
+	}
+
     serHost = gethostbyname(argv[2]);
+    if(serHost == NULL){
+		fprintf(stderr, "Fail to find server host %s\n",argv[2]);	
+		exit(EXIT_FAILURE);
+	}
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(portServeNum);
     servaddr.sin_addr = *((struct in_addr*) serHost->h_addr);
