@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include "list.h"
 #include <sys/socket.h>
+#include <errno.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 
 RttSem recSem;
@@ -28,12 +30,55 @@ void pStdout();
 void rKeyboard();
 struct sockaddr_in servaddr, cliaddr;
 
+void debug_printaddr(struct addrinfo *info) {
+  char string[INET6_ADDRSTRLEN];
+  struct sockaddr_in *addrIn = (struct sockaddr_in*)info->ai_addr;
+  inet_ntop(info->ai_family, (void*)&addrIn->sin_addr, string, sizeof(string));
+  if (info->ai_family == AF_INET) {
+    printf("IPV4 Address: ");
+  } else {
+    printf("IPV6 Address: ");
+  }
+  printf("%s\n", string);
+
+}
+
+int create_and_bind_socket(char *host, char *port) {
+  int err = 0;
+  int localSocketFd = 0;
+  struct addrinfo hints = {0};
+  struct addrinfo *info = NULL;
+
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_flags = host == NULL ? AI_PASSIVE : 0;
+  err = getaddrinfo(host, port, (const struct addrinfo*)&hints, &info);
+  if (err == -1) {
+    return -1;
+  }
+
+  localSocketFd = socket(PF_INET, SOCK_DGRAM, 0);
+  if (localSocketFd == -1) {
+    return -1;
+  }
+
+  err = bind(localSocketFd, info->ai_addr, info->ai_addrlen);
+  if (err == -1) {
+    return -1;
+  }
+
+  debug_printaddr(info);
+  freeaddrinfo(info);
+  return localSocketFd;
+}
+
 void mainp(int argc, char** argv){
     RttTimeValue rttime;
     RttSchAttr rtschattr;
     RttThreadId rttid;
-    struct hostent *serHost, *cliHost;
-    char hostBuffer[100];
+    /* struct hostent *serHost, *cliHost;*/
+    /* char hostBuffer[100]; */
+    int listenSocket = 0;
     receivedQueue = ListCreate();
     sendQueue = ListCreate();
 
@@ -57,27 +102,48 @@ void mainp(int argc, char** argv){
     rtschattr.priority = 0;
     rtschattr.deadline=rttime;
 
-    /* set up server */
+    /* Set up a "listen" socket for incoming data */
+    listenSocket = create_and_bind_socket(NULL, argv[1]);
+    if (listenSocket == -1) {
+      printf("ERR: Failed to create listen socket.\n");
+      exit(EXIT_FAILURE);
+    }
+    
+
+    /* set up server 
     portServeNum = atoi(argv[3]);
     sockfdServ = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfdServ  == -1){
-		close(sockfdServ);
-		fprintf(stderr, "Error, get socket file descripter failed");
-		exit(EXIT_FAILURE);
-	}
+		  close(sockfdServ);
+		  fprintf(stderr, "Error, get socket file descripter failed");
+		  exit(EXIT_FAILURE);
+	  }
 
     serHost = gethostbyname(argv[2]);
-    if(serHost == NULL){
-		fprintf(stderr, "Fail to find server host %s\n",argv[2]);	
-		exit(EXIT_FAILURE);
-	}
+      if(serHost == NULL){
+		  fprintf(stderr, "Fail to find server host %s\n",argv[2]);	
+		  exit(EXIT_FAILURE);
+	  }
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(portServeNum);
     servaddr.sin_addr = *((struct in_addr*) serHost->h_addr);
-    bind(sockfdServ, (const struct sockaddr *)&servaddr, sizeof(servaddr));
+    err = bind(sockfdServ, (const struct sockaddr *)&servaddr, sizeof(servaddr));
+    
+    {
+      int a = 0;
+      unsigned long test;
+      unsigned long res;
+      memcpy(&test, &servaddr, sizeof(struct in_addr));
+      res = ntohs(test);
+      printf("Res: %ld", test);
+      a = 0;
+    }
+    if (err == -1) {
+      printf("ERR %d \n", errno);
+      exit(EXIT_FAILURE);
+    }
 
 
-    /* set up client */
     portClientNum = atoi(argv[1]);
     sockfdCli = socket(AF_INET, SOCK_DGRAM, 0);
     gethostname(hostBuffer, sizeof(hostBuffer));
@@ -86,6 +152,7 @@ void mainp(int argc, char** argv){
     cliaddr.sin_port = htons(portClientNum);
     cliaddr.sin_addr = *((struct in_addr*) cliHost->h_addr);
     bind(sockfdCli, (const struct sockaddr *)&cliaddr, sizeof(cliaddr));
+    */
 
     /* Create the four threads */
     RttCreate(&rttid ,sendMsg ,16000, "send", NULL, rtschattr, RTTUSR);
