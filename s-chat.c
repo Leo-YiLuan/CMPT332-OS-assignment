@@ -29,34 +29,36 @@ void receiveMsg();
 void pStdout();
 void rKeyboard();
 struct sockaddr_in servaddr, cliaddr;
+struct sockaddr *destinationClient = NULL;
 
-void debug_printaddr(struct addrinfo *info) {
+void debug_printaddr(struct sockaddr_in *addrIn) {
   char string[INET6_ADDRSTRLEN];
-  struct sockaddr_in *addrIn = (struct sockaddr_in*)info->ai_addr;
-  inet_ntop(info->ai_family, (void*)&addrIn->sin_addr, string, sizeof(string));
-  if (info->ai_family == AF_INET) {
-    printf("IPV4 Address: ");
-  } else {
-    printf("IPV6 Address: ");
-  }
+  inet_ntop(AF_INET, (void*)&addrIn->sin_addr, string, sizeof(string));
   printf("%s\n", string);
+}
 
+struct addrinfo* get_host_info(char *hostname, char *port) {
+  int err = 0;
+  struct addrinfo *info = NULL;
+  struct addrinfo hints = {0};
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_flags = hostname == NULL ? AI_PASSIVE : 0;
+
+  err = getaddrinfo(hostname, port, (const struct addrinfo*)&hints, &info);
+  if (err != 0) {
+    return NULL;
+  }
+
+  return info;
 }
 
 int create_listen_socket(char *port) {
+  struct addrinfo *info = NULL;
   int err = 0;
   int localSocketFd = 0;
-  struct addrinfo hints = {0};
-  struct addrinfo *info = NULL;
 
-  hints.ai_family = AF_INET;
-  hints.ai_socktype = SOCK_DGRAM;
-  hints.ai_flags = AI_PASSIVE;
-  err = getaddrinfo(NULL, port, (const struct addrinfo*)&hints, &info);
-  if (err != 0) {
-    return -1;
-  }
-
+  info = get_host_info(NULL, port);
   localSocketFd = socket(PF_INET, SOCK_DGRAM, 0);
   if (localSocketFd == -1) {
     return -1;
@@ -67,28 +69,9 @@ int create_listen_socket(char *port) {
     return -1;
   }
 
-  debug_printaddr(info);
+  debug_printaddr((struct sockaddr_in*)info->ai_addr);
   freeaddrinfo(info);
   return localSocketFd;
-}
-
-int connect_to_remote_client(char *remoteHost, char *port, int socket) {
-  int err = 0;
-  struct addrinfo hints = {0};
-  struct addrinfo *info = NULL;
-  hints.ai_family = AF_INET;
-  hints.ai_socktype = SOCK_DGRAM;
-  err = getaddrinfo(remoteHost, port, (const struct addrinfo*)&hints, &info);
-  if (err != 0) {
-    return 0;
-  }
-
-  err = connect(socket, info->ai_addr, info->ai_addrlen);
-  if (err == -1) {
-    return 0;
-  }
-
-  return 1;
 }
 
 void mainp(int argc, char** argv){
@@ -96,6 +79,7 @@ void mainp(int argc, char** argv){
     RttSchAttr rtschattr;
     RttThreadId rttid;
     int listenSocket = 0;
+    int err = 0;
     receivedQueue = ListCreate();
     sendQueue = ListCreate();
 
@@ -126,21 +110,45 @@ void mainp(int argc, char** argv){
       exit(EXIT_FAILURE);
     }
 
-    if (connect_to_remote_client(argv[2], argv[3], listenSocket) == 0) {
-      printf("Failed to connect to remote host %s:%s\n", argv[2], argv[3]);
-      exit(EXIT_FAILURE);
-    } else {
-      printf("Connection successful!\n");
+    /* We need socket info on the destination client so that we can send that info with sendto */
+    {
+      struct addrinfo *info = get_host_info(argv[2], argv[3]);
+      if (!info) {
+        printf("Failed to get remote client info\n");
+        exit(EXIT_FAILURE);
+      }
+      destinationClient = info->ai_addr;
+      freeaddrinfo(info);
     }
-    
+
+    /* Test send data */
+    {
+      int *msg = malloc(sizeof(int));
+      *msg = 7;
+      err = sendto(listenSocket, (const void*)msg, sizeof(int), 0, destinationClient, sizeof(*destinationClient));
+      if (err == -1) {
+        printf("Error: Failed sending test data\n");
+      }
+    }
+
+    /* Test receive data. Wait in an infinite loop to get it. */
+    while (1) {
+      int a = 0;
+      struct sockaddr from = {0};
+      socklen_t fromlen = sizeof(from);
+
+      err = recvfrom(listenSocket, (void*)&a, sizeof(int), 0, &from, &fromlen);
+      if (err > 0) {
+        printf("Received integer %d from address ", a);
+        debug_printaddr((struct sockaddr_in*)&from);
+      }
+    }
 
     /* Create the four threads */
     RttCreate(&rttid ,sendMsg ,16000, "send", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,receiveMsg ,16000, "send", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,rKeyboard ,16000, "send", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,pStdout ,16000, "send", NULL, rtschattr, RTTUSR);
-
-
 }
 
 void sendMsg() {

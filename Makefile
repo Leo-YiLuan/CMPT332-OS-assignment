@@ -39,10 +39,12 @@ reader_writer.o: reader_writer.c reader_writer_monitor.h
 	reader_writer.c 
 
 s-chat.o: s-chat.c
-	$(CC) -o s-chat.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) -I/usr/include/tirpc -I. s-chat.c
+	$(CC) -o s-chat.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
+	-I/usr/include/tirpc -I. s-chat.c
 
 s-chat: s-chat.o
-	$(CC) -o s-chat $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) s-chat.o -ltirpc -lRtt -llist
+	$(CC) -o s-chat $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) s-chat.o \
+	-ltirpc -lRtt -llist
 
 liblist.a : list_adders.o list_movers.o list_removers.o
 	ar -r liblist.a list_movers.o list_adders.o list_removers.o
