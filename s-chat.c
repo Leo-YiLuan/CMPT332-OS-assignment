@@ -30,6 +30,7 @@ void pStdout();
 void rKeyboard();
 struct sockaddr_in servaddr, cliaddr;
 struct sockaddr *destinationClient = NULL;
+int listenSocket = 0;
 
 void debug_printaddr(struct sockaddr_in *addrIn) {
   char string[INET6_ADDRSTRLEN];
@@ -78,7 +79,6 @@ void mainp(int argc, char** argv){
     RttTimeValue rttime;
     RttSchAttr rtschattr;
     RttThreadId rttid;
-    int listenSocket = 0;
     int err = 0;
     receivedQueue = ListCreate();
     sendQueue = ListCreate();
@@ -131,19 +131,6 @@ void mainp(int argc, char** argv){
       }
     }
 
-    /* Test receive data. Wait in an infinite loop to get it. */
-    while (1) {
-      int a = 0;
-      struct sockaddr from = {0};
-      socklen_t fromlen = sizeof(from);
-
-      err = recvfrom(listenSocket, (void*)&a, sizeof(int), 0, &from, &fromlen);
-      if (err > 0) {
-        printf("Received integer %d from address ", a);
-        debug_printaddr((struct sockaddr_in*)&from);
-      }
-    }
-
     /* Create the four threads */
     RttCreate(&rttid ,sendMsg ,16000, "send", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,receiveMsg ,16000, "send", NULL, rtschattr, RTTUSR);
@@ -167,14 +154,19 @@ void sendMsg() {
 
 void receiveMsg() {
   while (1) {
-    char buffer[100];
-    int size;
+    int err = 0;
+    int a = 0;
+    struct sockaddr from = {0};
+    socklen_t fromlen = sizeof(from);
+
+    err = recvfrom(listenSocket, (void*)&a, sizeof(int), 0, &from, &fromlen);
+    if (err > 0) {
+      printf("Received integer %d from address ", a);
+      debug_printaddr((struct sockaddr_in*)&from);
+    }
+
     RttP(recSem);
-    size = recvfrom(sockfdCli, (char *)buffer, 100,
-    MSG_WAITALL, (struct sockaddr *) &cliaddr,
-    NULL);
-    buffer[size] = '\0';
-    ListPrepend(receivedQueue,&buffer);
+    ListPrepend(receivedQueue,&a);
     RttV(recSem);
     RttV(recSemHave);
   }
