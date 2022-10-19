@@ -9,12 +9,19 @@
   A2*/
 
 #include <rtthreads.h>
+#include <RttCommon.h>
 #include <stdio.h>
 #include "list.h"
 #include <sys/socket.h>
 #include <errno.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+
+typedef struct MSG MSG;
+struct MSG {
+  char *buf;
+  size_t bufLen;
+};
 
 RttSem recSem;
 RttSem sendSem;
@@ -133,12 +140,14 @@ void mainp(int argc, char** argv){
 
     /* Create the four threads */
     RttCreate(&rttid ,sendMsg ,16000, "send", NULL, rtschattr, RTTUSR);
-    RttCreate(&rttid ,receiveMsg ,16000, "send", NULL, rtschattr, RTTUSR);
-    RttCreate(&rttid ,rKeyboard ,16000, "send", NULL, rtschattr, RTTUSR);
-    RttCreate(&rttid ,pStdout ,16000, "send", NULL, rtschattr, RTTUSR);
+    RttCreate(&rttid ,receiveMsg ,16000, "recv", NULL, rtschattr, RTTUSR);
+    RttCreate(&rttid ,rKeyboard ,16000, "rkb", NULL, rtschattr, RTTUSR);
+    RttCreate(&rttid ,pStdout ,16000, "sout", NULL, rtschattr, RTTUSR);
 }
 
 void sendMsg() {
+    printf("SendMsg\n");
+
   while (1) {
     char* sendBuffer;
     RttP(sendSemHave);
@@ -147,12 +156,14 @@ void sendMsg() {
     sendto(sockfdServ, sendBuffer, strlen(sendBuffer),
     MSG_CONFIRM, (const struct sockaddr *) &servaddr,
     sizeof(servaddr));
-
     RttV(sendSem);
+    
+    RttUSleep(5000);
   }
 }
 
 void receiveMsg() {
+  printf("ReceiveMsg\n");
   while (1) {
     int err = 0;
     int a = 0;
@@ -163,27 +174,67 @@ void receiveMsg() {
     if (err > 0) {
       printf("Received integer %d from address ", a);
       debug_printaddr((struct sockaddr_in*)&from);
+      RttP(recSem);
+      ListPrepend(receivedQueue,&a);
+      RttV(recSem);
+      RttV(recSemHave);
     }
 
-    RttP(recSem);
-    ListPrepend(receivedQueue,&a);
-    RttV(recSem);
-    RttV(recSemHave);
+    RttUSleep(5000);
   }
 }
 
 void rKeyboard() {
+  int bufSize = 10 * sizeof(char);
+  char *buf = malloc(bufSize);
+  int res = 0;
+
+  res = fcntl(0, F_GETFL);
+  fcntl(0, F_SETFL, res | O_NONBLOCK);
+
   while (1) {
-    char keyBuffer[100];
-    scanf("%s\n", keyBuffer);
+    int bufUsed = 0;
+    int received = 0;
+    int pos = 0;
+
+    /* Get input from stdin for as long as it exists */
+    while (1) {
+      bufUsed += 1;
+      /* Resize the buffer to account for new char */
+      if (bufUsed > bufSize) {
+        bufSize += 10;
+        buf = realloc(buf, bufSize);
+      }
+      res = read(0, &buf[pos], 1);
+      if (res <= 0) {
+        /* No input, bail out and try again next loop */
+        break;
+      }
+      if (buf[pos] == '\n') {
+        /* We've hit the end of the input */
+        received = 1;
+        buf[pos] = '\0';
+        break;
+      }
+      pos++;
+    }
+
+    if (received) {
+      /* Received input from stdin */
+      printf("Message: %s\n", buf);
+    }
+
     RttP(sendSem);
-    ListPrepend(sendQueue,&keyBuffer);
+    ListPrepend(sendQueue,buf);
     RttV(sendSem);
     RttV(sendSemHave);
+
+    RttUSleep(5000);
   }
 }
 
 void pStdout() {
+  /*
   while (1) {
     char *printBuffer;
     RttP(recSemHave);
@@ -192,4 +243,5 @@ void pStdout() {
     printf("%p\n", printBuffer);
     RttV(recSem);
   }
+  */
 }
