@@ -77,7 +77,6 @@ int create_listen_socket(char *port) {
     return -1;
   }
 
-  debug_printaddr((struct sockaddr_in*)info->ai_addr);
   freeaddrinfo(info);
   return localSocketFd;
 }
@@ -127,36 +126,28 @@ void mainp(int argc, char** argv){
       freeaddrinfo(info);
     }
 
-    /* Test send data 
-    {
-      int *msg = malloc(sizeof(int));
-      *msg = 7;
-      err = sendto(listenSocket, (const void*)msg, sizeof(int), 0, destinationClient, sizeof(*destinationClient));
-      if (err == -1) {
-        printf("Error: Failed sending test data\n");
-      }
-    }
-    */
-
     /* Create the four threads */
     RttCreate(&rttid ,sendMsg ,16000, "send", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,receiveMsg ,16000, "recv", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,rKeyboard ,16000, "rkb", NULL, rtschattr, RTTUSR);
     RttCreate(&rttid ,pStdout ,16000, "sout", NULL, rtschattr, RTTUSR);
+
+    printf("Finished init, please type your messages.\n");
 }
 
 void sendMsg() {
 
   while (1) {
-    int res = 0;
     MSG* sendBuffer;
     RttP(sendSemHave);
     RttP(sendSem);
     sendBuffer = (MSG*)ListFirst(sendQueue);
     ListRemove(sendQueue);
-    res = sendto(listenSocket, (const void*)sendBuffer->buf, sendBuffer->bufLen,
+    sendto(listenSocket, (const void*)sendBuffer->buf, sendBuffer->bufLen,
     0, destinationClient, sizeof(*destinationClient));
-    printf("Sent %d bytes to remote host with return val %d.\n", sendBuffer->bufLen, res);
+    printf("Sent %d bytes of data to remote host ", sendBuffer->bufLen);
+    debug_printaddr((struct sockaddr_in*)destinationClient);
+    free(sendBuffer);
     RttV(sendSem);
   }
 }
@@ -168,25 +159,30 @@ void receiveMsg() {
     socklen_t fromlen = sizeof(from);
     char *buf = malloc(10);
     int bufSize = 10;
+    int received = 0;
 
+    while (1) {
 
-    err = recvfrom(listenSocket, (void*)buf, bufSize, MSG_PEEK, &from, &fromlen);
-    if (err > 0) {
-      printf("Err: %d, bufSize: %d\n", err, bufSize);
-      /* TODO: Reallocing doesn't work. */
-      if (err > bufSize) {
-        bufSize = err;
+      err = recvfrom(listenSocket, (void*)buf, bufSize, MSG_PEEK, &from, &fromlen);
+      if (err == -1) {
+        break;
+      }
+
+      if (err == bufSize) {
+        bufSize += 10;
         buf = realloc(buf, bufSize);
-        printf("Realloced new size:%d\n", bufSize);
+      } else {
+        err = recvfrom(listenSocket, (void*)buf, bufSize, 0, &from, &fromlen);
+        received = 1;
       }
-      err = recvfrom(listenSocket, (void*)buf, bufSize, 0, &from, &fromlen);
-
-      if (err > 0) {
-        printf("RECEIVED MSG: %s\n", buf);
-      }
-
-      err = -1;
     }
+
+    if (received) {
+      printf("Received data from remote host ");
+      debug_printaddr((struct sockaddr_in*)&from);
+      printf("DATA: %s\n", buf);
+    }
+    received = 0;
 
     RttUSleep(5000);
   }
@@ -234,7 +230,7 @@ void rKeyboard() {
       MSG *msg = malloc(sizeof(MSG));
       msg->buf = buf;
       msg->bufLen = bufLen;
-      printf("Received Msg from keyboard %d.\n", msg->bufLen);
+      printf("Inserted line of text into sendQueue.\n");
       RttP(sendSem);
       ListPrepend(sendQueue,(void*)msg);
       RttV(sendSem);
