@@ -20,7 +20,7 @@
 typedef struct MSG MSG;
 struct MSG {
   char *buf;
-  size_t bufLen;
+  int bufLen;
 };
 
 RttSem recSem;
@@ -86,7 +86,6 @@ void mainp(int argc, char** argv){
     RttTimeValue rttime;
     RttSchAttr rtschattr;
     RttThreadId rttid;
-    int err = 0;
     receivedQueue = ListCreate();
     sendQueue = ListCreate();
 
@@ -128,7 +127,7 @@ void mainp(int argc, char** argv){
       freeaddrinfo(info);
     }
 
-    /* Test send data */
+    /* Test send data 
     {
       int *msg = malloc(sizeof(int));
       *msg = 7;
@@ -137,6 +136,7 @@ void mainp(int argc, char** argv){
         printf("Error: Failed sending test data\n");
       }
     }
+    */
 
     /* Create the four threads */
     RttCreate(&rttid ,sendMsg ,16000, "send", NULL, rtschattr, RTTUSR);
@@ -146,38 +146,46 @@ void mainp(int argc, char** argv){
 }
 
 void sendMsg() {
-    printf("SendMsg\n");
 
   while (1) {
-    char* sendBuffer;
+    int res = 0;
+    MSG* sendBuffer;
     RttP(sendSemHave);
     RttP(sendSem);
-    sendBuffer = (char* )ListTrim(sendQueue);
-    sendto(sockfdServ, sendBuffer, strlen(sendBuffer),
-    MSG_CONFIRM, (const struct sockaddr *) &servaddr,
-    sizeof(servaddr));
+    sendBuffer = (MSG*)ListFirst(sendQueue);
+    ListRemove(sendQueue);
+    res = sendto(listenSocket, (const void*)sendBuffer->buf, sendBuffer->bufLen,
+    0, destinationClient, sizeof(*destinationClient));
+    printf("Sent %d bytes to remote host with return val %d.\n", sendBuffer->bufLen, res);
     RttV(sendSem);
-    
-    RttUSleep(5000);
   }
 }
 
 void receiveMsg() {
-  printf("ReceiveMsg\n");
   while (1) {
     int err = 0;
-    int a = 0;
     struct sockaddr from = {0};
     socklen_t fromlen = sizeof(from);
+    char *buf = malloc(10);
+    int bufSize = 10;
 
-    err = recvfrom(listenSocket, (void*)&a, sizeof(int), 0, &from, &fromlen);
+
+    err = recvfrom(listenSocket, (void*)buf, bufSize, MSG_PEEK, &from, &fromlen);
     if (err > 0) {
-      printf("Received integer %d from address ", a);
-      debug_printaddr((struct sockaddr_in*)&from);
-      RttP(recSem);
-      ListPrepend(receivedQueue,&a);
-      RttV(recSem);
-      RttV(recSemHave);
+      printf("Err: %d, bufSize: %d\n", err, bufSize);
+      /* TODO: Reallocing doesn't work. */
+      if (err > bufSize) {
+        bufSize = err;
+        buf = realloc(buf, bufSize);
+        printf("Realloced new size:%d\n", bufSize);
+      }
+      err = recvfrom(listenSocket, (void*)buf, bufSize, 0, &from, &fromlen);
+
+      if (err > 0) {
+        printf("RECEIVED MSG: %s\n", buf);
+      }
+
+      err = -1;
     }
 
     RttUSleep(5000);
@@ -188,6 +196,7 @@ void rKeyboard() {
   int bufSize = 10 * sizeof(char);
   char *buf = malloc(bufSize);
   int res = 0;
+  int bufLen = 0;
 
   res = fcntl(0, F_GETFL);
   fcntl(0, F_SETFL, res | O_NONBLOCK);
@@ -214,6 +223,7 @@ void rKeyboard() {
         /* We've hit the end of the input */
         received = 1;
         buf[pos] = '\0';
+        bufLen = pos+1;
         break;
       }
       pos++;
@@ -221,13 +231,15 @@ void rKeyboard() {
 
     if (received) {
       /* Received input from stdin */
-      printf("Message: %s\n", buf);
+      MSG *msg = malloc(sizeof(MSG));
+      msg->buf = buf;
+      msg->bufLen = bufLen;
+      printf("Received Msg from keyboard %d.\n", msg->bufLen);
+      RttP(sendSem);
+      ListPrepend(sendQueue,(void*)msg);
+      RttV(sendSem);
+      RttV(sendSemHave);
     }
-
-    RttP(sendSem);
-    ListPrepend(sendQueue,buf);
-    RttV(sendSem);
-    RttV(sendSemHave);
 
     RttUSleep(5000);
   }
