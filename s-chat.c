@@ -136,7 +136,6 @@ void mainp(int argc, char** argv){
 }
 
 void sendMsg() {
-
   while (1) {
     MSG* sendBuffer;
     RttP(sendSemHave);
@@ -145,8 +144,8 @@ void sendMsg() {
     ListRemove(sendQueue);
     sendto(listenSocket, (const void*)sendBuffer->buf, sendBuffer->bufLen,
     0, destinationClient, sizeof(*destinationClient));
-    printf("Sent %d bytes of data to remote host ", sendBuffer->bufLen);
-    debug_printaddr((struct sockaddr_in*)destinationClient);
+    /* printf("Sent %d bytes of data to remote host ", sendBuffer->bufLen); */
+    /* debug_printaddr((struct sockaddr_in*)destinationClient); */
     free(sendBuffer);
     RttV(sendSem);
   }
@@ -178,9 +177,15 @@ void receiveMsg() {
     }
 
     if (received) {
-      printf("Received data from remote host ");
-      debug_printaddr((struct sockaddr_in*)&from);
-      printf("DATA: %s\n", buf);
+      /* printf("Received data from remote host "); */
+      /* debug_printaddr((struct sockaddr_in*)&from); */
+
+      RttP(recSem);
+      ListPrepend(receivedQueue, (void*)buf);
+
+      RttV(recSem);
+      RttV(recSemHave);
+      
     }
     received = 0;
 
@@ -230,7 +235,7 @@ void rKeyboard() {
       MSG *msg = malloc(sizeof(MSG));
       msg->buf = buf;
       msg->bufLen = bufLen;
-      printf("Inserted line of text into sendQueue.\n");
+      /* printf("Inserted line of text into sendQueue.\n"); */
       RttP(sendSem);
       ListPrepend(sendQueue,(void*)msg);
       RttV(sendSem);
@@ -242,14 +247,12 @@ void rKeyboard() {
 }
 
 void pStdout() {
-  /*
   while (1) {
-    char *printBuffer;
+    char *msgToPrint = NULL;
     RttP(recSemHave);
     RttP(recSem);
-    printBuffer = (char*)ListTrim(receivedQueue);
-    printf("%p\n", printBuffer);
+    msgToPrint = (char*)ListTrim(receivedQueue);
+    printf("%s\n", msgToPrint);
     RttV(recSem);
   }
-  */
 }
