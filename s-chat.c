@@ -134,12 +134,11 @@ void sendMsg() {
     char* sendBuffer;
     RttP(sendSemHave);
     RttP(sendSem);
-    sendBuffer = (char*)ListFirst(sendQueue);
-    ListRemove(sendQueue);
-    sendto(listenSocket, (const void*)sendBuffer, strlen(sendBuffer),
+    sendBuffer = (char*)ListTrim(sendQueue);
+    sendto(listenSocket, (const void*)sendBuffer, strlen(sendBuffer) + 1,
     0, destinationClient, sizeof(*destinationClient));
-    /* printf("Sent %d bytes of data to remote host ", sendBuffer->bufLen); */
-    /* debug_printaddr((struct sockaddr_in*)destinationClient); */
+    /* printf("Sent %d bytes of data to remote host ", strlen(sendBuffer));
+    debug_printaddr((struct sockaddr_in*)destinationClient); */
     free(sendBuffer);
     RttV(sendSem);
   }
@@ -171,8 +170,8 @@ void receiveMsg() {
     }
 
     if (received) {
-      /* printf("Received data from remote host "); */
-      /* debug_printaddr((struct sockaddr_in*)&from); */
+      /* printf("Received data from remote host ");
+      debug_printaddr((struct sockaddr_in*)&from); */
 
       RttP(recSem);
       ListPrepend(receivedQueue, (void*)buf);
@@ -204,7 +203,7 @@ void rKeyboard() {
     while (1) {
       bufUsed += 1;
       /* Resize the buffer to account for new char */
-      if (bufUsed > bufSize) {
+      if (bufUsed >= bufSize) {
         bufSize += 10;
         buf = realloc(buf, bufSize);
       }
@@ -224,9 +223,9 @@ void rKeyboard() {
 
     if (received) {
       /* Received input from stdin */
-      char *msg = malloc(sizeof(strlen(buf) + 1));
+      /* char *msg = malloc(sizeof(strlen(buf) + 2)); */
+      char *msg = malloc(strlen(buf) + 1);
       memcpy(msg, buf, strlen(buf) + 1);
-      /* printf("Inserted line of text into sendQueue.\n"); */
       RttP(sendSem);
       ListPrepend(sendQueue,(void*)msg);
       RttV(sendSem);
@@ -244,7 +243,6 @@ void pStdout() {
     RttP(recSem);
     msgToPrint = (char*)ListTrim(receivedQueue);
     printf("%s\n", msgToPrint);
-    free(msgToPrint);
     RttV(recSem);
   }
 }
