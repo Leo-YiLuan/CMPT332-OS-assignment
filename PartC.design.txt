@@ -52,9 +52,5 @@ needed.
 
 TODO: 
 
-Storing char pointers in linked lists currently wont work if theres multiple entries
-because the buffer would get overwritten. We need to copy each message into its own 
-buffer before adding it to the linked list. 
-
 We need to print timestamps as well.
 

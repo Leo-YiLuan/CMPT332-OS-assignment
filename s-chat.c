@@ -17,12 +17,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-typedef struct MSG MSG;
-struct MSG {
-  char *buf;
-  int bufLen;
-};
-
 RttSem recSem;
 RttSem sendSem;
 RttSem recSemHave;
@@ -137,12 +131,12 @@ void mainp(int argc, char** argv){
 
 void sendMsg() {
   while (1) {
-    MSG* sendBuffer;
+    char* sendBuffer;
     RttP(sendSemHave);
     RttP(sendSem);
-    sendBuffer = (MSG*)ListFirst(sendQueue);
+    sendBuffer = (char*)ListFirst(sendQueue);
     ListRemove(sendQueue);
-    sendto(listenSocket, (const void*)sendBuffer->buf, sendBuffer->bufLen,
+    sendto(listenSocket, (const void*)sendBuffer, strlen(sendBuffer),
     0, destinationClient, sizeof(*destinationClient));
     /* printf("Sent %d bytes of data to remote host ", sendBuffer->bufLen); */
     /* debug_printaddr((struct sockaddr_in*)destinationClient); */
@@ -197,7 +191,6 @@ void rKeyboard() {
   int bufSize = 10 * sizeof(char);
   char *buf = malloc(bufSize);
   int res = 0;
-  int bufLen = 0;
 
   res = fcntl(0, F_GETFL);
   fcntl(0, F_SETFL, res | O_NONBLOCK);
@@ -224,7 +217,6 @@ void rKeyboard() {
         /* We've hit the end of the input */
         received = 1;
         buf[pos] = '\0';
-        bufLen = pos+1;
         break;
       }
       pos++;
@@ -232,9 +224,8 @@ void rKeyboard() {
 
     if (received) {
       /* Received input from stdin */
-      MSG *msg = malloc(sizeof(MSG));
-      msg->buf = buf;
-      msg->bufLen = bufLen;
+      char *msg = malloc(sizeof(strlen(buf) + 1));
+      memcpy(msg, buf, strlen(buf) + 1);
       /* printf("Inserted line of text into sendQueue.\n"); */
       RttP(sendSem);
       ListPrepend(sendQueue,(void*)msg);
@@ -253,6 +244,7 @@ void pStdout() {
     RttP(recSem);
     msgToPrint = (char*)ListTrim(receivedQueue);
     printf("%s\n", msgToPrint);
+    free(msgToPrint);
     RttV(recSem);
   }
 }
