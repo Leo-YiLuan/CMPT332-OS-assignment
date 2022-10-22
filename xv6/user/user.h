@@ -22,6 +22,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int thread_create(void (*tmain)(void *), void *stack, void *arg); 
 
 /* ulib.c */
 int stat(const char*, struct stat*);

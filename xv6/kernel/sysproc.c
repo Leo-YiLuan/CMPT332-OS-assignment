@@ -97,8 +97,8 @@ uint64 sys_thread_create(void) {
     uint64 argAddr = 0;
 
     argaddr(0, &tmainAddr);
-    argaddr(0, &stackAddr);
-    argaddr(0, &argAddr);
+    argaddr(1, &stackAddr);
+    argaddr(2, &argAddr);
 
     void (*tmain)(void*) = (void (*)(void *))tmainAddr;
     void *stack = (void*)stackAddr;

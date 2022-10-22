@@ -684,5 +684,6 @@ procdump(void)
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int thread_create(void (*tmain)(void *), void *stack, void *arg) {
+    printf("arg1: %d, arg2: %d, arg3: %d\n", tmain, stack, arg);
     return 1;
 }
