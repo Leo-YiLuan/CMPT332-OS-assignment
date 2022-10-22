@@ -20,3 +20,5 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+#define SYS_thread_create 22

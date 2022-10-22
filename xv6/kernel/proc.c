@@ -681,3 +681,8 @@ procdump(void)
     printf("\n");
   }
 }
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int thread_create(void (*tmain)(void *), void *stack, void *arg) {
+    return 1;
+}

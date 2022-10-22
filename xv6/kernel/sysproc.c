@@ -89,3 +89,20 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+uint64 sys_thread_create(void) {
+    uint64 tmainAddr = 0;
+    uint64 stackAddr = 0;
+    uint64 argAddr = 0;
+
+    argaddr(0, &tmainAddr);
+    argaddr(0, &stackAddr);
+    argaddr(0, &argAddr);
+
+    void (*tmain)(void*) = (void (*)(void *))tmainAddr;
+    void *stack = (void*)stackAddr;
+    void *arg = (void*)argAddr;
+
+    return thread_create(tmain, stack, arg);
+}
