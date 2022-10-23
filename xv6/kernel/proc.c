@@ -684,6 +684,53 @@ procdump(void)
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int thread_create(void (*tmain)(void *), void *stack, void *arg) {
-    printf("arg1: %d, arg2: %d, arg3: %d\n", tmain, stack, arg);
-    return 1;
+  uint64 sp = (uint64)stack;
+  uint64 i = 0;
+  int newThreadID = -1;
+  struct proc *newThread;
+  struct proc *parent = myproc();
+
+  // Get new PCB entry for this thread.
+  if((newThread = allocproc()) == 0){
+    return -1;
+  }
+
+  // Produce an exact copy of the parent pagetable, without copying mem.
+  if(uvmcopytable(parent->pagetable, newThread->pagetable, parent->sz) < 0){
+    freeproc(newThread);
+    release(&newThread->lock);
+    return newThreadID;
+  }
+  newThread->sz = parent->sz;
+
+  // Copy over cpu execution state, we will make 
+  // specific tweaks shortly. 
+  *(newThread->trapframe) = *(parent->trapframe);
+
+  // Perform some other bookkeeping, same as fork
+  for(i = 0; i < NOFILE; i++)
+    if(parent->ofile[i])
+      newThread->ofile[i] = filedup(parent->ofile[i]);
+  newThread->cwd = idup(parent->cwd);
+  safestrcpy(newThread->name, parent->name, sizeof(parent->name));
+  newThreadID = newThread->pid;
+
+  release(&newThread->lock);
+  
+  acquire(&wait_lock);
+  newThread->parent = parent;
+  release(&wait_lock);
+
+  // Reacquire lock on new thread PCB entry to do 
+  // some final adjustments.
+  acquire(&newThread->lock);
+  /* Set entry point */
+  newThread->trapframe->sp = sp;
+  newThread->trapframe->a0 = (uint64)arg;
+  newThread->trapframe->epc = (uint64)tmain;
+
+  newThread->state = RUNNABLE;
+  release(&newThread->lock);
+
+  return newThreadID;
 }

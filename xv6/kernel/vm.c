@@ -332,6 +332,32 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   return -1;
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int uvmcopytable(pagetable_t old, pagetable_t new, uint64 sz)
+{
+  pte_t *ptEntry = 0;
+  uint64 physAddr = 0;
+  uint64 i = 0;
+  uint flags;
+
+  // Walk through the entire page table for the old program,
+  // copying all the mappings over to the new thread's page table.
+  for(i = 0; i < sz; i += PGSIZE){
+    if((ptEntry = walk(old, i, 0)) == 0)
+      panic("uvmcopytable: pte should exist");
+    if((*ptEntry & PTE_V) == 0)
+      panic("uvmcopytable: page not present");
+    physAddr = PTE2PA(*ptEntry);
+    flags = PTE_FLAGS(*ptEntry);
+
+    if(mappages(new, i, PGSIZE, physAddr, flags) != 0){
+      uvmunmap(new, 0, i / PGSIZE, 1);
+      return -1;
+    }
+  }
+  return 0;
+}
+
 /* mark a PTE invalid for user access. */
 /* used by exec for the user stack guard page. */
 void
