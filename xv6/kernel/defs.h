@@ -108,6 +108,7 @@ int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int thread_create(void (*tmain)(void *), void *stack, void *arg); 
+int thread_join(void **stack);
 
 /* swtch.S */
 void            swtch(struct context*, struct context*);

@@ -734,3 +734,8 @@ int thread_create(void (*tmain)(void *), void *stack, void *arg) {
 
   return newThreadID;
 }
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int thread_join(void **stack) {
+  return 0;
+}

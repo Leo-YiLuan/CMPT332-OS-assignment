@@ -106,3 +106,8 @@ uint64 sys_thread_create(void) {
 
     return thread_create(tmain, stack, arg);
 }
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+uint64 sys_thread_join(void) {
+  return 0;
+}
