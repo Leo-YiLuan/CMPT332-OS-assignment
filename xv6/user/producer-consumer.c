@@ -17,8 +17,7 @@ void test(void *val) {
     printf("And another: %d\n", another);
     printf("Check global: %d\n", global);
 
-    while(1);
-    exit(0);
+   exit(0);
 }
 
 int
@@ -26,6 +25,7 @@ main(void)
 {
     int testVal = 5;
     void *stack = malloc(500);
+    void *otherstack = 0;
     int ret = 0;
     stack += 500;
     ret = thread_create(test, stack, (void*)((uint64)testVal));
@@ -33,7 +33,7 @@ main(void)
     global = 17;
     printf("Modified global\n");
 
-    thread_join(&stack);
-    while(1);
+    thread_join(&otherstack);
+    free(otherstack);
     exit(0);
 }

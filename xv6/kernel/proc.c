@@ -737,5 +737,54 @@ int thread_create(void (*tmain)(void *), void *stack, void *arg) {
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int thread_join(void **stack) {
+  struct proc *parent = myproc();
+  struct proc *candidate = 0;
+  int childCount = 0;
+
+  acquire(&wait_lock);
+
+  while (1) {
+    for (int i = 0; i < NPROC; i++) {
+      candidate = &proc[i];
+      // Is this a child proc?
+      // TODO: Test if its a thread instead of a proc.
+      if (candidate->parent == parent) {
+        childCount++;
+
+        acquire(&candidate->lock);
+        // Has this child proc exited?
+        if (candidate->state == ZOMBIE) {
+          // Found a dead child
+          int threadID = candidate->pid;
+
+          // TODO: We are sending back the sp, not the address we initially received from
+          // malloc. Is this a problem?
+          if ((uint64)stack != 0 && copyout(parent->pagetable, (uint64)stack, (char*)&candidate->trapframe->sp, sizeof(candidate->trapframe->sp)) < 0) {
+            printf("FATAL\n");
+            release(&candidate->lock);
+            release(&wait_lock);
+            return -1;
+          }
+          freeproc(candidate);
+          release(&candidate->lock);
+          release(&wait_lock);
+          return threadID;
+        }
+        release(&candidate->lock);
+      }
+    }
+
+    // No children, bail immediately.
+    if (childCount == 0 || killed(parent)) {
+      release(&wait_lock);
+      return -1;
+    }
+
+    // Put the parent to sleep, waiting for child.
+    sleep(parent, &wait_lock);
+    
+  }
+
+  release(&wait_lock);
   return 0;
 }
