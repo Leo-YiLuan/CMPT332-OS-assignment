@@ -17,7 +17,6 @@ void test(void *val) {
     printf("And another: %d\n", another);
     printf("Check global: %d\n", global);
 
-    printf("Child pid: %d\n", getpid());
     while(1);
     exit(0);
 }
@@ -32,7 +31,9 @@ main(void)
     ret = thread_create(test, stack, (void*)((uint64)testVal));
     printf("Successfully called thread_create, return: %d\n", ret);
     global = 17;
+    printf("Modified global\n");
 
+    thread_join(&stack);
     while(1);
     exit(0);
 }

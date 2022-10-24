@@ -109,5 +109,11 @@ uint64 sys_thread_create(void) {
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 uint64 sys_thread_join(void) {
-  return 0;
+  uint64 stackAddr = 0;
+
+  argaddr(0, &stackAddr);
+
+  void **stack = (void**)stackAddr;
+
+  return thread_join(stack);
 }
