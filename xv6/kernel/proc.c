@@ -17,6 +17,9 @@ struct spinlock pid_lock;
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+static void freethread(struct proc *p);
+static void thread_freepagetable(pagetable_t pagetable, uint64 sz);
 
 extern char trampoline[]; /* trampoline.S */
 
@@ -171,6 +174,31 @@ freeproc(struct proc *p)
   p->state = UNUSED;
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+/* free a thread structure and the data hanging from it, */
+/* however, physical memory is not freed. */
+/* p->lock must be held. */
+static void
+freethread(struct proc *p)
+{
+  printf("Start freeThread\n");
+  if(p->trapframe)
+    kfree((void*)p->trapframe);
+  p->trapframe = 0;
+  if(p->pagetable)
+    thread_freepagetable(p->pagetable, p->sz);
+  p->pagetable = 0;
+  p->sz = 0;
+  p->pid = 0;
+  p->parent = 0;
+  p->name[0] = 0;
+  p->chan = 0;
+  p->killed = 0;
+  p->xstate = 0;
+  p->state = UNUSED;
+  printf("freeThread!\n");
+}
+
 /* Create a user page table for a given process, with no user memory, */
 /* but with trampoline and trapframe pages. */
 pagetable_t
@@ -213,6 +241,17 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
   uvmfree(pagetable, sz);
+}
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+void
+thread_freepagetable(pagetable_t pagetable, uint64 sz)
+{
+  uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+  uvmunmap(pagetable, TRAPFRAME, 1, 0);
+  // TODO: Finish freeing this properly.
+  // Can't use uvmfree because it was freeing the physical pages
+  // and blowing up everything.
 }
 
 /* a user program that calls exec("/init") */
@@ -765,7 +804,7 @@ int thread_join(void **stack) {
             release(&wait_lock);
             return -1;
           }
-          freeproc(candidate);
+          freethread(candidate);
           release(&candidate->lock);
           release(&wait_lock);
           return threadID;
