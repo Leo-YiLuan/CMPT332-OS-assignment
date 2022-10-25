@@ -288,11 +288,15 @@ freewalk(pagetable_t pagetable)
 
 /* Free user memory pages, */
 /* then free page-table pages. */
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+/* Student note: Modified function signature so we can
+   choose not to free the physical memory when freeing
+   a thread. */
 void
-uvmfree(pagetable_t pagetable, uint64 sz)
+uvmfree(pagetable_t pagetable, uint64 sz, int doFree)
 {
   if(sz > 0)
-    uvmunmap(pagetable, 0, PGROUNDUP(sz)/PGSIZE, 1);
+    uvmunmap(pagetable, 0, PGROUNDUP(sz)/PGSIZE, doFree);
   freewalk(pagetable);
 }
 
