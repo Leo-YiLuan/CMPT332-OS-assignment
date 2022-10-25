@@ -149,6 +149,10 @@ found:
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
 
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  /* Define to be a process by default. */
+  p->isThread = 0;
+
   return p;
 }
 
@@ -746,6 +750,9 @@ int thread_create(void (*tmain)(void *), void *stack, void *arg) {
   // specific tweaks shortly. 
   *(newThread->trapframe) = *(parent->trapframe);
 
+  // Mark as a thread
+  newThread->isThread = 1;
+
   // Perform some other bookkeeping, same as fork
   for(i = 0; i < NOFILE; i++)
     if(parent->ofile[i])
@@ -792,7 +799,7 @@ int thread_join(void **stack) {
 
         acquire(&candidate->lock);
         // Has this child proc exited?
-        if (candidate->state == ZOMBIE) {
+        if (candidate->state == ZOMBIE && candidate->isThread == 1) {
           // Found a dead child
           int threadID = candidate->pid;
 

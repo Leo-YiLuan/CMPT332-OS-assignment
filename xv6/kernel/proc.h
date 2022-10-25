@@ -104,4 +104,6 @@ struct proc {
   struct file *ofile[NOFILE];  /* Open files */
   struct inode *cwd;           /* Current directory */
   char name[16];               /* Process name (debugging) */
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  int isThread;
 };
