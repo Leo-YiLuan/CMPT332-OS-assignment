@@ -421,7 +421,8 @@ wait(uint64 addr)
     /* Scan through table looking for exited children. */
     havekids = 0;
     for(pp = proc; pp < &proc[NPROC]; pp++){
-      if(pp->parent == p){
+      /* CMPT 332 GROUP 22 Change, Fall 2022 */
+      if(pp->parent == p && pp->isThread == 0){
         /* make sure the child isn't still in exit() or swtch(). */
         acquire(&pp->lock);
 
@@ -770,14 +771,13 @@ int thread_join(void **stack) {
   while (1) {
     for (int i = 0; i < NPROC; i++) {
       candidate = &proc[i];
-      // Is this a child proc?
-      // TODO: Test if its a thread instead of a proc.
-      if (candidate->parent == parent) {
+      // Is this a child thread?
+      if (candidate->parent == parent && candidate->isThread == 1) {
         childCount++;
 
         acquire(&candidate->lock);
         // Has this child proc exited?
-        if (candidate->state == ZOMBIE && candidate->isThread == 1) {
+        if (candidate->state == ZOMBIE) {
           // Found a dead child
           int threadID = candidate->pid;
 
