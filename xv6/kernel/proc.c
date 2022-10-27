@@ -729,8 +729,9 @@ int thread_create(void (*tmain)(void *), void *stack, void *arg) {
   // specific tweaks shortly. 
   *(newThread->trapframe) = *(parent->trapframe);
 
-  // Mark as a thread
+  // Mark as a thread and store stack top for returning later.
   newThread->isThread = 1;
+  newThread->threadTop = sp;
 
   // Perform some other bookkeeping, same as fork
   for(i = 0; i < NOFILE; i++)
@@ -781,13 +782,11 @@ int thread_join(void **stack) {
           // Found a dead child
           int threadID = candidate->pid;
 
-          // TODO: We are sending back the sp, not the address we initially received from
-          // malloc. Is this a problem?
-          if ((uint64)stack != 0 && copyout(parent->pagetable, (uint64)stack, (char*)&candidate->trapframe->sp, sizeof(candidate->trapframe->sp)) < 0) {
-            printf("FATAL\n");
+          // Return the top of the stack we were given in thread_create.
+          if ((uint64)stack != 0 && copyout(parent->pagetable, (uint64)stack, (char*)&candidate->threadTop, sizeof(candidate->threadTop)) < 0) {
             release(&candidate->lock);
             release(&wait_lock);
-            return -1;
+            return -2;
           }
           freeproc(candidate);
           release(&candidate->lock);
@@ -806,7 +805,6 @@ int thread_join(void **stack) {
 
     // Put the parent to sleep, waiting for child.
     sleep(parent, &wait_lock);
-    
   }
 
   release(&wait_lock);
