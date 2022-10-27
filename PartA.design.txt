@@ -1,0 +1,22 @@
+thread_create is similar to fork, with a few key differences:
+
+First, instead of copying every page of the parent process into 
+a new physical memory location, we copy the page table only, through 
+a new function named uvmcopytable. This class is similar to uvmcopy 
+except we don't alloc new physical pages and instead just map the existing 
+physical pages into a new page table for the thread. 
+
+The second key difference is we store an identifier that a process is a thread,
+as well as the top of the stack, into the pcb entry for this thread. 
+
+
+For thread_join, it is similar to wait, with a few key differences:
+
+We check to confirm that when we find a child thread, it is actually marked 
+as a thread and not a seperate child process. 
+We had to modify freeproc() to handle the special case of freeing a thread 
+vs freeing a process. If you try to use freeproc unmodified, it will free
+the physical pages allocated to the parent, causing really bad things to happen 
+that takes hours to debug. So freeproc checks whether its freeing a thread or 
+a process, and if its freeing a thread, it frees the memory allocated to the 
+page table but not the physical pages themselves. 
