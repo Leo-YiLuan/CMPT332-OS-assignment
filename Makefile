@@ -14,15 +14,34 @@ PARTB_INCLUDE=-I/student/cmpt332/pthreads/ -I.
 PARTB_LIBS=-L. -L/student/cmpt332/pthreads/lib/Linuxx86_64/
 RTTHREADS_DIR=/student/cmpt332/rtt/include/
 RTTHREADS_LIB=/student/cmpt332/rtt/lib/Linuxx86_64/
+RTTHREADS_LIB_PPC=/student/cmpt332/rtt/lib/Linuxppc/
 
-RWT_DEPS=libMonitor.a liblist.a reader_writer.o reader_writer_monitor.o
+RWT_DEPS=libMonitor.a liblist_Linuxx86_64.a reader_writer.o reader_writer_monitor.o
+
+#x86_64
+#armv7l
+#ppc
+ARCH=$(shell uname -m)
 
 .PHONY : all
-all: reader_writer_test s-chat
+all: s-chat reader_writer_test
+
+ifeq ($(ARCH), x86_64)
+.PHONY : s-chat
+s-chat: s-chat_Linuxx86_64
+
+s-chat_Linuxx86_64: liblist_Linuxx86_64.a s-chat.o
+	@echo build on linux
+	$(CC) -o s-chat_Linuxx86_64 $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) s-chat_Linuxx86_64.o \
+	-ltirpc -lRtt -llist_Linuxx86_64 -lRttUtils
+
+s-chat.o: s-chat.c
+	$(CC) -o s-chat_Linuxx86_64.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
+	-I/usr/include/tirpc -I. s-chat.c
 
 reader_writer_test: $(RWT_DEPS)
 	$(CC) -o reader_writer_test $(CFLAGS) $(CPPFLAGS) $(PARTB_LIBS) \
-	reader_writer.o reader_writer_monitor.o -lMonitor -lpthreads -llist
+	reader_writer.o reader_writer_monitor.o -lMonitor -lpthreads -llist_Linuxx86_64
 
 libMonitor.a: Monitor.o
 	ar -r libMonitor.a Monitor.o
@@ -38,25 +57,47 @@ reader_writer.o: reader_writer.c reader_writer_monitor.h
 	$(CC) -o reader_writer.o -c $(CFLAGS) $(CPPFLAGS) $(PARTB_INCLUDE) \
 	reader_writer.c 
 
+liblist_Linuxx86_64.a : list_adders_Linuxx86_64.o list_movers_Linuxx86_64.o list_removers_Linuxx86_64.o
+	ar -r liblist_Linuxx86_64.a list_movers_Linuxx86_64.o list_adders_Linuxx86_64.o list_removers_Linuxx86_64.o
+
+list_movers_Linuxx86_64.o : list_movers.c list.h
+	$(CC) -o list_movers_Linuxx86_64.o -c $(CFLAGS) $(CPPFLAGS) list_movers.c
+
+list_adders_Linuxx86_64.o : list_adders.c list.h
+	$(CC) -o list_adders_Linuxx86_64.o -c $(CFLAGS) $(CPPFLAGS) list_adders.c
+
+list_removers_Linuxx86_64.o : list_removers.c list.h
+	$(CC) -o list_removers_Linuxx86_64.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
+
+
+else ifeq ($(ARCH), ppc)
+reader_writer_test:
+	@echo Not on x86 architecture, skipping partB...
+
+.PHONY : s-chat
+s-chat: s-chat_Linuxppc
+
+s-chat_Linuxppc: liblist_Linuxppc.a s-chat.o
+	@echo build on ppc
+	$(CC) -o s-chat_Linuxppc $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_PPC) s-chat_Linuxppc.o \
+	-lRtt -ltirpc -llist_Linuxppc -lRttUtils
+
 s-chat.o: s-chat.c
-	$(CC) -o s-chat.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
+	$(CC) -o s-chat_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
 	-I/usr/include/tirpc -I. s-chat.c
 
-s-chat: s-chat.o
-	$(CC) -o s-chat $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) s-chat.o \
-	-ltirpc -lRtt -llist -lRttUtils
+liblist_Linuxppc.a : list_adders_Linuxppc.o list_movers_Linuxppc.o list_removers_Linuxppc.o
+	ar -r liblist_Linuxppc.a list_movers_Linuxppc.o list_adders_Linuxppc.o list_removers_Linuxppc.o
 
-liblist.a : list_adders.o list_movers.o list_removers.o
-	ar -r liblist.a list_movers.o list_adders.o list_removers.o
+list_movers_Linuxppc.o : list_movers.c list.h
+	$(CC) -o list_movers_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) list_movers.c
 
-list_movers.o : list_movers.c list.h
-	$(CC) -o list_movers.o -c $(CFLAGS) $(CPPFLAGS) list_movers.c
+list_adders_Linuxppc.o : list_adders.c list.h
+	$(CC) -o list_adders_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) list_adders.c
 
-list_adders.o : list_adders.c list.h
-	$(CC) -o list_adders.o -c $(CFLAGS) $(CPPFLAGS) list_adders.c
-
-list_removers.o : list_removers.c list.h
-	$(CC) -o list_removers.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
+list_removers_Linuxppc.o : list_removers.c list.h
+	$(CC) -o list_removers_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
+endif
 
 clean:
-	rm -f *.o liblist.a libMonitor.a reader_writer_test s-chat
+	rm -f *.o *.a reader_writer_test s-chat_Linuxx86_64 s-chat_Linuxppc
