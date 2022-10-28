@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <time.h>
 
 RttSem recSem;
 RttSem sendSem;
@@ -29,9 +30,17 @@ void sendMsg();
 void receiveMsg();
 void pStdout();
 void rKeyboard();
-struct sockaddr_in servaddr, cliaddr;
 struct sockaddr *destinationClient = NULL;
+struct sockaddr *myClient = NULL;
 int listenSocket = 0;
+
+char *concat_time(char *msg) {
+  char *timefmt = malloc(25 + strlen(msg) + 1);
+  struct timeval value;
+  gettimeofday(&value, NULL);
+  sprintf(timefmt, "%ld.%ld - ", value.tv_sec, value.tv_usec);
+  return strcat(timefmt, msg);
+}
 
 void debug_printaddr(struct sockaddr_in *addrIn) {
   char string[INET6_ADDRSTRLEN];
@@ -71,7 +80,7 @@ int create_listen_socket(char *port) {
     return -1;
   }
 
-  freeaddrinfo(info);
+  myClient = info->ai_addr;
   return localSocketFd;
 }
 
@@ -131,15 +140,31 @@ void mainp(int argc, char** argv){
 
 void sendMsg() {
   while (1) {
-    char* sendBuffer;
+    char* msg;
+    char *buf;
+    int res = 0;
     RttP(sendSemHave);
     RttP(sendSem);
-    sendBuffer = (char*)ListTrim(sendQueue);
-    sendto(listenSocket, (const void*)sendBuffer, strlen(sendBuffer) + 1,
+    msg = (char*)ListTrim(sendQueue);
+    buf = concat_time(msg);
+    /* Send to remote client */
+    res = sendto(listenSocket, (const void*)buf, strlen(buf) + 1,
     0, destinationClient, sizeof(*destinationClient));
-    /* printf("Sent %d bytes of data to remote host ", strlen(sendBuffer));
+    if (res < 0) {
+      printf("Failed to deliver message to remote host.\n");
+    }
+    /* printf("Sent %d bytes of data to remote host ", strlen(buf));
     debug_printaddr((struct sockaddr_in*)destinationClient); */
-    free(sendBuffer);
+
+    /* Send to myself */
+    res = sendto(listenSocket, (const void*)buf, strlen(buf) + 1,
+    0, myClient, sizeof(*myClient));
+    if (res < 0) {
+      printf("Failed to deliver message to myself res: %d.\n", errno);
+    }
+    /* printf("Sent %d bytes of data to remote host ", strlen(buf));
+    debug_printaddr((struct sockaddr_in*)myClient); */
+    free(buf);
     RttV(sendSem);
   }
 }
@@ -223,7 +248,6 @@ void rKeyboard() {
 
     if (received) {
       /* Received input from stdin */
-      /* char *msg = malloc(sizeof(strlen(buf) + 2)); */
       char *msg = malloc(strlen(buf) + 1);
       memcpy(msg, buf, strlen(buf) + 1);
       RttP(sendSem);
@@ -241,8 +265,10 @@ void pStdout() {
     char *msgToPrint = NULL;
     RttP(recSemHave);
     RttP(recSem);
-    msgToPrint = (char*)ListTrim(receivedQueue);
-    printf("%s\n", msgToPrint);
+    while (ListCount(receivedQueue) > 0) {
+      msgToPrint = (char*)ListTrim(receivedQueue);
+      printf("%s\n", msgToPrint);
+    }
     RttV(recSem);
   }
 }
