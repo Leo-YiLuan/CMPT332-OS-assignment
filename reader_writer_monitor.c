@@ -1,6 +1,13 @@
-/*# Dwight Makaroff   */
-/*# student number    */
-/*# nsid              */
+/*
+  NAME: Matthew Munro
+  NSID: mam552
+  STUDENT NUMBER: 11291769
+  NAME: Yi Luan
+  NSID: yil160
+  STUDENT NUMBER: 11253856
+  CMPT 332 2022
+  A2*/
+
 /*# November 7, 2008  */
 
 /* modified slightly October 2018 */
@@ -57,9 +64,9 @@ void StartRead()
    */
   numReaders++;
   printf("starting value of numReaders = %d\n", numReaders);
-  
+
   MonSignal(OKtoRead);
-  
+
   MonLeave();
 
 }
@@ -72,13 +79,13 @@ void StopRead()
   /* Only signal the writer when all readers have gone */
   if (numReaders == 0) MonSignal(OKtoWrite);
   MonLeave();
-  
-  
+
+
 }
 
 void StartWrite()
 {
-  MonEnter(); 
+  MonEnter();
 
   /* if there are any readers or a writer */
   if ((numReaders !=0) || busyWriting)

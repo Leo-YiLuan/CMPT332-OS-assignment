@@ -11,7 +11,15 @@
 
    *********** reader-writer.c ***********
 */
-
+/*
+  NAME: Matthew Munro
+  NSID: mam552
+  STUDENT NUMBER: 11291769
+  NAME: Yi Luan
+  NSID: yil160
+  STUDENT NUMBER: 11253856
+  CMPT 332 2022
+  A2*/
 /* Student Notes:
   Changed signature of reader and writer to PROCESS instead of PID return type.
 */
