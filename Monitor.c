@@ -62,14 +62,14 @@ void MonMain() {
             case REQUEST_LEAVE:
 
                 if (ListCount(monitor.urgentQueue)>0) {
-                    PID id = (PID)ListTrim(monitor.urgentQueue);
-                    if(Reply(id, (void*)0, sizeof(int))!=0){
+                    if(Reply((PID)ListTrim(monitor.urgentQueue),
+                    (void*)0, sizeof(int))!=0){
                       printf("Leave urgent Failed replied\n");
                     }
 
                 }else if(ListCount(monitor.enterQueue)>0){
-                    PID id = (PID)ListTrim(monitor.enterQueue);
-                    if(Reply(id, (void*)0, sizeof(int))!=0){
+                    if(Reply((PID)ListTrim(monitor.enterQueue), (void*)0,
+                    sizeof(int))!=0){
                       printf("Leave enter Failed replied\n");
                     }
 
@@ -83,13 +83,13 @@ void MonMain() {
             case WAIT:
                 ListPrepend(monitor.waitQueues[msg->condition], (void*)sender);
                 if (ListCount(monitor.urgentQueue) > 0) {
-                    PID id = (PID)ListTrim(monitor.urgentQueue);
-                    if(Reply(id, (void*)0, sizeof(int))!=0){
+                    if(Reply((PID)ListTrim(monitor.urgentQueue), (void*)0,
+                     sizeof(int))!=0){
                       printf("Wait urgent Failed replied\n");
                     }
                 }else if(ListCount(monitor.enterQueue) > 0){
-                    PID id = (PID)ListTrim(monitor.enterQueue);
-                    if(Reply(id, (void*)0, sizeof(int))!=0){
+                    if(Reply((PID)ListTrim(monitor.enterQueue), (void*)0,
+                     sizeof(int))!=0){
                       printf("Wait enter Failed replied\n");
                     }
 
@@ -99,8 +99,8 @@ void MonMain() {
                 break;
             case SIGNAL:
                 if (ListCount(monitor.waitQueues[msg->condition])>0) {
-                    PID id = (PID)ListTrim(monitor.waitQueues[msg->condition]);
-                    Reply(id, (void*)0, sizeof(int));
+                    Reply((PID)ListTrim(monitor.waitQueues[msg->condition]),
+                     (void*)0, sizeof(int));
                     ListPrepend(monitor.urgentQueue, (void*)sender);
 
                 }else{
