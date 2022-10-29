@@ -15,6 +15,7 @@ PARTB_LIBS=-L. -L/student/cmpt332/pthreads/lib/Linuxx86_64/
 RTTHREADS_DIR=/student/cmpt332/rtt/include/
 RTTHREADS_LIB=/student/cmpt332/rtt/lib/Linuxx86_64/
 RTTHREADS_LIB_PPC=/student/cmpt332/rtt/lib/Linuxppc/
+RTTHREADS_LIB_ARM=/student/cmpt332/rtt/lib/Linuxarmv7l/
 
 RWT_DEPS=libMonitor.a liblist_Linuxx86_64.a reader_writer.o reader_writer_monitor.o
 
@@ -30,12 +31,12 @@ ifeq ($(ARCH), x86_64)
 .PHONY : s-chat
 s-chat: s-chat_Linuxx86_64
 
-s-chat_Linuxx86_64: liblist_Linuxx86_64.a s-chat.o
+s-chat_Linuxx86_64: liblist_Linuxx86_64.a s-chat_Linuxx86_64.o
 	@echo build on linux
 	$(CC) -o s-chat_Linuxx86_64 $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) s-chat_Linuxx86_64.o \
 	-ltirpc -lRtt -llist_Linuxx86_64 -lRttUtils
 
-s-chat.o: s-chat.c
+s-chat_Linuxx86_64.o: s-chat.c
 	$(CC) -o s-chat_Linuxx86_64.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
 	-I/usr/include/tirpc -I. s-chat.c
 
@@ -77,12 +78,12 @@ reader_writer_test:
 .PHONY : s-chat
 s-chat: s-chat_Linuxppc
 
-s-chat_Linuxppc: liblist_Linuxppc.a s-chat.o
+s-chat_Linuxppc: liblist_Linuxppc.a s-chat_Linuxppc.o
 	@echo build on ppc
 	$(CC) -o s-chat_Linuxppc $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_PPC) s-chat_Linuxppc.o \
 	-lRtt -ltirpc -llist_Linuxppc -lRttUtils
 
-s-chat.o: s-chat.c
+s-chat_Linuxppc.o: s-chat.c
 	$(CC) -o s-chat_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
 	-I/usr/include/tirpc -I. s-chat.c
 
@@ -97,6 +98,34 @@ list_adders_Linuxppc.o : list_adders.c list.h
 
 list_removers_Linuxppc.o : list_removers.c list.h
 	$(CC) -o list_removers_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
+
+else ifeq ($(ARCH), armv7l)
+
+reader_writer_test:
+	@echo Not on x86 architecture, skipping partB...
+
+.PHONY : s-chat
+s-chat: s-chat_arm
+
+s-chat_arm: liblist_arm.a s-chat_arm.o
+	$(CC) -o s-chat_arm $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_ARM) s-chat_arm.o \
+	-lRtt -ltirpc -llist_arm -lRttUtils
+
+s-chat_arm.o: s-chat.c
+	$(CC) -o s-chat_arm.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
+	-I/usr/include/tirpc -I. s-chat.c
+
+liblist_arm.a : list_adders_arm.o list_movers_arm.o list_removers_arm.o
+	ar -r liblist_arm.a list_movers_arm.o list_adders_arm.o list_removers_arm.o
+
+list_movers_arm.o : list_movers.c list.h
+	$(CC) -o list_movers_arm.o -c $(CFLAGS) $(CPPFLAGS) list_movers.c
+
+list_adders_arm.o : list_adders.c list.h
+	$(CC) -o list_adders_arm.o -c $(CFLAGS) $(CPPFLAGS) list_adders.c
+
+list_removers_arm.o : list_removers.c list.h
+	$(CC) -o list_removers_arm.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
 endif
 
 clean:

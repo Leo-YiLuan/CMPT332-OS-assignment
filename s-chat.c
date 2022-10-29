@@ -126,7 +126,6 @@ void mainp(int argc, char** argv){
         exit(EXIT_FAILURE);
       }
       destinationClient = info->ai_addr;
-      freeaddrinfo(info);
     }
 
     /* Create the four threads */
@@ -151,10 +150,11 @@ void sendMsg() {
     res = sendto(listenSocket, (const void*)buf, strlen(buf) + 1,
     0, destinationClient, sizeof(*destinationClient));
     if (res < 0) {
-      printf("Failed to deliver message to remote host.\n");
+      printf("Failed to deliver message to remote. Err: %d\n", errno);
     }
-    /* printf("Sent %d bytes of data to remote host ", strlen(buf));
-    debug_printaddr((struct sockaddr_in*)destinationClient); */
+    /*
+    printf("Sent %d bytes of data to remote host ", strlen(buf));
+    debug_printaddr((struct sockaddr_in*)destinationClient);*/
 
     /* Send to myself */
     res = sendto(listenSocket, (const void*)buf, strlen(buf) + 1,
@@ -195,8 +195,8 @@ void receiveMsg() {
     }
 
     if (received) {
-      /* printf("Received data from remote host ");
-      debug_printaddr((struct sockaddr_in*)&from); */
+      /*printf("Received data from remote host ");
+      debug_printaddr((struct sockaddr_in*)&from);*/
 
       RttP(recSem);
       ListPrepend(receivedQueue, (void*)buf);
