@@ -10,11 +10,11 @@
 */
 
 #include "Monitor.h"
-
 #include "list.h"
 #include <os.h>
 #include <standards.h>
 #include <stdio.h>
+#include <pthread.h>
 
 enum MSGTYPE {
     REQUEST_ENTER,
@@ -40,30 +40,74 @@ struct Monitor {
 Monitor monitor = {0};
 
 void MonMain() {
+    int MonBusy=0;
     /* Basic structural layout for the server thread. */
     while (1) {
         PID sender = PNUL;
         int len = 0;
         Message *msg;
         msg = Receive(&sender, &len);
-
         switch (msg->type) {
             case REQUEST_ENTER:
-                ListCount(monitor.enterQueue);
-                ListAdd(monitor.enterQueue, (void*)sender);
+                if (MonBusy==0) {
+                    MonBusy=1;
+                    if (Reply(sender, (void*)0, sizeof(int))!=0) {
+                        printf("Entering Filed replied\n");
+                    }
+
+                }else {
+                    ListPrepend(monitor.enterQueue, (void*)sender);
+                }
                 break;
             case REQUEST_LEAVE:
+
+                if (ListCount(monitor.urgentQueue)>0) {
+                    PID id = (PID)ListTrim(monitor.urgentQueue);
+                    if(Reply(id, (void*)0, sizeof(int))!=0){
+                      printf("Leave urgent Failed replied\n");
+                    }
+
+                }else if(ListCount(monitor.enterQueue)>0){
+                    PID id = (PID)ListTrim(monitor.enterQueue);
+                    if(Reply(id, (void*)0, sizeof(int))!=0){
+                      printf("Leave enter Failed replied\n");
+                    }
+
+                }else{
+                    MonBusy = 0;
+                }
+                Reply(sender, (void*)0, sizeof(int));
+
                 break;
+
             case WAIT:
-                ListAdd(monitor.waitQueues[msg->condition], (void*)sender);
+                ListPrepend(monitor.waitQueues[msg->condition], (void*)sender);
+                if (ListCount(monitor.urgentQueue) > 0) {
+                    PID id = (PID)ListTrim(monitor.urgentQueue);
+                    if(Reply(id, (void*)0, sizeof(int))!=0){
+                      printf("Wait urgent Failed replied\n");
+                    }
+                }else if(ListCount(monitor.enterQueue) > 0){
+                    PID id = (PID)ListTrim(monitor.enterQueue);
+                    if(Reply(id, (void*)0, sizeof(int))!=0){
+                      printf("Wait enter Failed replied\n");
+                    }
+
+                }else{
+                    MonBusy = 0;
+                }
                 break;
             case SIGNAL:
-                ListFirst(monitor.waitQueues[msg->condition]);
-                ListRemove(monitor.waitQueues[msg->condition]);
+                if (ListCount(monitor.waitQueues[msg->condition])>0) {
+                    PID id = (PID)ListTrim(monitor.waitQueues[msg->condition]);
+                    Reply(id, (void*)0, sizeof(int));
+                    ListPrepend(monitor.urgentQueue, (void*)sender);
+
+                }else{
+                    Reply(sender,(void*)0, sizeof(int));
+                }
                 break;
         }
-
-        Reply(sender, (void*)0, sizeof(int));
     }
 }
 
@@ -81,7 +125,7 @@ void MonServer(size_t numConditions) {
         }
     }
 
-    monitor.serverThread = Create((void(*)()) MonMain, 16000, "Monitor", 
+    monitor.serverThread = Create((void(*)()) MonMain, 16000, "Monitor",
                                   (void*)100, HIGH, USR);
     if (monitor.serverThread == PNUL) {
         printf("Error attempting to construct thread during monitor init.\n");
@@ -108,6 +152,8 @@ void MonWait(int condition) {
     Message msg = {0};
     msg.type = WAIT;
     msg.condition = condition;
+    /*printf("waitr conditions %d\n", condition);*/
+
     Send(monitor.serverThread, (void*)&msg, &pLen);
 }
 
@@ -116,5 +162,6 @@ void MonSignal(int condition) {
     Message msg = {0};
     msg.type = SIGNAL;
     msg.condition = condition;
+    /*printf("sig conditions %d\n", condition);*/
     Send(monitor.serverThread, (void*)&msg, &pLen);
 }

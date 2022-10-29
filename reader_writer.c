@@ -29,9 +29,9 @@
 PROCESS reader(void *arg)
 {
   long myId;
-  
+
   myId = (long) arg;
-  
+
   for(;;)
     {
       printf("%ld start read\n", myId);
@@ -48,13 +48,13 @@ PROCESS writer(void *arg)
 {
   long myId;
   myId = (long) arg;
-  
+
   for(;;)
     {
       printf("%ld start write\n", myId);
       StartWrite();
       printf("%ld writing\n", myId);
-      Sleep((int) (rand() % SLEEPMAX*5));
+      Sleep((int) (rand() % SLEEPMAX*10));
       StopWrite();
       printf("%ld stop write\n", myId);
       Sleep((int) (rand() % SLEEPMAX*6));
@@ -68,22 +68,22 @@ int mainp()
     Initialize();
     srand(71);
 
-    tempPid = Create((void(*)()) reader, 16000, "R1", (void *) 1000, 
+    tempPid = Create((void(*)()) reader, 16000, "R1", (void *) 1000,
 		      NORM, USR );
     if (tempPid == PNUL) perror("Create");
-    temp2 = Create(  (void(*)()) writer, 16000, "W1", (void *) 500, 
+    temp2 = Create(  (void(*)()) writer, 16000, "W1", (void *) 500,
 		       NORM, USR );
     if (temp2 == PNUL) perror("Create");
     temp3 = Create(  (void(*)()) reader, 16000, "R2", (void *) 1001,
 		       NORM, USR );
     if (temp3 == PNUL) perror("Create");
-    temp3 = Create(  (void(*)()) reader, 16000, "R3", (void *) 1002, 
+    temp3 = Create(  (void(*)()) reader, 16000, "R3", (void *) 1002,
 		       NORM, USR );
     if (temp3 == PNUL) perror("Create");
-    temp3 = Create(  (void(*)()) writer, 16000, "W2", (void *) 501, 
+    temp3 = Create(  (void(*)()) writer, 16000, "W2", (void *) 501,
 		       NORM, USR );
     if (temp3 == PNUL) perror("Create");
     printf("Reader and Writer processes created\n");
-    
+
     return(0);
 }
