@@ -17,7 +17,8 @@ RTTHREADS_LIB=/student/cmpt332/rtt/lib/Linuxx86_64/
 RTTHREADS_LIB_PPC=/student/cmpt332/rtt/lib/Linuxppc/
 RTTHREADS_LIB_ARM=/student/cmpt332/rtt/lib/Linuxarmv7l/
 
-RWT_DEPS=libMonitor.a liblist_Linuxx86_64.a reader_writer.o reader_writer_monitor.o
+RWT_DEPS=libMonitor.a liblist_Linuxx86_64.a reader_writer.o \
+reader_writer_monitor.o
 
 #x86_64
 #armv7l
@@ -28,13 +29,15 @@ ARCH=$(shell uname -m)
 all: s-chat reader_writer_test
 
 ifeq ($(ARCH), x86_64)
+
+
 .PHONY : s-chat
 s-chat: s-chat_Linuxx86_64
 
 s-chat_Linuxx86_64: liblist_Linuxx86_64.a s-chat_Linuxx86_64.o
 	@echo build on linux
-	$(CC) -o s-chat_Linuxx86_64 $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) s-chat_Linuxx86_64.o \
-	-ltirpc -lRtt -llist_Linuxx86_64 -lRttUtils
+	$(CC) -o s-chat_Linuxx86_64 $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB) \
+	s-chat_Linuxx86_64.o -ltirpc -lRtt -llist_Linuxx86_64 -lRttUtils
 
 s-chat_Linuxx86_64.o: s-chat.c
 	$(CC) -o s-chat_Linuxx86_64.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
@@ -42,7 +45,8 @@ s-chat_Linuxx86_64.o: s-chat.c
 
 reader_writer_test: $(RWT_DEPS)
 	$(CC) -o reader_writer_test $(CFLAGS) $(CPPFLAGS) $(PARTB_LIBS) \
-	reader_writer.o reader_writer_monitor.o -lMonitor -lpthreads -llist_Linuxx86_64
+	reader_writer.o reader_writer_monitor.o -lMonitor -lpthreads \
+	-llist_Linuxx86_64
 
 libMonitor.a: Monitor.o
 	ar -r libMonitor.a Monitor.o
@@ -58,8 +62,10 @@ reader_writer.o: reader_writer.c reader_writer_monitor.h
 	$(CC) -o reader_writer.o -c $(CFLAGS) $(CPPFLAGS) $(PARTB_INCLUDE) \
 	reader_writer.c 
 
-liblist_Linuxx86_64.a : list_adders_Linuxx86_64.o list_movers_Linuxx86_64.o list_removers_Linuxx86_64.o
-	ar -r liblist_Linuxx86_64.a list_movers_Linuxx86_64.o list_adders_Linuxx86_64.o list_removers_Linuxx86_64.o
+liblist_Linuxx86_64.a : list_adders_Linuxx86_64.o list_movers_Linuxx86_64.o \
+list_removers_Linuxx86_64.o
+	ar -r liblist_Linuxx86_64.a list_movers_Linuxx86_64.o \
+	list_adders_Linuxx86_64.o list_removers_Linuxx86_64.o
 
 list_movers_Linuxx86_64.o : list_movers.c list.h
 	$(CC) -o list_movers_Linuxx86_64.o -c $(CFLAGS) $(CPPFLAGS) list_movers.c
@@ -72,6 +78,8 @@ list_removers_Linuxx86_64.o : list_removers.c list.h
 
 
 else ifeq ($(ARCH), ppc)
+
+
 reader_writer_test:
 	@echo Not on x86 architecture, skipping partB...
 
@@ -80,15 +88,17 @@ s-chat: s-chat_Linuxppc
 
 s-chat_Linuxppc: liblist_Linuxppc.a s-chat_Linuxppc.o
 	@echo build on ppc
-	$(CC) -o s-chat_Linuxppc $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_PPC) s-chat_Linuxppc.o \
-	-lRtt -ltirpc -llist_Linuxppc -lRttUtils
+	$(CC) -o s-chat_Linuxppc $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_PPC) \
+	s-chat_Linuxppc.o -lRtt -ltirpc -llist_Linuxppc -lRttUtils
 
 s-chat_Linuxppc.o: s-chat.c
 	$(CC) -o s-chat_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
 	-I/usr/include/tirpc -I. s-chat.c
 
-liblist_Linuxppc.a : list_adders_Linuxppc.o list_movers_Linuxppc.o list_removers_Linuxppc.o
-	ar -r liblist_Linuxppc.a list_movers_Linuxppc.o list_adders_Linuxppc.o list_removers_Linuxppc.o
+liblist_Linuxppc.a : list_adders_Linuxppc.o list_movers_Linuxppc.o \
+list_removers_Linuxppc.o
+	ar -r liblist_Linuxppc.a list_movers_Linuxppc.o list_adders_Linuxppc.o \
+	list_removers_Linuxppc.o
 
 list_movers_Linuxppc.o : list_movers.c list.h
 	$(CC) -o list_movers_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) list_movers.c
@@ -99,7 +109,9 @@ list_adders_Linuxppc.o : list_adders.c list.h
 list_removers_Linuxppc.o : list_removers.c list.h
 	$(CC) -o list_removers_Linuxppc.o -c $(CFLAGS) $(CPPFLAGS) list_removers.c
 
+
 else ifeq ($(ARCH), armv7l)
+
 
 reader_writer_test:
 	@echo Not on x86 architecture, skipping partB...
@@ -108,8 +120,8 @@ reader_writer_test:
 s-chat: s-chat_arm
 
 s-chat_arm: liblist_arm.a s-chat_arm.o
-	$(CC) -o s-chat_arm $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_ARM) s-chat_arm.o \
-	-lRtt -ltirpc -llist_arm -lRttUtils
+	$(CC) -o s-chat_arm $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_ARM) 
+	s-chat_arm.o -lRtt -ltirpc -llist_arm -lRttUtils
 
 s-chat_arm.o: s-chat.c
 	$(CC) -o s-chat_arm.o -c $(CFLAGS) $(CPPFLAGS) -I$(RTTHREADS_DIR) \
@@ -129,4 +141,4 @@ list_removers_arm.o : list_removers.c list.h
 endif
 
 clean:
-	rm -f *.o *.a reader_writer_test s-chat_Linuxx86_64 s-chat_Linuxppc
+	rm -f *.o *.a reader_writer_test s-chat_Linuxx86_64 s-chat_Linuxppc s-chat_arm

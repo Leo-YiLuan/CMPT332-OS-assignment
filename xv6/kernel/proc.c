@@ -783,7 +783,10 @@ int thread_join(void **stack) {
           int threadID = candidate->pid;
 
           // Return the top of the stack we were given in thread_create.
-          if ((uint64)stack != 0 && copyout(parent->pagetable, (uint64)stack, (char*)&candidate->threadTop, sizeof(candidate->threadTop)) < 0) {
+          if ((uint64)stack != 0 && 
+               copyout(parent->pagetable, (uint64)stack, 
+               (char*)&candidate->threadTop, 
+               sizeof(candidate->threadTop)) < 0) {
             release(&candidate->lock);
             release(&wait_lock);
             return -2;

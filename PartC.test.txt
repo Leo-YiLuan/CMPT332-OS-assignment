@@ -1,0 +1,12 @@
+White box testing ideas:
+
+1. Need to test messages of different lengths, to ensure that there's no
+memory errors involved in the mallocing in the keyboard thread.
+2. Need to test communicating on different architectures to ensure no 
+platform specific issues. 
+3. Need to test with the machines using two different ports. 
+4. Need to test rapid message transfers to ensure list buffer is working 
+and timestamps are working. 
+
+
+TODO: Results.

@@ -7,6 +7,10 @@
 # CMPT 332 2022
 # A2
 
+Part 2 Update: 
+Used gettimeofday() to get timestamps for messages. Timestamps 
+were concatenated with the message, then the entire char buffer
+was transmitted over the network. 
 
 Socket:
     use gethostname() to get current host name. then use gethostbyname() to get
@@ -48,9 +52,4 @@ Consumer:
   }
 Note: since our LIST have 1000 notes available, checking empty space may not
 needed.
-
-
-TODO: 
-
-We need to print timestamps as well.
 

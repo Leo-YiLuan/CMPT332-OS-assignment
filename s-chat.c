@@ -22,17 +22,15 @@ RttSem recSem;
 RttSem sendSem;
 RttSem recSemHave;
 RttSem sendSemHave;
-int portServeNum, portClientNum;
-int sockfdServ, sockfdCli;
 LIST* sendQueue;
 LIST* receivedQueue;
+struct sockaddr *destinationClient = NULL;
+struct sockaddr *myClient = NULL;
+int listenSocket = 0;
 void sendMsg();
 void receiveMsg();
 void pStdout();
 void rKeyboard();
-struct sockaddr *destinationClient = NULL;
-struct sockaddr *myClient = NULL;
-int listenSocket = 0;
 
 char *concat_time(char *msg) {
   char *timefmt = malloc(25 + strlen(msg) + 1);
@@ -40,12 +38,6 @@ char *concat_time(char *msg) {
   gettimeofday(&value, NULL);
   sprintf(timefmt, "%ld.%ld - ", value.tv_sec, value.tv_usec);
   return strcat(timefmt, msg);
-}
-
-void debug_printaddr(struct sockaddr_in *addrIn) {
-  char string[INET6_ADDRSTRLEN];
-  inet_ntop(AF_INET, (void*)&addrIn->sin_addr, string, sizeof(string));
-  printf("%s\n", string);
 }
 
 struct addrinfo* get_host_info(char *hostname, char *port) {
@@ -111,14 +103,15 @@ void mainp(int argc, char** argv){
     rtschattr.priority = 0;
     rtschattr.deadline=rttime;
 
-    /* Set up a "listen" socket for incoming data */
+    /* Set up a "listen" socket for incoming data. Also sets myClient global */
     listenSocket = create_listen_socket(argv[1]);
     if (listenSocket == -1) {
       printf("ERR: Failed to create listen socket.\n");
       exit(EXIT_FAILURE);
     }
 
-    /* We need socket info on the destination client so that we can send that info with sendto */
+    /* We need socket info on the destination client so that we can send 
+    that info with sendto */
     {
       struct addrinfo *info = get_host_info(argv[2], argv[3]);
       if (!info) {
@@ -152,18 +145,12 @@ void sendMsg() {
     if (res < 0) {
       printf("Failed to deliver message to remote. Err: %d\n", errno);
     }
-    /*
-    printf("Sent %d bytes of data to remote host ", strlen(buf));
-    debug_printaddr((struct sockaddr_in*)destinationClient);*/
-
     /* Send to myself */
     res = sendto(listenSocket, (const void*)buf, strlen(buf) + 1,
     0, myClient, sizeof(*myClient));
     if (res < 0) {
       printf("Failed to deliver message to myself res: %d.\n", errno);
     }
-    /* printf("Sent %d bytes of data to remote host ", strlen(buf));
-    debug_printaddr((struct sockaddr_in*)myClient); */
     free(buf);
     RttV(sendSem);
   }
@@ -179,8 +166,8 @@ void receiveMsg() {
     int received = 0;
 
     while (1) {
-
-      err = recvfrom(listenSocket, (void*)buf, bufSize, MSG_PEEK, &from, &fromlen);
+      err = recvfrom(listenSocket, (void*)buf, bufSize, MSG_PEEK, &from, 
+                     &fromlen);
       if (err == -1) {
         break;
       }
@@ -195,18 +182,18 @@ void receiveMsg() {
     }
 
     if (received) {
-      /*printf("Received data from remote host ");
-      debug_printaddr((struct sockaddr_in*)&from);*/
-
       RttP(recSem);
+
       ListPrepend(receivedQueue, (void*)buf);
 
       RttV(recSem);
       RttV(recSemHave);
       
     }
+    /* Reset to having not received anything. */
     received = 0;
 
+    /* Sleep the thread briefly to give time to the other threads */
     RttUSleep(5000);
   }
 }
@@ -216,6 +203,7 @@ void rKeyboard() {
   char *buf = malloc(bufSize);
   int res = 0;
 
+  /* Set to nonblocking */
   res = fcntl(0, F_GETFL);
   fcntl(0, F_SETFL, res | O_NONBLOCK);
 
