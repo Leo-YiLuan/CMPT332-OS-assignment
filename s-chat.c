@@ -33,11 +33,20 @@ void pStdout();
 void rKeyboard();
 
 char *concat_time(char *msg) {
-  char *timefmt = malloc(25 + strlen(msg) + 1);
+  char *timefmt = malloc(35 + strlen(msg) + 1);
   struct timeval value;
   gettimeofday(&value, NULL);
   sprintf(timefmt, "%ld.%ld - ", value.tv_sec, value.tv_usec);
+
   return strcat(timefmt, msg);
+}
+
+char *sent_succeed_msg() {
+  char *timefmt = malloc(35);
+  struct timeval value;
+  gettimeofday(&value, NULL);
+  sprintf(timefmt, "Msg sent @%ld.%ld", value.tv_sec, value.tv_usec);
+  return timefmt;
 }
 
 struct addrinfo* get_host_info(char *hostname, char *port) {
@@ -138,18 +147,15 @@ void sendMsg() {
     RttP(sendSemHave);
     RttP(sendSem);
     msg = (char*)ListTrim(sendQueue);
-    buf = concat_time(msg);
     /* Send to remote client */
+    buf = concat_time(msg);
     res = sendto(listenSocket, (const void*)buf, strlen(buf) + 1,
     0, destinationClient, sizeof(*destinationClient));
-    if (res < 0) {
-      printf("Failed to deliver message to remote. Err: %d\n", errno);
-    }
-    /* Send to myself */
-    res = sendto(listenSocket, (const void*)buf, strlen(buf) + 1,
-    0, myClient, sizeof(*myClient));
-    if (res < 0) {
-      printf("Failed to deliver message to myself res: %d.\n", errno);
+    if (res > 0) {
+      char *succeed = sent_succeed_msg();
+      /* Send confirmation message. */
+      res = sendto(listenSocket, (const void*)succeed, strlen(succeed) + 1,
+      0, myClient, sizeof(*myClient));
     }
     free(buf);
     RttV(sendSem);

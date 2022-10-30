@@ -11,6 +11,8 @@ Part 2 Update:
 Used gettimeofday() to get timestamps for messages. Timestamps 
 were concatenated with the message, then the entire char buffer
 was transmitted over the network. 
+When a message is sent, a local message is printed informing the user 
+of the time in which their message was successfully sent. 
 
 Socket:
     use gethostname() to get current host name. then use gethostbyname() to get
