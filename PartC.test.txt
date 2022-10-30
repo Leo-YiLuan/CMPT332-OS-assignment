@@ -10,3 +10,126 @@ and timestamps are working.
 
 
 TODO: Results.
+
+===== Run 1 (x86 <-> ppc) =====
+Machine 1:
+Finished init, please type your messages.
+test message
+Msg sent @1667161544.584743
+1667161548.496942 - test reply
+this is a longer message, to test theres no issues with buffer allocation
+Msg sent @1667161565.764853
+1667161572.918279 - looks good
+1
+Msg sent @1667161581.944708
+2
+Msg sent @1667161582.184693
+3
+Msg sent @1667161582.404692
+4
+Msg sent @1667161582.604695
+5
+Msg sent @1667161582.844697
+6
+Msg sent @1667161583.44705
+7
+Msg sent @1667161583.284697
+
+Machine 2:
+Finished init, please type your messages.
+1667161544.584701 - test message
+test reply
+Msg sent @1667161548.500789
+1667161565.764825 - this is a longer message, to test theres no issues with buffer allocation
+looks good
+Msg sent @1667161572.918726
+1667161581.944677 - 1
+1667161582.184674 - 2
+1667161582.404673 - 3
+1667161582.604673 - 4
+1667161582.844675 - 5
+1667161583.44679 - 6
+1667161583.284676 - 7
+
+
+===== Run 2 (x86 <-> arm2) =====
+Machine 1:
+Finished init, please type your messages.
+test message
+Msg sent @1667161831.939710
+1667161838.290268 - test reply
+thius is a longer message, to test there's no issues with buffer allocation
+Msg sent @1667161856.699815
+1667161863.908101 - looks good
+1
+Msg sent @1667161868.899664
+2
+Msg sent @1667161869.179663
+3
+Msg sent @1667161869.459668
+4
+Msg sent @1667161869.719663
+5
+Msg sent @1667161869.999665
+6
+Msg sent @1667161870.239634
+7
+Msg sent @1667161870.559665
+
+Machine 2:
+Finished init, please type your messages.
+1667161831.939668 - test message
+test reply
+Msg sent @1667161838.293277
+1667161856.699790 - thius is a longer message, to test there's no issues with buffer allocation
+looks good
+Msg sent @1667161863.908620
+1667161868.899642 - 1
+1667161869.179643 - 2
+1667161869.459646 - 3
+1667161869.719644 - 4
+1667161869.999644 - 5
+1667161870.239621 - 6
+1667161870.559644 - 7
+
+
+===== Run 2 (x86 <-> x86, different ports) =====
+Machine 1:
+Finished init, please type your messages.
+test message
+Msg sent @1667161980.619250
+1667161985.32369 - test reply
+this is a longer message, to test there's no issues with buffer allocation
+Msg sent @1667161996.359356
+1667162001.152362 - looks good
+1
+Msg sent @1667162008.619208
+2
+Msg sent @1667162008.979178
+3
+Msg sent @1667162009.319189
+4
+Msg sent @1667162009.659188
+5
+Msg sent @1667162010.19188
+6
+Msg sent @1667162010.339188
+7
+Msg sent @1667162010.699186
+
+Machine 2:
+Finished init, please type your messages.
+1667161980.619182 - test message
+test reply
+Msg sent @1667161985.32436
+1667161996.359314 - this is a longer message, to test there's no issues with buffer allocation
+looks good
+Msg sent @1667162001.152411
+1667162008.619164 - 1
+1667162008.979150 - 2
+1667162009.319155 - 3
+1667162009.659155 - 4
+1667162010.19152 - 5
+1667162010.339153 - 6
+1667162010.699152 - 7
+
