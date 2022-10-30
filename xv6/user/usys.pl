@@ -14,7 +14,7 @@ sub entry {
     print " ecall\n";
     print " ret\n";
 }
-	
+
 entry("fork");
 entry("exit");
 entry("wait");
@@ -39,4 +39,6 @@ entry("uptime");
 # CMPT 332 GROUP 22 Change, Fall 2022
 entry("thread_create");
 entry("thread_join");
-
+entry("mtx_create");
+entry("mtx_lock");
+entry("mtx_unlock");

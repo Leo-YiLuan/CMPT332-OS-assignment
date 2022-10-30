@@ -104,6 +104,9 @@ extern uint64 sys_close(void);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 extern uint64 sys_thread_create(void);
 extern uint64 sys_thread_join(void);
+extern uint64 sys_mtx_create(void);
+extern uint64 sys_mtx_lock(void);
+extern uint64 sys_mtx_unlock(void);
 
 /* An array mapping syscall numbers from syscall.h */
 /* to the function that handles the system call. */
@@ -132,6 +135,9 @@ static uint64 (*syscalls[])(void) = {
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 [SYS_thread_create]   sys_thread_create,
 [SYS_thread_join]     sys_thread_join,
+[SYS_mtx_create]      sys_mtx_create,
+[SYS_mtx_lock]        sys_mtx_lock,
+[SYS_mtx_unlock]      sys_mtx_unlock,
 };
 
 void

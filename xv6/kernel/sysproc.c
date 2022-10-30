@@ -117,3 +117,17 @@ uint64 sys_thread_join(void) {
 
   return thread_join(stack);
 }
+
+uint64 sys_mtx_create(void) {
+  return mtx_create(1);
+}
+
+uint64 sys_mtx_lock(void) {
+  return mtx_lock(1);
+
+}
+
+uint64 sys_mtx_unlock(void) {
+  return mtx_unlock(1);
+
+}

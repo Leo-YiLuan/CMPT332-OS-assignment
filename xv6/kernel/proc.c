@@ -12,6 +12,8 @@ struct proc proc[NPROC];
 
 struct proc *initproc;
 
+struct spinlock mtxlist[MAXMTX];
+
 int nextpid = 1;
 struct spinlock pid_lock;
 
@@ -35,7 +37,7 @@ void
 proc_mapstacks(pagetable_t kpgtbl)
 {
   struct proc *p;
-  
+
   for(p = proc; p < &proc[NPROC]; p++) {
     char *pa = kalloc();
     if(pa == 0)
@@ -50,7 +52,7 @@ void
 procinit(void)
 {
   struct proc *p;
-  
+
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
@@ -95,7 +97,7 @@ int
 allocpid()
 {
   int pid;
-  
+
   acquire(&pid_lock);
   pid = nextpid;
   nextpid = nextpid + 1;
@@ -257,7 +259,7 @@ userinit(void)
 
   p = allocproc();
   initproc = p;
-  
+
   /* allocate one user page and copy initcode's instructions */
   /* and data into it. */
   uvmfirst(p->pagetable, initcode, sizeof(initcode));
@@ -393,7 +395,7 @@ exit(int status)
 
   /* Parent might be sleeping in wait(). */
   wakeup(p->parent);
-  
+
   acquire(&p->lock);
 
   p->xstate = status;
@@ -450,7 +452,7 @@ wait(uint64 addr)
       release(&wait_lock);
       return -1;
     }
-    
+
     /* Wait for a child to exit. */
     sleep(p, &wait_lock);  /*DOC: wait-sleep */
   }
@@ -468,7 +470,7 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-  
+
   c->proc = 0;
   for(;;){
     /* Avoid deadlock by ensuring that devices can interrupt. */
@@ -558,7 +560,7 @@ void
 sleep(void *chan, struct spinlock *lk)
 {
   struct proc *p = myproc();
-  
+
   /* Must acquire p->lock in order to */
   /* change p->state and then call sched. */
   /* Once we hold p->lock, we can be */
@@ -637,7 +639,7 @@ int
 killed(struct proc *p)
 {
   int k;
-  
+
   acquire(&p->lock);
   k = p->killed;
   release(&p->lock);
@@ -725,8 +727,8 @@ int thread_create(void (*tmain)(void *), void *stack, void *arg) {
   }
   newThread->sz = parent->sz;
 
-  // Copy over cpu execution state, we will make 
-  // specific tweaks shortly. 
+  // Copy over cpu execution state, we will make
+  // specific tweaks shortly.
   *(newThread->trapframe) = *(parent->trapframe);
 
   // Mark as a thread and store stack top for returning later.
@@ -742,12 +744,12 @@ int thread_create(void (*tmain)(void *), void *stack, void *arg) {
   newThreadID = newThread->pid;
 
   release(&newThread->lock);
-  
+
   acquire(&wait_lock);
   newThread->parent = parent;
   release(&wait_lock);
 
-  // Reacquire lock on new thread PCB entry to do 
+  // Reacquire lock on new thread PCB entry to do
   // some final adjustments.
   acquire(&newThread->lock);
   /* Set entry point */
@@ -783,9 +785,9 @@ int thread_join(void **stack) {
           int threadID = candidate->pid;
 
           // Return the top of the stack we were given in thread_create.
-          if ((uint64)stack != 0 && 
-               copyout(parent->pagetable, (uint64)stack, 
-               (char*)&candidate->threadTop, 
+          if ((uint64)stack != 0 &&
+               copyout(parent->pagetable, (uint64)stack,
+               (char*)&candidate->threadTop,
                sizeof(candidate->threadTop)) < 0) {
             release(&candidate->lock);
             release(&wait_lock);
@@ -812,4 +814,19 @@ int thread_join(void **stack) {
 
   release(&wait_lock);
   return 0;
+}
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int mtx_create(int locked) {
+  return 0;
+}
+
+int mtx_lock(int lock_id) {
+  return 0;
+
+}
+
+int mtx_unlock(int lock_id) {
+  return 0;
+
 }

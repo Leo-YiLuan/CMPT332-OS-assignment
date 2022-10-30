@@ -107,9 +107,11 @@ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-int thread_create(void (*tmain)(void *), void *stack, void *arg); 
-int thread_join(void **stack);
-
+int             thread_create(void (*tmain)(void *), void *stack, void *arg);
+int             thread_join(void **stack);
+int             mtx_create(int locked);
+int             mtx_lock(int lock_id);
+int             mtx_unlock(int lock_id);
 /* swtch.S */
 void            swtch(struct context*, struct context*);
 

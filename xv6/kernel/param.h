@@ -11,3 +11,5 @@
 #define NBUF         (MAXOPBLOCKS*3)  /* size of disk block cache */
 #define FSSIZE       2000  /* size of file system in blocks */
 #define MAXPATH      128   /* maximum file path name */
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+#define MAXMTX       150   /* maximum mutex lock */
