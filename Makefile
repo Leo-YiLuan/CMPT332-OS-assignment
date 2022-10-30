@@ -120,7 +120,7 @@ reader_writer_test:
 s-chat: s-chat_arm
 
 s-chat_arm: liblist_arm.a s-chat_arm.o
-	$(CC) -o s-chat_arm $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_ARM) 
+	$(CC) -o s-chat_arm $(CFLAGS) $(CPPFLAGS) -L. -L$(RTTHREADS_LIB_ARM) \
 	s-chat_arm.o -lRtt -ltirpc -llist_arm -lRttUtils
 
 s-chat_arm.o: s-chat.c
