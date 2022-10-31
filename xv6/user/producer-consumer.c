@@ -14,7 +14,7 @@ int bufSize = 300;
 int mtxID;
 
 void consumer() {
-  while (1) {
+  for (int i = 0; i < 5000; i++) {
     mtx_lock(mtxID);
     if (buffer>0) {
       buffer --;
@@ -23,10 +23,11 @@ void consumer() {
     }
     mtx_unlock(mtxID);
     }
+  exit(0);
 }
 
 void producer(){
-  while (1) {
+  for (int i = 0; i < 5000; i++) {
     mtx_lock(mtxID);
     if (bufSize>0) {
       buffer ++;
@@ -35,8 +36,9 @@ void producer(){
 
     }
     mtx_unlock(mtxID);
-
   }
+  exit(0);
+
 }
 void test(void *val) {
     int testStack = 42;
@@ -80,7 +82,8 @@ main(void)
 
 
     thread_join(&otherstack);
-    free(otherstack - STACK_SIZE);
+
+
 
 
 

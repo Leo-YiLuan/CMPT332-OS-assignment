@@ -41,26 +41,29 @@ Monitor monitor = {0};
 
 void MonMain() {
     int MonBusy=0;
-    /* Basic structural layout for the server thread. */
+    /* server thread. */
     while (1) {
         PID sender = PNUL;
         int len = 0;
         Message *msg;
         msg = Receive(&sender, &len);
+        /* do the operation in Message */
         switch (msg->type) {
             case REQUEST_ENTER:
                 if (MonBusy==0) {
                     MonBusy=1;
+                    /* reply to unblock the thread */
                     if (Reply(sender, (void*)0, sizeof(int))!=0) {
                         printf("Entering Filed replied\n");
                     }
 
                 }else {
+                    /* prepend the thread to enter queue when monitor is busy*/
                     ListPrepend(monitor.enterQueue, (void*)sender);
                 }
                 break;
             case REQUEST_LEAVE:
-
+            /* unblock threads in urgentQueue or enterQueue after leave */
                 if (ListCount(monitor.urgentQueue)>0) {
                     if(Reply((PID)ListTrim(monitor.urgentQueue),
                     (void*)0, sizeof(int))!=0){
@@ -76,8 +79,8 @@ void MonMain() {
                 }else{
                     MonBusy = 0;
                 }
-                Reply(sender, (void*)0, sizeof(int));
 
+                Reply(sender, (void*)0, sizeof(int));
                 break;
 
             case WAIT:

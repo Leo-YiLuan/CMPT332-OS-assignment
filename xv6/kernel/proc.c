@@ -385,6 +385,8 @@ exit(int status)
   if(p == initproc)
     panic("init exiting");
 
+  while (thread_join((void*)0)!=-1);
+
   /* Close all open files. */
   for(int fd = 0; fd < NOFILE; fd++){
     if(p->ofile[fd]){
@@ -794,7 +796,6 @@ int thread_join(void **stack) {
         if (candidate->state == ZOMBIE) {
           // Found a dead child
           int threadID = candidate->pid;
-
           // Return the top of the stack we were given in thread_create.
           if ((uint64)stack != 0 &&
                copyout(parent->pagetable, (uint64)stack,
@@ -807,7 +808,7 @@ int thread_join(void **stack) {
           freeproc(candidate);
           release(&candidate->lock);
           release(&wait_lock);
-          return threadID;
+            return threadID;
         }
         release(&candidate->lock);
       }
@@ -821,6 +822,7 @@ int thread_join(void **stack) {
 
     // Put the parent to sleep, waiting for child.
     sleep(parent, &wait_lock);
+
   }
 
   release(&wait_lock);
