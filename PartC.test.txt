@@ -1,3 +1,14 @@
+/*
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A2
+*/
+
 White box testing ideas:
 
 1. Need to test messages of different lengths, to ensure that there's no
@@ -8,8 +19,6 @@ platform specific issues.
 4. Need to test rapid message transfers to ensure list buffer is working 
 and timestamps are working. 
 
-
-TODO: Results.
 
 ===== Run 1 (x86 <-> ppc) =====
 Machine 1:
