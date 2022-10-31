@@ -20,6 +20,12 @@ of the time in which their message was successfully sent.
 We make sure to set stdin file descriptor copy to nonblocking, so 
 we don't lock up the entire process. 
 
+
+The files are named the following:
+s-chat_Linuxx86_64
+s-chat_Linuxppc
+s-chat_arm
+
 Socket:
     use gethostname() to get current host name. then use gethostbyname() to get
     ip address of local ip and the guest ip. Have two port address now, one
