@@ -10,9 +10,15 @@
 Part 2 Update: 
 Used gettimeofday() to get timestamps for messages. Timestamps 
 were concatenated with the message, then the entire char buffer
-was transmitted over the network. 
+was transmitted over the network. This is done in concat_time().
+Additionally, we have sent_succeed_msg(), which simply produces a char 
+buffer for sending to the local machine to confirm the message was sent.
+
 When a message is sent, a local message is printed informing the user 
 of the time in which their message was successfully sent. 
+
+We make sure to set stdin file descriptor copy to nonblocking, so 
+we don't lock up the entire process. 
 
 Socket:
     use gethostname() to get current host name. then use gethostbyname() to get
