@@ -20,7 +20,7 @@ extern void forkret(void);
 static void freeproc(struct proc *p);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 static void thread_freepagetable(pagetable_t pagetable, uint64 sz);
-struct sleeplock mtxlist[MAXMTX];
+struct sleeplock mtxArr[MAXMTX];
 int counter = 0;
 struct spinlock counter_lock;
 
@@ -824,29 +824,38 @@ int thread_join(void **stack) {
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int mtx_create(int locked) {
 
-  // 
+  // the Id of the lock
   int lock_id;
+
+  // calculate the ID of lock
   acquire(&counter_lock);
+
+  // return -1 when the lock reached the max lock allowed at the same time
   if (counter>=MAXMTX) {
     release(&counter_lock);
     return -1;
   }
   counter++;
+  // setup lock id
   lock_id = counter;
   release(&counter_lock);
 
+  // create and initialize a sleeplock
   struct sleeplock mtx;
   initsleeplock(&mtx,"mutex");
+  // set the lock state as the parameter
   mtx.locked = locked;
 
-  mtxlist[lock_id] = mtx;
+  // save the sleeplock with it's id in the array
+  mtxArr[lock_id] = mtx;
   return lock_id;
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int mtx_lock(int lock_id) {
-    if (!holdingsleep(&mtxlist[lock_id])) {
-      acquiresleep(&mtxlist[lock_id]);
+  // only if the lock is not holding, lock it up
+    if (!holdingsleep(&mtxArr[lock_id])) {
+      acquiresleep(&mtxArr[lock_id]);
     }
 
   return 0;
@@ -854,8 +863,9 @@ int mtx_lock(int lock_id) {
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int mtx_unlock(int lock_id) {
-  if (holdingsleep(&mtxlist[lock_id])) {
-    releasesleep(&mtxlist[lock_id]);
+  // only if the lock is been holding, unlock it
+  if (holdingsleep(&mtxArr[lock_id])) {
+    releasesleep(&mtxArr[lock_id]);
   }
   return 0;
 
