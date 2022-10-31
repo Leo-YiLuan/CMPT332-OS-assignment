@@ -1,0 +1,739 @@
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A2
+
+diff --git a/xv6/Makefile b/xv6/Makefile
+index 4e0afe5..3981c48 100644
+--- a/xv6/Makefile
++++ b/xv6/Makefile
+@@ -32,7 +32,7 @@ OBJS = \
+ 
+ # riscv64-unknown-elf- or riscv64-linux-gnu-
+ # perhaps in /opt/riscv/bin
+-TOOLPREFIX = /student/cmpt332/xv6/prefix/bin/riscv64-unknown-elf-
++# TOOLPREFIX = /student/cmpt332/xv6/prefix/bin/riscv64-unknown-elf-
+ 
+ # Try to infer the correct TOOLPREFIX if not set
+ ifndef TOOLPREFIX
+@@ -132,6 +132,7 @@ UPROGS=\
+ 	$U/_grind\
+ 	$U/_wc\
+ 	$U/_zombie\
++	$U/_producer-consumer\
+ 
+ fs.img: mkfs/mkfs README $(UPROGS)
+ 	mkfs/mkfs fs.img README $(UPROGS)
+@@ -170,4 +171,3 @@ qemu: $K/kernel fs.img
+ qemu-gdb: $K/kernel .gdbinit fs.img
+ 	@echo "*** Now run 'gdb' in another window." 1>&2
+ 	$(QEMU) $(QEMUOPTS) -S $(QEMUGDB)
+-
+diff --git a/xv6/kernel/defs.h b/xv6/kernel/defs.h
+index 6c3ae5a..20ca55c 100644
+--- a/xv6/kernel/defs.h
++++ b/xv6/kernel/defs.h
+@@ -106,7 +106,12 @@ void            yield(void);
+ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
+ int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
+ void            procdump(void);
+-
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int             thread_create(void (*tmain)(void *), void *stack, void *arg);
++int             thread_join(void **stack);
++int             mtx_create(int locked);
++int             mtx_lock(int lock_id);
++int             mtx_unlock(int lock_id);
+ /* swtch.S */
+ void            swtch(struct context*, struct context*);
+ 
+@@ -165,7 +170,7 @@ void            uvmfirst(pagetable_t, uchar *, uint);
+ uint64          uvmalloc(pagetable_t, uint64, uint64, int);
+ uint64          uvmdealloc(pagetable_t, uint64, uint64);
+ int             uvmcopy(pagetable_t, pagetable_t, uint64);
+-void            uvmfree(pagetable_t, uint64);
++void            uvmfree(pagetable_t, uint64, int);
+ void            uvmunmap(pagetable_t, uint64, uint64, int);
+ void            uvmclear(pagetable_t, uint64);
+ pte_t *         walk(pagetable_t, uint64, int);
+@@ -173,6 +178,8 @@ uint64          walkaddr(pagetable_t, uint64);
+ int             copyout(pagetable_t, uint64, char *, uint64);
+ int             copyin(pagetable_t, char *, uint64, uint64);
+ int             copyinstr(pagetable_t, char *, uint64, uint64);
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int             uvmcopytable(pagetable_t, pagetable_t, uint64);
+ 
+ /* plic.c */
+ void            plicinit(void);
+diff --git a/xv6/kernel/param.h b/xv6/kernel/param.h
+index 627f767..cfd1ab6 100644
+--- a/xv6/kernel/param.h
++++ b/xv6/kernel/param.h
+@@ -11,3 +11,5 @@
+ #define NBUF         (MAXOPBLOCKS*3)  /* size of disk block cache */
+ #define FSSIZE       2000  /* size of file system in blocks */
+ #define MAXPATH      128   /* maximum file path name */
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++#define MAXMTX       150   /* maximum mutex lock */
+diff --git a/xv6/kernel/proc.c b/xv6/kernel/proc.c
+index cc50132..db1ba6c 100644
+--- a/xv6/kernel/proc.c
++++ b/xv6/kernel/proc.c
+@@ -5,18 +5,30 @@
+ #include "spinlock.h"
+ #include "proc.h"
+ #include "defs.h"
+-
++#include "sleeplock.h"
+ struct cpu cpus[NCPU];
+ 
+ struct proc proc[NPROC];
+ 
+ struct proc *initproc;
+ 
++
+ int nextpid = 1;
+ struct spinlock pid_lock;
+ 
+ extern void forkret(void);
+ static void freeproc(struct proc *p);
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++static void thread_freepagetable(pagetable_t pagetable, uint64 sz);
++int counter = 0;
++struct spinlock counter_lock;
++struct mutexlock {
++  uint locked;       /* Is the lock held? */
++  struct spinlock lk; /* spinlock protecting this mutex lock */
++  int pid;           /* Process holding lock */
++};
++
++struct mutexlock mtxArr[MAXMTX]; /* arr saves locks */
+ 
+ extern char trampoline[]; /* trampoline.S */
+ 
+@@ -51,6 +63,9 @@ procinit(void)
+ 
+   initlock(&pid_lock, "nextpid");
+   initlock(&wait_lock, "wait_lock");
++  /* CMPT 332 GROUP 22 Change, Fall 2022 */
++  /* Lock to get mutex ID */
++  initlock(&counter_lock, "counter_lock");
+   for(p = proc; p < &proc[NPROC]; p++) {
+       initlock(&p->lock, "proc");
+       p->state = UNUSED;
+@@ -146,6 +161,10 @@ found:
+   p->context.ra = (uint64)forkret;
+   p->context.sp = p->kstack + PGSIZE;
+ 
++  /* CMPT 332 GROUP 22 Change, Fall 2022 */
++  /* Define to be a process by default. */
++  p->isThread = 0;
++
+   return p;
+ }
+ 
+@@ -158,8 +177,14 @@ freeproc(struct proc *p)
+   if(p->trapframe)
+     kfree((void*)p->trapframe);
+   p->trapframe = 0;
+-  if(p->pagetable)
++  /* CMPT 332 GROUP 22 Change, Fall 2022 */
++  if(p->pagetable) {
++    if (p->isThread) {
++      thread_freepagetable(p->pagetable, p->sz);
++    } else {
+       proc_freepagetable(p->pagetable, p->sz);
++    }
++  }
+   p->pagetable = 0;
+   p->sz = 0;
+   p->pid = 0;
+@@ -189,7 +214,7 @@ proc_pagetable(struct proc *p)
+   /* to/from user space, so not PTE_U. */
+   if(mappages(pagetable, TRAMPOLINE, PGSIZE,
+               (uint64)trampoline, PTE_R | PTE_X) < 0){
+-    uvmfree(pagetable, 0);
++    uvmfree(pagetable, 0, 1);
+     return 0;
+   }
+ 
+@@ -198,7 +223,7 @@ proc_pagetable(struct proc *p)
+   if(mappages(pagetable, TRAPFRAME, PGSIZE,
+               (uint64)(p->trapframe), PTE_R | PTE_W) < 0){
+     uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+-    uvmfree(pagetable, 0);
++    uvmfree(pagetable, 0, 1);
+     return 0;
+   }
+ 
+@@ -212,7 +237,16 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
+ {
+   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+   uvmunmap(pagetable, TRAPFRAME, 1, 0);
+-  uvmfree(pagetable, sz);
++  uvmfree(pagetable, sz, 1);
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++void
++thread_freepagetable(pagetable_t pagetable, uint64 sz)
++{
++  uvmunmap(pagetable, TRAMPOLINE, 1, 0);
++  uvmunmap(pagetable, TRAPFRAME, 1, 0);
++  uvmfree(pagetable, sz, 0);
+ }
+ 
+ /* a user program that calls exec("/init") */
+@@ -351,6 +385,7 @@ exit(int status)
+   if(p == initproc)
+     panic("init exiting");
+ 
++
+   /* Close all open files. */
+   for(int fd = 0; fd < NOFILE; fd++){
+     if(p->ofile[fd]){
+@@ -367,6 +402,19 @@ exit(int status)
+ 
+   acquire(&wait_lock);
+   
++
++  /* CMPT 332 GROUP 22 Change, Fall 2022 */
++  /* Kill child threads forcibly to avoid issues */
++  for (int i = 0; i < NPROC; i++) {
++    struct proc *candidate = &proc[i];
++    // Is this a child thread?
++    if (candidate->parent == p && candidate->isThread == 1) {
++      acquire(&candidate->lock);
++      freeproc(candidate);
++      release(&candidate->lock);
++    }
++  }
++    
+       /* Give any children to init. */
+   reparent(p);
+ 
+@@ -400,7 +448,8 @@ wait(uint64 addr)
+     /* Scan through table looking for exited children. */
+     havekids = 0;
+     for(pp = proc; pp < &proc[NPROC]; pp++){
+-      if(pp->parent == p){
++      /* CMPT 332 GROUP 22 Change, Fall 2022 */
++      if(pp->parent == p && pp->isThread == 0){
+         /* make sure the child isn't still in exit() or swtch(). */
+         acquire(&pp->lock);
+ 
+@@ -681,3 +730,196 @@ procdump(void)
+     printf("\n");
+   }
+ }
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int thread_create(void (*tmain)(void *), void *stack, void *arg) {
++  uint64 sp = (uint64)stack;
++  uint64 i = 0;
++  int newThreadID = -1;
++  struct proc *newThread;
++  struct proc *parent = myproc();
++
++  // Get new PCB entry for this thread.
++  if((newThread = allocproc()) == 0){
++    return -1;
++  }
++
++  // Produce an exact copy of the parent pagetable, without copying mem.
++  if(uvmcopytable(parent->pagetable, newThread->pagetable, parent->sz) < 0){
++    freeproc(newThread);
++    release(&newThread->lock);
++    return newThreadID;
++  }
++  newThread->sz = parent->sz;
++
++  // Copy over cpu execution state, we will make
++  // specific tweaks shortly.
++  *(newThread->trapframe) = *(parent->trapframe);
++
++  // Mark as a thread and store stack top for returning later.
++  newThread->isThread = 1;
++  newThread->threadTop = sp;
++
++  // Perform some other bookkeeping, same as fork
++  for(i = 0; i < NOFILE; i++)
++    if(parent->ofile[i])
++      newThread->ofile[i] = filedup(parent->ofile[i]);
++  newThread->cwd = idup(parent->cwd);
++  safestrcpy(newThread->name, parent->name, sizeof(parent->name));
++  newThreadID = newThread->pid;
++
++  release(&newThread->lock);
++
++  acquire(&wait_lock);
++  newThread->parent = parent;
++  release(&wait_lock);
++
++  // Reacquire lock on new thread PCB entry to do
++  // some final adjustments.
++  acquire(&newThread->lock);
++  /* Set entry point */
++  newThread->trapframe->sp = sp;
++  newThread->trapframe->a0 = (uint64)arg;
++  newThread->trapframe->epc = (uint64)tmain;
++
++  newThread->state = RUNNABLE;
++  release(&newThread->lock);
++
++  return newThreadID;
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int thread_join(void **stack) {
++  struct proc *parent = myproc();
++  struct proc *candidate = 0;
++  int childCount = 0;
++
++  acquire(&wait_lock);
++
++  while (1) {
++    for (int i = 0; i < NPROC; i++) {
++      candidate = &proc[i];
++      // Is this a child thread?
++      if (candidate->parent == parent && candidate->isThread == 1) {
++        childCount++;
++
++        acquire(&candidate->lock);
++        // Has this child proc exited?
++        if (candidate->state == ZOMBIE) {
++          // Found a dead child
++          int threadID = candidate->pid;
++          // Return the top of the stack we were given in thread_create.
++          if ((uint64)stack != 0 &&
++               copyout(parent->pagetable, (uint64)stack,
++               (char*)&candidate->threadTop,
++               sizeof(candidate->threadTop)) < 0) {
++            release(&candidate->lock);
++            release(&wait_lock);
++            return -2;
++          }
++          freeproc(candidate);
++          release(&candidate->lock);
++          release(&wait_lock);
++            return threadID;
++        }
++        release(&candidate->lock);
++      }
++    }
++
++    // No children, bail immediately.
++    if (childCount == 0 || killed(parent)) {
++      release(&wait_lock);
++      return -1;
++    }
++
++    // Put the parent to sleep, waiting for child.
++    sleep(parent, &wait_lock);
++
++  }
++
++  release(&wait_lock);
++  return 0;
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++void
++initmutexlock(struct mutexlock *lk, char *name)
++{
++  initlock(&lk->lk, "mutex lock");
++  lk->locked = 0;
++  lk->pid = 0;
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int mtx_create(int locked) {
++
++  // the Id of the lock
++  int lock_id;
++
++  // calculate the ID of lock
++  acquire(&counter_lock);
++
++  // return -1 when the lock reached the max lock allowed at the same time
++  if (counter>=MAXMTX) {
++    release(&counter_lock);
++    return -1;
++  }
++  counter++;
++  // setup lock id
++  lock_id = counter;
++  release(&counter_lock);
++
++  // create and initialize a mutexlock
++  struct mutexlock mtx;
++  initmutexlock(&mtx,"mutex");
++  // set the lock state as the parameter
++  mtx.locked = locked;
++
++  // save the mutexlock with it's id in the array
++  mtxArr[lock_id] = mtx;
++  return lock_id;
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int
++holdingmutex(struct mutexlock *ml)
++{
++  int r;
++
++  acquire(&ml->lk);
++  r = ml->locked && (ml->pid == myproc()->pid);
++  release(&ml->lk);
++  return r;
++}
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int
++mtx_lock(int lock_id) {
++  // only if the lock is not holding, lock it up
++    if (!holdingmutex(&mtxArr[lock_id])) {
++      acquire(&(&mtxArr[lock_id])->lk);
++      while ((&mtxArr[lock_id])->locked) {
++        sleep(&mtxArr[lock_id], &(&mtxArr[lock_id])->lk);
++      }
++      (&mtxArr[lock_id])->locked = 1;
++      (&mtxArr[lock_id])->pid = myproc()->pid;
++
++      release(&(&mtxArr[lock_id])->lk);
++    }
++
++  return 0;
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int
++mtx_unlock(int lock_id) {
++  // only if the lock is been holding, unlock it
++  if (holdingmutex(&mtxArr[lock_id])) {
++    acquire(&(&mtxArr[lock_id])->lk);
++    (&mtxArr[lock_id])->locked = 0;
++    (&mtxArr[lock_id])->pid = 0;
++    wakeup(&mtxArr[lock_id]);
++    release(&(&mtxArr[lock_id])->lk);
++  }
++  return 0;
++
++}
+diff --git a/xv6/kernel/proc.h b/xv6/kernel/proc.h
+index 1d7d309..11c2469 100644
+--- a/xv6/kernel/proc.h
++++ b/xv6/kernel/proc.h
+@@ -104,4 +104,7 @@ struct proc {
+   struct file *ofile[NOFILE];  /* Open files */
+   struct inode *cwd;           /* Current directory */
+   char name[16];               /* Process name (debugging) */
++  /* CMPT 332 GROUP 22 Change, Fall 2022 */
++  int isThread;
++  uint64 threadTop;
+ };
+diff --git a/xv6/kernel/sleeplock.c b/xv6/kernel/sleeplock.c
+index 63c9354..6430ec3 100644
+--- a/xv6/kernel/sleeplock.c
++++ b/xv6/kernel/sleeplock.c
+@@ -50,6 +50,3 @@ holdingsleep(struct sleeplock *lk)
+   release(&lk->lk);
+   return r;
+ }
+-
+-
+-
+diff --git a/xv6/kernel/sleeplock.h b/xv6/kernel/sleeplock.h
+index ddf68b4..35e65a1 100644
+--- a/xv6/kernel/sleeplock.h
++++ b/xv6/kernel/sleeplock.h
+@@ -7,4 +7,3 @@ struct sleeplock {
+   char *name;        /* Name of lock. */
+   int pid;           /* Process holding lock */
+ };
+-
+diff --git a/xv6/kernel/syscall.c b/xv6/kernel/syscall.c
+index 5ae08cc..2fa3164 100644
+--- a/xv6/kernel/syscall.c
++++ b/xv6/kernel/syscall.c
+@@ -101,6 +101,12 @@ extern uint64 sys_unlink(void);
+ extern uint64 sys_link(void);
+ extern uint64 sys_mkdir(void);
+ extern uint64 sys_close(void);
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++extern uint64 sys_thread_create(void);
++extern uint64 sys_thread_join(void);
++extern uint64 sys_mtx_create(void);
++extern uint64 sys_mtx_lock(void);
++extern uint64 sys_mtx_unlock(void);
+ 
+ /* An array mapping syscall numbers from syscall.h */
+ /* to the function that handles the system call. */
+@@ -126,6 +132,12 @@ static uint64 (*syscalls[])(void) = {
+ [SYS_link]    sys_link,
+ [SYS_mkdir]   sys_mkdir,
+ [SYS_close]   sys_close,
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++[SYS_thread_create]   sys_thread_create,
++[SYS_thread_join]     sys_thread_join,
++[SYS_mtx_create]      sys_mtx_create,
++[SYS_mtx_lock]        sys_mtx_lock,
++[SYS_mtx_unlock]      sys_mtx_unlock,
+ };
+ 
+ void
+diff --git a/xv6/kernel/syscall.h b/xv6/kernel/syscall.h
+index 95eab25..d9efebb 100644
+--- a/xv6/kernel/syscall.h
++++ b/xv6/kernel/syscall.h
+@@ -20,3 +20,9 @@
+ #define SYS_link   19
+ #define SYS_mkdir  20
+ #define SYS_close  21
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++#define SYS_thread_create 22
++#define SYS_thread_join 23
++#define SYS_mtx_create 24
++#define SYS_mtx_lock 25
++#define SYS_mtx_unlock 26
+diff --git a/xv6/kernel/sysproc.c b/xv6/kernel/sysproc.c
+index 63b9f42..586232f 100644
+--- a/xv6/kernel/sysproc.c
++++ b/xv6/kernel/sysproc.c
+@@ -89,3 +89,54 @@ sys_uptime(void)
+   release(&tickslock);
+   return xticks;
+ }
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++uint64 sys_thread_create(void) {
++    uint64 tmainAddr = 0;
++    uint64 stackAddr = 0;
++    uint64 argAddr = 0;
++
++    argaddr(0, &tmainAddr);
++    argaddr(1, &stackAddr);
++    argaddr(2, &argAddr);
++
++    void (*tmain)(void*) = (void (*)(void *))tmainAddr;
++    void *stack = (void*)stackAddr;
++    void *arg = (void*)argAddr;
++
++    return thread_create(tmain, stack, arg);
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++uint64 sys_thread_join(void) {
++  uint64 stackAddr = 0;
++
++  argaddr(0, &stackAddr);
++
++  void **stack = (void**)stackAddr;
++
++  return thread_join(stack);
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++uint64 sys_mtx_create(void) {
++  uint64 locked;
++  argaddr(0, &locked);
++  return mtx_create(locked);
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++uint64 sys_mtx_lock(void) {
++  uint64 lock_id;
++  argaddr(0, &lock_id);
++  return mtx_lock(lock_id);
++
++}
++
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++uint64 sys_mtx_unlock(void) {
++  uint64 lock_id;
++  argaddr(0, &lock_id);
++  return mtx_unlock(lock_id);
++
++}
+diff --git a/xv6/kernel/vm.c b/xv6/kernel/vm.c
+index 6f72356..54ebf5b 100644
+--- a/xv6/kernel/vm.c
++++ b/xv6/kernel/vm.c
+@@ -288,11 +288,15 @@ freewalk(pagetable_t pagetable)
+ 
+ /* Free user memory pages, */
+ /* then free page-table pages. */
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++/* Student note: Modified function signature so we can
++   choose not to free the physical memory when freeing
++   a thread. */
+ void
+-uvmfree(pagetable_t pagetable, uint64 sz)
++uvmfree(pagetable_t pagetable, uint64 sz, int doFree)
+ {
+   if(sz > 0)
+-    uvmunmap(pagetable, 0, PGROUNDUP(sz)/PGSIZE, 1);
++    uvmunmap(pagetable, 0, PGROUNDUP(sz)/PGSIZE, doFree);
+   freewalk(pagetable);
+ }
+ 
+@@ -332,6 +336,32 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
+   return -1;
+ }
+ 
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int uvmcopytable(pagetable_t old, pagetable_t new, uint64 sz)
++{
++  pte_t *ptEntry = 0;
++  uint64 physAddr = 0;
++  uint64 i = 0;
++  uint flags;
++
++  // Walk through the entire page table for the old program,
++  // copying all the mappings over to the new thread's page table.
++  for(i = 0; i < sz; i += PGSIZE){
++    if((ptEntry = walk(old, i, 0)) == 0)
++      panic("uvmcopytable: pte should exist");
++    if((*ptEntry & PTE_V) == 0)
++      panic("uvmcopytable: page not present");
++    physAddr = PTE2PA(*ptEntry);
++    flags = PTE_FLAGS(*ptEntry);
++
++    if(mappages(new, i, PGSIZE, physAddr, flags) != 0){
++      uvmunmap(new, 0, i / PGSIZE, 1);
++      return -1;
++    }
++  }
++  return 0;
++}
++
+ /* mark a PTE invalid for user access. */
+ /* used by exec for the user stack guard page. */
+ void
+diff --git a/xv6/user/producer-consumer.c b/xv6/user/producer-consumer.c
+new file mode 100644
+index 0000000..c0e688c
+--- /dev/null
++++ b/xv6/user/producer-consumer.c
+@@ -0,0 +1,87 @@
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++/* Tests threads */
++/* TODO: Page fault sometimes. Related to wait and exit perhaps? Why? */
++
++#include "kernel/types.h"
++#include "kernel/stat.h"
++#include "user/user.h"
++
++#define STACK_SIZE 500
++
++int global = 1;
++int buffer = 0;
++int bufSize = 300;
++int mtxID;
++
++void consumer() {
++  for (int i = 0; i < 5000; i++) {
++    mtx_lock(mtxID);
++    if (buffer>0) {
++      buffer --;
++      bufSize ++;
++      printf("Buffer consume %d\n",buffer);
++    }
++    mtx_unlock(mtxID);
++    }
++  exit(0);
++}
++
++void producer(){
++  for (int i = 0; i < 5000; i++) {
++    mtx_lock(mtxID);
++    if (bufSize>0) {
++      buffer ++;
++      bufSize--;
++      printf("Buffer produce %d\n",buffer);
++
++    }
++    mtx_unlock(mtxID);
++  }
++  exit(0);
++
++}
++void test(void *val) {
++    int testStack = 42;
++    int another = -4;
++    printf("Reached thread main. parameter value: %d\n", (uint64)val);
++    printf("Test a stack value: %d\n", testStack);
++    printf("And another: %d\n", another);
++    printf("Check global: %d\n", global);
++   exit(0);
++}
++
++int
++main(void)
++{
++    int testVal = 5;
++    void *stack = malloc(STACK_SIZE);
++    void *otherstack = 0;
++    int ret = 0;
++    stack += STACK_SIZE;
++    ret = thread_create(test, stack, (void*)((uint64)testVal));
++    printf("Successfully called thread_create, return: %d\n", ret);
++    global = 17;
++    printf("Modified global\n");
++
++    thread_join(&otherstack);
++    free(otherstack - STACK_SIZE);
++
++    mtxID = mtx_create(0);
++
++    void *stack1 = malloc(STACK_SIZE);
++    int ret1 = 0;
++    stack1 += STACK_SIZE;
++
++    void *stack2 = malloc(STACK_SIZE);
++    int ret2 = 0;
++    stack2 += STACK_SIZE;
++    ret1 = thread_create(producer, stack1, (void*)((uint64)testVal));
++    ret2 = thread_create(consumer, stack2, (void*)((uint64)testVal));
++    printf("Successfully called thread_create, return: %d\n", ret1);
++    printf("Successfully called thread_create, return: %d\n", ret2);
++
++
++    thread_join(&otherstack);
++
++    exit(0);
++}
+diff --git a/xv6/user/user.h b/xv6/user/user.h
+index ea1d5a5..c7df44e 100644
+--- a/xv6/user/user.h
++++ b/xv6/user/user.h
+@@ -22,6 +22,12 @@ int getpid(void);
+ char* sbrk(int);
+ int sleep(int);
+ int uptime(void);
++/* CMPT 332 GROUP 22 Change, Fall 2022 */
++int thread_create(void (*tmain)(void *), void *stack, void *arg);
++int thread_join(void **stack);
++int mtx_create(int locked);
++int mtx_lock(int lock_id);
++int mtx_unlock(int lock_id);
+ 
+ /* ulib.c */
+ int stat(const char*, struct stat*);
+diff --git a/xv6/user/usys.pl b/xv6/user/usys.pl
+index 01e426e..4aeebfa 100755
+--- a/xv6/user/usys.pl
++++ b/xv6/user/usys.pl
+@@ -36,3 +36,9 @@ entry("getpid");
+ entry("sbrk");
+ entry("sleep");
+ entry("uptime");
++# CMPT 332 GROUP 22 Change, Fall 2022
++entry("thread_create");
++entry("thread_join");
++entry("mtx_create");
++entry("mtx_lock");
++entry("mtx_unlock");
