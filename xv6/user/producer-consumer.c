@@ -49,16 +49,12 @@ main(void)
 
     mtxID = mtx_create(0);
     void *stack1 = malloc(STACK_SIZE);
-    int ret1 = 0;
     stack1 += STACK_SIZE;
 
     void *stack2 = malloc(STACK_SIZE);
-    int ret2 = 0;
     stack2 += STACK_SIZE;
-    ret1 = thread_create(producer, stack1, (void*)(0));
-    ret2 = thread_create(consumer, stack2, (void*)(0));
-    printf("Successfully called thread_create, return: %d\n", ret1);
-    printf("Successfully called thread_create, return: %d\n", ret2);
+    thread_create(producer, stack1, (void*)(0));
+    thread_create(consumer, stack2, (void*)(0));
 
 
     thread_join(&otherstack);
@@ -66,6 +62,6 @@ main(void)
 
     thread_join(&otherstack);
     free(otherstack-STACK_SIZE);
-    
+
     exit(0);
 }

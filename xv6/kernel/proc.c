@@ -5,7 +5,6 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
-#include "sleeplock.h"
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
@@ -401,7 +400,7 @@ exit(int status)
   p->cwd = 0;
 
   acquire(&wait_lock);
-  
+
 
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
   /* Kill child threads forcibly to avoid issues */
@@ -414,7 +413,7 @@ exit(int status)
       release(&candidate->lock);
     }
   }
-    
+
       /* Give any children to init. */
   reparent(p);
 
