@@ -152,8 +152,6 @@ void MonWait(int condition) {
     Message msg = {0};
     msg.type = WAIT;
     msg.condition = condition;
-    /*printf("waitr conditions %d\n", condition);*/
-
     Send(monitor.serverThread, (void*)&msg, &pLen);
 }
 
@@ -162,6 +160,5 @@ void MonSignal(int condition) {
     Message msg = {0};
     msg.type = SIGNAL;
     msg.condition = condition;
-    /*printf("sig conditions %d\n", condition);*/
     Send(monitor.serverThread, (void*)&msg, &pLen);
 }
