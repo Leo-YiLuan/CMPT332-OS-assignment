@@ -385,9 +385,6 @@ exit(int status)
   if(p == initproc)
     panic("init exiting");
 
-  /* CMPT 332 GROUP 22 Change, Fall 2022 */
-  /* clean all it's child threads before exit */
-  while (thread_join((void*)0)!=-1);
 
   /* Close all open files. */
   for(int fd = 0; fd < NOFILE; fd++){
@@ -404,8 +401,21 @@ exit(int status)
   p->cwd = 0;
 
   acquire(&wait_lock);
+  
 
-  /* Give any children to init. */
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  /* Kill child threads forcibly to avoid issues */
+  for (int i = 0; i < NPROC; i++) {
+    struct proc *candidate = &proc[i];
+    // Is this a child thread?
+    if (candidate->parent == p && candidate->isThread == 1) {
+      acquire(&candidate->lock);
+      freeproc(candidate);
+      release(&candidate->lock);
+    }
+  }
+    
+      /* Give any children to init. */
   reparent(p);
 
   /* Parent might be sleeping in wait(). */
