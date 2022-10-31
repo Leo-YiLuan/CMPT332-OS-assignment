@@ -20,9 +20,15 @@ extern void forkret(void);
 static void freeproc(struct proc *p);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 static void thread_freepagetable(pagetable_t pagetable, uint64 sz);
-struct sleeplock mtxArr[MAXMTX];
 int counter = 0;
 struct spinlock counter_lock;
+struct mutexlock {
+  uint locked;       /* Is the lock held? */
+  struct spinlock lk; /* spinlock protecting this mutex lock */
+  int pid;           /* Process holding lock */
+};
+
+struct mutexlock mtxArr[MAXMTX]; /* arr saves locks */
 
 extern char trampoline[]; /* trampoline.S */
 
@@ -822,6 +828,15 @@ int thread_join(void **stack) {
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
+void
+initmutexlock(struct mutexlock *lk, char *name)
+{
+  initlock(&lk->lk, "mutex lock");
+  lk->locked = 0;
+  lk->pid = 0;
+}
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 int mtx_create(int locked) {
 
   // the Id of the lock
@@ -840,32 +855,56 @@ int mtx_create(int locked) {
   lock_id = counter;
   release(&counter_lock);
 
-  // create and initialize a sleeplock
-  struct sleeplock mtx;
-  initsleeplock(&mtx,"mutex");
+  // create and initialize a mutexlock
+  struct mutexlock mtx;
+  initmutexlock(&mtx,"mutex");
   // set the lock state as the parameter
   mtx.locked = locked;
 
-  // save the sleeplock with it's id in the array
+  // save the mutexlock with it's id in the array
   mtxArr[lock_id] = mtx;
   return lock_id;
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-int mtx_lock(int lock_id) {
+int
+holdingmutex(struct mutexlock *ml)
+{
+  int r;
+
+  acquire(&ml->lk);
+  r = ml->locked && (ml->pid == myproc()->pid);
+  release(&ml->lk);
+  return r;
+}
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int
+mtx_lock(int lock_id) {
   // only if the lock is not holding, lock it up
-    if (!holdingsleep(&mtxArr[lock_id])) {
-      acquiresleep(&mtxArr[lock_id]);
+    if (!holdingmutex(&mtxArr[lock_id])) {
+      acquire(&(&mtxArr[lock_id])->lk);
+      while ((&mtxArr[lock_id])->locked) {
+        sleep(&mtxArr[lock_id], &(&mtxArr[lock_id])->lk);
+      }
+      (&mtxArr[lock_id])->locked = 1;
+      (&mtxArr[lock_id])->pid = myproc()->pid;
+
+      release(&(&mtxArr[lock_id])->lk);
     }
 
   return 0;
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-int mtx_unlock(int lock_id) {
+int
+mtx_unlock(int lock_id) {
   // only if the lock is been holding, unlock it
-  if (holdingsleep(&mtxArr[lock_id])) {
-    releasesleep(&mtxArr[lock_id]);
+  if (holdingmutex(&mtxArr[lock_id])) {
+    acquire(&(&mtxArr[lock_id])->lk);
+    (&mtxArr[lock_id])->locked = 0;
+    (&mtxArr[lock_id])->pid = 0;
+    wakeup(&mtxArr[lock_id]);
+    release(&(&mtxArr[lock_id])->lk);
   }
   return 0;
 

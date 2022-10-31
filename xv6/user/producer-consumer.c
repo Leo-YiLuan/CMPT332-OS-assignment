@@ -10,16 +10,16 @@
 
 int global = 1;
 int buffer = 0;
-int bufSize = 20;
+int bufSize = 300;
 int mtxID;
 
 void consumer() {
   while (1) {
     mtx_lock(mtxID);
     if (buffer>0) {
-      printf("Buffer consume %d\n",buffer);
       buffer --;
       bufSize ++;
+      printf("Buffer consume %d\n",buffer);
     }
     mtx_unlock(mtxID);
     }
@@ -29,9 +29,10 @@ void producer(){
   while (1) {
     mtx_lock(mtxID);
     if (bufSize>0) {
-      printf("Buffer produce %d\n",buffer);
       buffer ++;
       bufSize--;
+      printf("Buffer produce %d\n",buffer);
+
     }
     mtx_unlock(mtxID);
 
