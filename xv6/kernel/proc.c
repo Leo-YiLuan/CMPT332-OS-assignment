@@ -385,6 +385,8 @@ exit(int status)
   if(p == initproc)
     panic("init exiting");
 
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  /* clean all it's child threads before exit */
   while (thread_join((void*)0)!=-1);
 
   /* Close all open files. */

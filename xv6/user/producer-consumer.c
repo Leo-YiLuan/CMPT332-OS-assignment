@@ -81,7 +81,7 @@ main(void)
     printf("Successfully called thread_create, return: %d\n", ret2);
 
 
-    thread_join(&otherstack);
+    // thread_join(&otherstack);
 
 
 
