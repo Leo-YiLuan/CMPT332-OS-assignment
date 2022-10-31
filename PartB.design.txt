@@ -8,13 +8,34 @@
 # A2
 
 
-The monitor will use a client-Server IPC setup. Client threads message 
-a server thread (via the standard Monitor procedures) with requests 
+The monitor will use a client-Server IPC setup. Client threads message
+a server thread (via the standard Monitor procedures) with requests
 such as enter, leave, signal, wait. Clients block during Send calls to
-the server thread, the server thread determines what must be done, and 
-eventually unblocks the client thread with a reply. 
+the server thread, the server thread determines what must be done, and
+eventually unblocks the client thread with a reply.
 
-For example, MonEnter() will send a REQUEST_ENTER message to the server 
-thread. The server thread processes the message, and places the client 
-in a wait queue, only replying to the client thread when its time for 
-the client thread to enter the monitor. 
+For example, MonEnter() will send a REQUEST_ENTER message to the server
+thread. The server thread processes the message, and places the client
+in a wait queue, only replying to the client thread when its time for
+the client thread to enter the monitor.
+
+The sender will send a message including the condition variable and the type
+of it's operation(REQUEST_ENTER, REQUEST_LEAVE, WAIT, SIGNAL). The server will
+do stuff depending on the operation type in the message received.
+
+REQUEST_ENTER:
+    if monitor is not busy, unblock(reply) the sender thread set monitor to
+    busy. Put it in the enterQueue if monitor is occupied.
+
+REQUEST_LEAVE:
+    After unblock the sender thread, unblock threads in urgentQueue or
+    enterQueue. Or set monitor to not Busy.
+
+WAIT:
+    block the sender thread, unblock thread from urgent or enter queue
+    if there is one. Set monitor not busy if nothing to run.
+    Put the sender to the waiting Queue depending on the condition.
+
+SIGNAL:
+    if there is a thread blocked by the condition received, dequeue and unblock
+    one thread from the waiting queue. Otherwise, unblock the sender.
