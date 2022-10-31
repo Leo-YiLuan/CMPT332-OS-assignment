@@ -64,6 +64,7 @@ void MonMain() {
                 break;
             case REQUEST_LEAVE:
             /* unblock threads in urgentQueue or enterQueue after leave */
+                Reply(sender, (void*)0, sizeof(int));
                 if (ListCount(monitor.urgentQueue)>0) {
                     if(Reply((PID)ListTrim(monitor.urgentQueue),
                     (void*)0, sizeof(int))!=0){
@@ -80,10 +81,13 @@ void MonMain() {
                     MonBusy = 0;
                 }
 
-                Reply(sender, (void*)0, sizeof(int));
                 break;
 
             case WAIT:
+            /* block the sender thread, run thread from urgent or enter queue
+              if there is one. Put the sender to the waiting Queue depending
+              on the condition.
+            */
                 ListPrepend(monitor.waitQueues[msg->condition], (void*)sender);
                 if (ListCount(monitor.urgentQueue) > 0) {
                     if(Reply((PID)ListTrim(monitor.urgentQueue), (void*)0,
@@ -100,7 +104,12 @@ void MonMain() {
                     MonBusy = 0;
                 }
                 break;
+
             case SIGNAL:
+            /*
+            if there is a thread blocked by the condition sent, unblock one from
+            the queue. Otherwise, unblock the sender.
+            */
                 if (ListCount(monitor.waitQueues[msg->condition])>0) {
                     Reply((PID)ListTrim(monitor.waitQueues[msg->condition]),
                      (void*)0, sizeof(int));
