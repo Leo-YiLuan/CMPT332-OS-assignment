@@ -5,14 +5,13 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
-
+#include "sleeplock.h"
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
 
 struct proc *initproc;
 
-struct spinlock mtxlist[MAXMTX];
 
 int nextpid = 1;
 struct spinlock pid_lock;
@@ -21,6 +20,9 @@ extern void forkret(void);
 static void freeproc(struct proc *p);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 static void thread_freepagetable(pagetable_t pagetable, uint64 sz);
+struct sleeplock mtxlist[MAXMTX];
+int counter = 0;
+struct spinlock counter_lock;
 
 extern char trampoline[]; /* trampoline.S */
 
@@ -55,6 +57,9 @@ procinit(void)
 
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  /* Lock to get mutex ID */
+  initlock(&counter_lock, "counter_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
@@ -818,15 +823,40 @@ int thread_join(void **stack) {
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int mtx_create(int locked) {
-  return 0;
+
+  // 
+  int lock_id;
+  acquire(&counter_lock);
+  if (counter>=MAXMTX) {
+    release(&counter_lock);
+    return -1;
+  }
+  counter++;
+  lock_id = counter;
+  release(&counter_lock);
+
+  struct sleeplock mtx;
+  initsleeplock(&mtx,"mutex");
+  mtx.locked = locked;
+
+  mtxlist[lock_id] = mtx;
+  return lock_id;
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 int mtx_lock(int lock_id) {
-  return 0;
+    if (!holdingsleep(&mtxlist[lock_id])) {
+      acquiresleep(&mtxlist[lock_id]);
+    }
 
+  return 0;
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 int mtx_unlock(int lock_id) {
+  if (holdingsleep(&mtxlist[lock_id])) {
+    releasesleep(&mtxlist[lock_id]);
+  }
   return 0;
 
 }

@@ -118,16 +118,25 @@ uint64 sys_thread_join(void) {
   return thread_join(stack);
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 uint64 sys_mtx_create(void) {
-  return mtx_create(1);
+  uint64 locked;
+  argaddr(0, &locked);
+  return mtx_create(locked);
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 uint64 sys_mtx_lock(void) {
-  return mtx_lock(1);
+  uint64 lock_id;
+  argaddr(0, &lock_id);
+  return mtx_lock(lock_id);
 
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 uint64 sys_mtx_unlock(void) {
-  return mtx_unlock(1);
+  uint64 lock_id;
+  argaddr(0, &lock_id);
+  return mtx_unlock(lock_id);
 
 }

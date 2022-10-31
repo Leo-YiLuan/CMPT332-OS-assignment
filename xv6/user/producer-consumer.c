@@ -9,7 +9,34 @@
 #define STACK_SIZE 500
 
 int global = 1;
+int buffer = 0;
+int bufSize = 20;
+int mtxID;
 
+void consumer() {
+  while (1) {
+    mtx_lock(mtxID);
+    if (buffer>0) {
+      printf("Buffer consume %d\n",buffer);
+      buffer --;
+      bufSize ++;
+    }
+    mtx_unlock(mtxID);
+    }
+}
+
+void producer(){
+  while (1) {
+    mtx_lock(mtxID);
+    if (bufSize>0) {
+      printf("Buffer produce %d\n",buffer);
+      buffer ++;
+      bufSize--;
+    }
+    mtx_unlock(mtxID);
+
+  }
+}
 void test(void *val) {
     int testStack = 42;
     int another = -4;
@@ -17,7 +44,6 @@ void test(void *val) {
     printf("Test a stack value: %d\n", testStack);
     printf("And another: %d\n", another);
     printf("Check global: %d\n", global);
-
    exit(0);
 }
 
@@ -36,5 +62,26 @@ main(void)
 
     thread_join(&otherstack);
     free(otherstack - STACK_SIZE);
+
+    mtxID = mtx_create(0);
+
+    void *stack1 = malloc(STACK_SIZE);
+    int ret1 = 0;
+    stack1 += STACK_SIZE;
+
+    void *stack2 = malloc(STACK_SIZE);
+    int ret2 = 0;
+    stack2 += STACK_SIZE;
+    ret1 = thread_create(producer, stack1, (void*)((uint64)testVal));
+    ret2 = thread_create(consumer, stack2, (void*)((uint64)testVal));
+    printf("Successfully called thread_create, return: %d\n", ret1);
+    printf("Successfully called thread_create, return: %d\n", ret2);
+
+
+    thread_join(&otherstack);
+    free(otherstack - STACK_SIZE);
+
+
+
     exit(0);
 }
