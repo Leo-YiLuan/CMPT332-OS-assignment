@@ -32,7 +32,7 @@ OBJS = \
 
 # riscv64-unknown-elf- or riscv64-linux-gnu-
 # perhaps in /opt/riscv/bin
-TOOLPREFIX = /student/cmpt332/xv6/prefix/bin/riscv64-unknown-elf-
+TOOLPREFIX = /student/cmpt332/riscv/bin/riscv64-unknown-linux-gnu-
 
 # Try to infer the correct TOOLPREFIX if not set
 ifndef TOOLPREFIX
