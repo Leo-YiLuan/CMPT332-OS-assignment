@@ -10,6 +10,13 @@
 #include "defs.h"
 
 void freerange(void *pa_start, void *pa_end);
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+/* Reserves physical memory to track references 
+   for every physical page frame. Returns
+   the new "first address" that the page frame
+   allocator is allowed to use. 
+*/
+uint64 init_ref_map();
 
 extern char end[]; /* first address after kernel. */
                    /* defined by kernel.ld. */
@@ -23,13 +30,32 @@ struct {
   struct run *freelist;
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
   uint64 freecount;
+  uint64 refmap_pagesize;
+  char *ref_map;
 } kmem;
 
 void
 kinit()
 {
+  uint64 newEnd = 0;
   initlock(&kmem.lock, "kmem");
-  freerange(end, (void*)PHYSTOP);
+  newEnd = init_ref_map();
+  freerange((void*)newEnd, (void*)PHYSTOP);
+}
+
+uint64
+init_ref_map() {
+  /* Reserve a chunk of contiguous free pages for the ref map */
+  uint64 refMapSize = (PHYSTOP - (uint64)end) / PGSIZE;
+  uint64 pagesNeeded = (refMapSize / PGSIZE) + 1;
+  
+  acquire(&kmem.lock);
+  kmem.ref_map = end;
+  kmem.refmap_pagesize = pagesNeeded;
+  release(&kmem.lock);
+
+  /* Return a new starting point for free physical memory */
+  return ((uint64)&end) + (pagesNeeded * PGSIZE);
 }
 
 void
