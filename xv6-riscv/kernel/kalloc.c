@@ -12,14 +12,15 @@
 void freerange(void *pa_start, void *pa_end);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 /* Reserves physical memory to track references 
-   for every physical page frame. Returns
-   the new "first address" that the page frame
-   allocator is allowed to use. 
+   for every physical page frame. 
+   Sets the value newEnd to the new start of 
+   available memory for the page frame allocator.
 */
-uint64 init_ref_map();
+void init_ref_map();
 
 extern char end[]; /* first address after kernel. */
                    /* defined by kernel.ld. */
+uint64 newEnd;
 
 struct run {
   struct run *next;
@@ -37,13 +38,12 @@ struct {
 void
 kinit()
 {
-  uint64 newEnd = 0;
   initlock(&kmem.lock, "kmem");
-  newEnd = init_ref_map();
+  init_ref_map();
   freerange((void*)newEnd, (void*)PHYSTOP);
 }
 
-uint64
+void
 init_ref_map() {
   /* Reserve a chunk of contiguous free pages for the ref map */
   uint64 refMapSize = (PHYSTOP - (uint64)end) / PGSIZE;
@@ -54,8 +54,7 @@ init_ref_map() {
   kmem.refmap_pagesize = pagesNeeded;
   release(&kmem.lock);
 
-  /* Return a new starting point for free physical memory */
-  return ((uint64)&end) + (pagesNeeded * PGSIZE);
+  newEnd = ((uint64)&end) + (pagesNeeded * PGSIZE);
 }
 
 void
@@ -112,6 +111,42 @@ kalloc(void)
   if(r)
     memset((char*)r, 5, PGSIZE); /* fill with junk */
   return (void*)r;
+}
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int
+page_ref_inc(uint64 pa) {
+  uint64 frameNum = 0;
+  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - newEnd) / PGSIZE;
+  if (frameNum >= kmem.refmap_pagesize) {
+    return -1;
+  }
+
+  acquire(&kmem.lock);
+  kmem.ref_map[frameNum]++;
+  release(&kmem.lock);
+
+  return 0;
+}
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int
+page_ref_dec(uint64 pa) {
+  uint64 frameNum = 0;
+  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - newEnd) / PGSIZE;
+  if (frameNum >= kmem.refmap_pagesize) {
+    return -1;
+  }
+
+  acquire(&kmem.lock);
+  if (kmem.ref_map[frameNum] == 0) {
+    release(&kmem.lock);
+    return -1;
+  }
+  kmem.ref_map[frameNum]--;
+  release(&kmem.lock);
+
+  return 0;
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
