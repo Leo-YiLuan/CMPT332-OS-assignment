@@ -1,0 +1,19 @@
+getNumPages is a simple syscall implementation. We modify kalloc and kfree to simply increment
+a single counter each time these functions are called successfully. Then, getNumPages simply returns this
+count whenever it is called. kinit() calls kfree on every physical page during system init, so 
+we end up with the correct count when the os is initialized.
+
+For storing reference counts for each physical page, we store a flat array of bytes, with one byte 
+for each physical page of memory available to the page frame allocator. While this initially seemed 
+a waste of memory, it appears to be similar to how the linux kernel does the same thing.
+Tanenbaum, for example, reports that mem_map in linux is made up of structs each 32 bytes in size, and 
+there is one struct for each physical page. He claims that less than 1% of physical memory is reserved
+just for keeping track of this page information. Indeed 32 bytes is ~0.78% of a single 4096 byte page. 
+Our implementation need store only 1 byte per physical page (since only a maximum of 64 processes can 
+be sharing a page at any one time), which means our referencing counting system only uses up 
+~0.025% of physical memory. 
+This physical memory we use for reference counting is reserved during kinit(), so that the page frame 
+allocator never adds it to the freelist. Then, to increment or decrement a reference count, we simply 
+use the physical page frame number as an index into the array of reference count values. 
+
+Almost all of the changes for these first two steps exist entirely in kalloc.c
