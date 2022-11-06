@@ -21,6 +21,8 @@ struct run {
 struct {
   struct spinlock lock;
   struct run *freelist;
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  uint64 freecount;
 } kmem;
 
 void
@@ -59,6 +61,8 @@ kfree(void *pa)
   acquire(&kmem.lock);
   r->next = kmem.freelist;
   kmem.freelist = r;
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  kmem.freecount++;
   release(&kmem.lock);
 }
 
@@ -72,8 +76,11 @@ kalloc(void)
 
   acquire(&kmem.lock);
   r = kmem.freelist;
-  if(r)
+  if(r) {
     kmem.freelist = r->next;
+    /* CMPT 332 GROUP 22 Change, Fall 2022 */
+    kmem.freecount--;
+  }
   release(&kmem.lock);
 
   if(r)
