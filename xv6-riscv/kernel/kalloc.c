@@ -87,3 +87,14 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); /* fill with junk */
   return (void*)r;
 }
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+uint64
+sys_getNumPages(void) {
+  uint64 res = 0;
+  acquire(&kmem.lock);
+  res = kmem.freecount;
+  release(&kmem.lock);
+
+  return res;
+}

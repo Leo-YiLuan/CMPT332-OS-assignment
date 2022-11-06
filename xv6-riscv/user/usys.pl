@@ -36,3 +36,5 @@ entry("getpid");
 entry("sbrk");
 entry("sleep");
 entry("uptime");
+# CMPT 332 GROUP 22 Change, Fall 2022
+entry("getNumPages");
