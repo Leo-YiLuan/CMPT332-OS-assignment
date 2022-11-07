@@ -20,7 +20,6 @@ void init_ref_map();
 
 extern char end[]; /* first address after kernel. */
                    /* defined by kernel.ld. */
-uint64 newEnd;
 
 struct run {
   struct run *next;
@@ -39,8 +38,8 @@ void
 kinit()
 {
   initlock(&kmem.lock, "kmem");
+  freerange((void*)end, (void*)PHYSTOP);
   init_ref_map();
-  freerange((void*)newEnd, (void*)PHYSTOP);
 }
 
 void
@@ -49,12 +48,14 @@ init_ref_map() {
   uint64 refMapSize = (PHYSTOP - (uint64)end) / PGSIZE;
   uint64 pagesNeeded = (refMapSize / PGSIZE) + 1;
   
+  uint64 lastPage = 0;
+  for (int i = 0; i < pagesNeeded; i++) {
+    lastPage = (uint64)kalloc();
+    memset((void*)lastPage, 0, PGSIZE);
+  }
   acquire(&kmem.lock);
-  kmem.ref_map = end;
-  kmem.refmap_pagesize = pagesNeeded;
+  kmem.ref_map = (char *)((lastPage - (pagesNeeded * PGSIZE)));
   release(&kmem.lock);
-
-  newEnd = ((uint64)&end) + (pagesNeeded * PGSIZE);
 }
 
 void
@@ -117,12 +118,15 @@ kalloc(void)
 int
 page_ref_inc(uint64 pa) {
   uint64 frameNum = 0;
-  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - newEnd) / PGSIZE;
-  if (frameNum >= kmem.refmap_pagesize) {
+  if ((uint64)pa < (uint64)end) {
     return -1;
   }
+  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - (uint64)end) / PGSIZE;
 
   acquire(&kmem.lock);
+  if (kmem.ref_map[frameNum] >= 64) {
+    panic("page_ref_inc");
+  }
   kmem.ref_map[frameNum]++;
   release(&kmem.lock);
 
@@ -133,20 +137,36 @@ page_ref_inc(uint64 pa) {
 int
 page_ref_dec(uint64 pa) {
   uint64 frameNum = 0;
-  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - newEnd) / PGSIZE;
-  if (frameNum >= kmem.refmap_pagesize) {
+  if ((uint64)pa < (uint64)end) {
     return -1;
   }
+  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - (uint64)end) / PGSIZE;
 
   acquire(&kmem.lock);
-  if (kmem.ref_map[frameNum] == 0) {
-    release(&kmem.lock);
-    return -1;
+  if (kmem.ref_map[frameNum] <= 0) {
+    panic("page_ref_dec");
   }
   kmem.ref_map[frameNum]--;
   release(&kmem.lock);
 
   return 0;
+}
+
+int
+page_ref_count(uint64 pa) {
+  uint64 frameNum = 0;
+  int refCount = 0;
+
+  // Why is this happening? This should never happen.
+  if ((uint64)pa < (uint64)end) {
+    return -1;
+  }
+  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - (uint64)end) / PGSIZE;
+
+  acquire(&kmem.lock);
+  refCount = kmem.ref_map[frameNum];
+  release(&kmem.lock);
+  return refCount;
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
