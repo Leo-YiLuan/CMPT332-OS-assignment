@@ -9,14 +9,12 @@
 #include "riscv.h"
 #include "defs.h"
 
-void freerange(void *pa_start, void *pa_end);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-/* Reserves physical memory to track references 
-   for every physical page frame. 
-   Sets the value newEnd to the new start of 
-   available memory for the page frame allocator.
-*/
-void init_ref_map();
+void page_ref_inc(uint64 pa);
+void page_ref_dec(uint64 pa);
+void page_ref_set(uint64 pa, uint8 val);
+
+void freerange(void *pa_start, void *pa_end);
 
 extern char end[]; /* first address after kernel. */
                    /* defined by kernel.ld. */
@@ -30,8 +28,7 @@ struct {
   struct run *freelist;
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
   uint64 freecount;
-  uint64 refmap_pagesize;
-  char *ref_map;
+  uint8 ref_map[PHYSTOP / PGSIZE];
 } kmem;
 
 void
@@ -39,23 +36,6 @@ kinit()
 {
   initlock(&kmem.lock, "kmem");
   freerange((void*)end, (void*)PHYSTOP);
-  init_ref_map();
-}
-
-void
-init_ref_map() {
-  /* Reserve a chunk of contiguous free pages for the ref map */
-  uint64 refMapSize = (PHYSTOP - (uint64)end) / PGSIZE;
-  uint64 pagesNeeded = (refMapSize / PGSIZE) + 1;
-  
-  uint64 lastPage = 0;
-  for (int i = 0; i < pagesNeeded; i++) {
-    lastPage = (uint64)kalloc();
-    memset((void*)lastPage, 0, PGSIZE);
-  }
-  acquire(&kmem.lock);
-  kmem.ref_map = (char *)((lastPage - (pagesNeeded * PGSIZE)));
-  release(&kmem.lock);
 }
 
 void
@@ -90,6 +70,9 @@ kfree(void *pa)
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
   kmem.freecount++;
   release(&kmem.lock);
+
+  
+  page_ref_set((uint64)r, 0);
 }
 
 /* Allocate one 4096-byte page of physical memory. */
@@ -109,64 +92,82 @@ kalloc(void)
   }
   release(&kmem.lock);
 
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  // Set ref count to 1, someone must have asked for it.
+  page_ref_set((uint64)r, 1);
+
   if(r)
     memset((char*)r, 5, PGSIZE); /* fill with junk */
   return (void*)r;
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-int
+void
 page_ref_inc(uint64 pa) {
-  uint64 frameNum = 0;
-  if ((uint64)pa < (uint64)end) {
-    return -1;
+  uint64 frameNum = ((pa >> PGSHIFT) << PGSHIFT) / PGSIZE;
+
+  if (frameNum < 0 || (frameNum > (PHYSTOP / PGSIZE))) {
+    panic("page_ref_inc invalid frame number");
   }
-  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - (uint64)end) / PGSIZE;
 
   acquire(&kmem.lock);
   if (kmem.ref_map[frameNum] >= 64) {
-    panic("page_ref_inc");
+    panic("page_ref_inc increment past 64");
   }
   kmem.ref_map[frameNum]++;
   release(&kmem.lock);
-
-  return 0;
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-int
+void
 page_ref_dec(uint64 pa) {
-  uint64 frameNum = 0;
-  if ((uint64)pa < (uint64)end) {
-    return -1;
+  uint64 frameNum = ((pa >> PGSHIFT) << PGSHIFT) / PGSIZE;
+
+  if (frameNum < 0 || (frameNum > (PHYSTOP / PGSIZE))) {
+    panic("page_ref_dec invalid frame number");
   }
-  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - (uint64)end) / PGSIZE;
 
   acquire(&kmem.lock);
-  if (kmem.ref_map[frameNum] <= 0) {
-    panic("page_ref_dec");
+  if ((kmem.ref_map[frameNum] - 1) >= 64) {
+    panic("page_ref_dec decrement below 0, underflow");
   }
   kmem.ref_map[frameNum]--;
   release(&kmem.lock);
 
-  return 0;
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 int
 page_ref_count(uint64 pa) {
-  uint64 frameNum = 0;
   int refCount = 0;
+  uint64 frameNum = ((pa >> PGSHIFT) << PGSHIFT) / PGSIZE;
 
-  // Why is this happening? This should never happen.
-  if ((uint64)pa < (uint64)end) {
-    return -1;
+  if (frameNum < 0 || (frameNum > (PHYSTOP / PGSIZE))) {
+    panic("page_ref_count invalid frame number");
   }
-  frameNum = (((pa >> PGSHIFT) << PGSHIFT) - (uint64)end) / PGSIZE;
 
   acquire(&kmem.lock);
   refCount = kmem.ref_map[frameNum];
   release(&kmem.lock);
+
   return refCount;
+}
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+void 
+page_ref_set(uint64 pa, uint8 val) {
+  uint64 frameNum = ((pa >> PGSHIFT) << PGSHIFT) / PGSIZE;
+
+  if (frameNum < 0 || (frameNum > (PHYSTOP / PGSIZE))) {
+    panic("page_ref_set invalid frame number");
+  }
+  if (val < 0 || val > 64) {
+    panic("page_ref_set val out of range");
+  }
+
+  acquire(&kmem.lock);
+  kmem.ref_map[frameNum] = val;
+  release(&kmem.lock);
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */

@@ -63,6 +63,10 @@ void            ramdiskrw(struct buf*);
 void*           kalloc(void);
 void            kfree(void *);
 void            kinit(void);
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+void page_ref_inc(uint64 pa);
+void page_ref_dec(uint64 pa);
+void page_ref_set(uint64 pa, uint8 val);
 
 /* log.c */
 void            initlog(int, struct superblock*);
