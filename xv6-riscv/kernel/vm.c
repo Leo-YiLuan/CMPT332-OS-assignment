@@ -167,11 +167,14 @@ mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)
 /* Remove npages of mappings starting from va. va must be */
 /* page-aligned. The mappings must exist. */
 /* Optionally free the physical memory. */
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 void
 uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
 {
   uint64 a;
   pte_t *pte;
+  int save_free = do_free;
 
   if((va % PGSIZE) != 0)
     panic("uvmunmap: not aligned");
@@ -183,8 +186,16 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
       panic("uvmunmap: not mapped");
     if(PTE_FLAGS(*pte) == PTE_V)
       panic("uvmunmap: not a leaf");
+
+    // If ref count is greater than 1, we can't free.
+    uint64 pa = PTE2PA(*pte);
+    do_free = (page_ref_count(pa) > 1) ? 0 : save_free;
+    // Decrement ref count.
+    // Trampoline is a special count, don't dec it.
+    if (va != TRAMPOLINE) {
+      page_ref_dec(pa);
+    }
     if(do_free){
-      uint64 pa = PTE2PA(*pte);
       kfree((void*)pa);
     }
     *pte = 0;
@@ -333,7 +344,6 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     // Increment the ref count now that we successfully
     // have two procs looking at the same physical page.
     page_ref_inc(pa);
-    printf("Physical page %p copied, ref count: %d\n", pa, page_ref_count((uint64)pa));
   }
   return 0;
 }
