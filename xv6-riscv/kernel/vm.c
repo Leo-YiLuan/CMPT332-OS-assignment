@@ -302,13 +302,16 @@ uvmfree(pagetable_t pagetable, uint64 sz)
 /* physical memory. */
 /* returns 0 on success, -1 on failure. */
 /* frees any allocated pages on failure. */
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+/* Modified this thread - removed physical page allocation,
+   and increment ref count if successfully remapping. */
 int
 uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 {
   pte_t *pte;
   uint64 pa, i;
   uint flags;
-  char *mem;
 
   for(i = 0; i < sz; i += PGSIZE){
     if((pte = walk(old, i, 0)) == 0)
@@ -317,19 +320,22 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
       panic("uvmcopy: page not present");
     pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
-    if((mem = kalloc()) == 0)
-      goto err;
-    memmove(mem, (char*)pa, PGSIZE);
-    if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
-      kfree(mem);
-      goto err;
+    // Modify flags so the page is read-only in both
+    // child and parent. 
+    flags = flags & ~(PTE_W);
+    *pte = PA2PTE(pa) | flags;
+    if(mappages(new, i, PGSIZE, pa, flags) != 0){
+      uvmunmap(new, 0, i / PGSIZE, 1);
+      return -1;
     }
+    // Flush the TLB
+    sfence_vma();
+    // Increment the ref count now that we successfully
+    // have two procs looking at the same physical page.
+    page_ref_inc(pa);
+    printf("Physical page %p copied, ref count: %d\n", pa, page_ref_count((uint64)pa));
   }
   return 0;
-
- err:
-  uvmunmap(new, 0, i / PGSIZE, 1);
-  return -1;
 }
 
 /* mark a PTE invalid for user access. */

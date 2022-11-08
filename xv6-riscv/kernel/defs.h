@@ -66,7 +66,7 @@ void            kinit(void);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 void page_ref_inc(uint64 pa);
 void page_ref_dec(uint64 pa);
-void page_ref_set(uint64 pa, uint8 val);
+int page_ref_count(uint64 pa);
 
 /* log.c */
 void            initlog(int, struct superblock*);
