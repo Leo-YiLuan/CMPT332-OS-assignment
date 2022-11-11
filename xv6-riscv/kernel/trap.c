@@ -71,8 +71,6 @@ usertrap(void)
 
     if(killed(p))
       exit(-1);
-
-        intr_on();
     
     // Get faulting address and pagetable
     uint64 va = r_stval();
@@ -85,10 +83,7 @@ usertrap(void)
       // Invalid virtual address!
       printf("usertrap(): Page fault on invalid address. pid = %d, addr = %p\n", p->pid, va);
       setkilled(p);
-    } else {
-      printf("Faulting address at va: %p, page-aligned: %p, phys addr: %p, pid: %d\n", va, vaAligned, pa, p->pid);
     }
-    printf("Is writable: %d\n", PTE_FLAGS(*pte) & PTE_W);
 
     if (page_ref_count(pa) > 1) {
       // Create a new physical page.
@@ -100,28 +95,21 @@ usertrap(void)
       // Move data into new page. 
       memmove(newPage, (char*)pa, PGSIZE);
 
-      // Unmap old read-only page from page table.
-      // uvmunmap handles the decrementing for us.
-      uvmunmap(p->pagetable, vaAligned, 1, 0);
-
       // Map the newly constructed copy into the same spot, now with writeable perms.
       mappages(p->pagetable, vaAligned, PGSIZE, (uint64)newPage, PTE_FLAGS(*pte) | PTE_W | PTE_R);
+      if (pa != TRAMPOLINE) { page_ref_dec(pa); }
       // Flush TLB
       sfence_vma();
-      printf("Mapped new page, writeable: %d\n", PTE_FLAGS(*walk(p->pagetable, va, 0)) & PTE_W);
     } else {
       // This must be the parent, as they have only 1 ref left.
       // We can just modify the permissions to let them write to it. 
-      printf("Page has only 1 refcount, simply enable writing perm.\n");
+      //printf("Page has only 1 refcount, simply enable writing perm.\n");
       uint flags = PTE_FLAGS(*pte);
       flags = flags | PTE_W;
       *pte = PA2PTE(pa) | flags;
       // Flush TLB
       sfence_vma();
     }
-
-    printf("Completed page fault. sepc: %p\n", p->trapframe->epc);
-
   } else if((which_dev = devintr()) != 0){
     /* ok */
   } else {
