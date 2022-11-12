@@ -71,44 +71,15 @@ usertrap(void)
 
     if(killed(p))
       exit(-1);
-    
-    // Get faulting address and pagetable
-    uint64 va = r_stval();
-    uint64 vaAligned = PGROUNDDOWN(va);
-    pte_t *pte = walk(p->pagetable, va, 0);
-    uint64 pa = PTE2PA(*pte);
 
-    // Check if the faulting address is valid
-    if((*pte & PTE_V) == 0) {
-      // Invalid virtual address!
-      printf("usertrap(): Page fault on invalid address. pid = %d, addr = %p\n", p->pid, va);
+    int res = handle_pagefault(p->pagetable, r_stval());
+    if (res == -1) {
+      printf("usertrap(): Page fault on invalid address. pid = %d, addr = %p\n", p->pid, r_stval());
       setkilled(p);
-    }
-
-    if (page_ref_count(pa) > 1) {
-      // Create a new physical page.
-      char *newPage;
-      if((newPage = kalloc()) == 0) {
-        panic("usertrap page fault cannot alloc memory");
-      }
-
-      // Move data into new page. 
-      memmove(newPage, (char*)pa, PGSIZE);
-
-      // Map the newly constructed copy into the same spot, now with writeable perms.
-      mappages(p->pagetable, vaAligned, PGSIZE, (uint64)newPage, PTE_FLAGS(*pte) | PTE_W | PTE_R);
-      if (pa != TRAMPOLINE) { page_ref_dec(pa); }
-      // Flush TLB
-      sfence_vma();
-    } else {
-      // This must be the parent, as they have only 1 ref left.
-      // We can just modify the permissions to let them write to it. 
-      //printf("Page has only 1 refcount, simply enable writing perm.\n");
-      uint flags = PTE_FLAGS(*pte);
-      flags = flags | PTE_W;
-      *pte = PA2PTE(pa) | flags;
-      // Flush TLB
-      sfence_vma();
+    } else if (res == -2) {
+      printf("usertrap(): Page fault could not COW because we are out of physical memory. "
+              " Killing pid %d instead...\n", p->pid);
+      setkilled(p);
     }
   } else if((which_dev = devintr()) != 0){
     /* ok */

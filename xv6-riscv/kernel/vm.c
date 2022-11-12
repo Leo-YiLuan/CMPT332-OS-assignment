@@ -364,12 +364,27 @@ uvmclear(pagetable_t pagetable, uint64 va)
 /* Copy from kernel to user. */
 /* Copy len bytes from src to virtual address dstva in a given page table. */
 /* Return 0 on success, -1 on error. */
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+/* We aren't getting a pagefault because this call occurs in kernel mode, 
+   so instead we fake it. */
 int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
   uint64 n, va0, pa0;
+  /* Have to perform this early, to catch invalid addresses */
+  va0 = PGROUNDDOWN(dstva);
+  pa0 = walkaddr(pagetable, va0);
+  if(pa0 == 0) {
+    return -1;
+  }
 
   while(len > 0){
+    pte_t *pte = walk(pagetable, dstva, 0);
+    // Have to perform a COW action.
+    if (!(PTE_FLAGS(*pte) & PTE_W)) {
+      handle_pagefault(pagetable, dstva);
+    }
+
     va0 = PGROUNDDOWN(dstva);
     pa0 = walkaddr(pagetable, va0);
     if(pa0 == 0)
@@ -452,4 +467,58 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   } else {
     return -1;
   }
+}
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int
+handle_pagefault(pagetable_t table, uint64 va) {
+  if (va >= MAXVA) {
+    // We could normally test this by checking PTE_V,
+    // but in order to check that we need to walk the 
+    // page table, and walk() wont let us walk on
+    // a completely invalid address. 
+    // So we test early. 
+    return -1;
+  }
+
+  // Get faulting address and pagetable
+  uint64 vaAligned = PGROUNDDOWN(va);
+  pte_t *pte = walk(table, va, 0);
+  uint64 pa = PTE2PA(*pte);
+
+  // Check if the faulting address is valid
+  if((*pte & PTE_V) == 0) {
+    // Invalid virtual address!
+    return -1;
+  }
+
+  if (page_ref_count(pa) > 1) {
+    // Create a new physical page.
+    char *newPage;
+    if((newPage = kalloc()) == 0) {
+      // Out of memory, we have no choice but to bail on this proc.
+      // Initially we just used a panic, but that caused the execout
+      // test to fail. 
+      return -2;
+    }
+
+    // Move data into new page. 
+    memmove(newPage, (char*)pa, PGSIZE);
+
+    // Map the newly constructed copy into the same spot, now with writeable perms.
+    mappages(table, vaAligned, PGSIZE, (uint64)newPage, PTE_FLAGS(*pte) | PTE_W | PTE_R);
+    if (pa != TRAMPOLINE) { page_ref_dec(pa); }
+    // Flush TLB
+    sfence_vma();
+  } else {
+    // This must be the parent, as they have only 1 ref left.
+    // We can just modify the permissions to let them write to it. 
+    //printf("Page has only 1 refcount, simply enable writing perm.\n");
+    uint flags = PTE_FLAGS(*pte);
+    flags = flags | PTE_W;
+    *pte = PA2PTE(pa) | flags;
+    // Flush TLB
+    sfence_vma();
+  }
+  return 0;
 }

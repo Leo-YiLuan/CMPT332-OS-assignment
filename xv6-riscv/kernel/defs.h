@@ -177,6 +177,8 @@ uint64          walkaddr(pagetable_t, uint64);
 int             copyout(pagetable_t, uint64, char *, uint64);
 int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
+int handle_pagefault(pagetable_t, uint64);
 
 /* plic.c */
 void            plicinit(void);
