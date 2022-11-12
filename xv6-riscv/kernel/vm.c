@@ -490,6 +490,11 @@ handle_pagefault(pagetable_t table, uint64 va) {
   if((*pte & PTE_V) == 0) {
     // Invalid virtual address!
     return -1;
+  } else if (*pte & PTE_X) {
+    // This is a code page, we shouldn't be allowed to modify it. 
+    // This check is needed to pass the "textwrite" usertest,
+    // otherwise we inadvertantly set code pages to PTE_W.
+    return -1;
   }
 
   if (page_ref_count(pa) > 1) {
@@ -506,7 +511,7 @@ handle_pagefault(pagetable_t table, uint64 va) {
     memmove(newPage, (char*)pa, PGSIZE);
 
     // Map the newly constructed copy into the same spot, now with writeable perms.
-    mappages(table, vaAligned, PGSIZE, (uint64)newPage, PTE_FLAGS(*pte) | PTE_W | PTE_R);
+    mappages(table, vaAligned, PGSIZE, (uint64)newPage, PTE_FLAGS(*pte) | PTE_W);
     if (pa != TRAMPOLINE) { page_ref_dec(pa); }
     // Flush TLB
     sfence_vma();
