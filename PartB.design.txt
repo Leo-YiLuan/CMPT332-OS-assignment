@@ -1,19 +1,50 @@
+# NAME: Matthew Munro
+# NSID: mam552
+# STUDENT NUMBER: 11291769
+# NAME: Yi Luan
+# NSID: yil160
+# STUDENT NUMBER: 11253856
+# CMPT 332 2022
+# A2
+
+
+partB passes all tests in the provided cowtest, and passes all tests in usertests xv6 executable.
+
 getNumPages is a simple syscall implementation. We modify kalloc and kfree to simply increment
 a single counter each time these functions are called successfully. Then, getNumPages simply returns this
 count whenever it is called. kinit() calls kfree on every physical page during system init, so 
 we end up with the correct count when the os is initialized.
 
 For storing reference counts for each physical page, we store a flat array of bytes, with one byte 
-for each physical page of memory available to the page frame allocator. While this initially seemed 
-a waste of memory, it appears to be similar to how the linux kernel does the same thing.
-Tanenbaum, for example, reports that mem_map in linux is made up of structs each 32 bytes in size, and 
-there is one struct for each physical page. He claims that less than 1% of physical memory is reserved
-just for keeping track of this page information. Indeed 32 bytes is ~0.78% of a single 4096 byte page. 
-Our implementation need store only 1 byte per physical page (since only a maximum of 64 processes can 
+for each physical page of memory. While this initially seemed a waste of memory, it appears to be 
+similar to how the linux kernel does the same thing. Tanenbaum, for example, reports that 
+mem_map in linux is made up of structs each 32 bytes in size, and there is one struct for each 
+physical page. He claims that less than 1% of physical memory is reserved just for keeping 
+track of this page information. Indeed 32 bytes is ~0.78% of a single 4096 byte page. Our 
+implementation need store only 1 byte per physical page (since only a maximum of 64 processes can 
 be sharing a page at any one time), which means our referencing counting system only uses up 
 ~0.025% of physical memory. 
 This physical memory we use for reference counting is reserved during kinit(), so that the page frame 
 allocator never adds it to the freelist. Then, to increment or decrement a reference count, we simply 
 use the physical page frame number as an index into the array of reference count values. 
-
 Almost all of the changes for these first two steps exist entirely in kalloc.c
+
+Our trap function checks for exception code 15, signifying a store fault. This means the cpu tried 
+to store data to an address but could not do so. Whenever, this happens, we do a few things: 
+1. Get the faulting address and the proc's page table. 
+2. Check if the address is valid. 
+3. Check if the page is executable. If it is, we do nothing, because we shouldn't set an executable 
+page to have PTE_W. 
+4. If the reference count for the page is more than 1, we know we need to copy the memory, so we 
+allocate a new page and copy the memory into it. Then we update the page table. 
+5. If there's only 1 reference, we don't have to copy any memory and we just need to update the page
+table. 
+6. We also must flush the TLB. 
+
+We have to modify a few functions that deal with virtual addressing. First, we need to modify 
+mappages to allow remaps. We need to modify uvmunmap to ensure memory is only freed when 
+the reference count drops to 1. uvmcopy had to be modified so that we dont actually copy memory, 
+and only copy the page table (plus update the page tables to reflect read-only status.)
+
+Finally we had to modify copyout. Since copyout happens in the kernel, we had to handle it specially,
+by "faking" a pagefault and just calling the pagefault handler directly. 
