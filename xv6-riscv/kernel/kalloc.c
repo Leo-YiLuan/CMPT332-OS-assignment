@@ -99,12 +99,12 @@ kalloc(void)
   }
   release(&kmem.lock);
 
-  /* CMPT 332 GROUP 22 Change, Fall 2022 */
-  // Set ref count to 1, someone must have asked for it.
-  page_ref_set((uint64)r, 1);
-
-  if(r)
+  if(r) {
+    /* CMPT 332 GROUP 22 Change, Fall 2022 */
+    // Set ref count to 1, someone must have asked for it.
+    page_ref_set((uint64)r, 1);
     memset((char*)r, 5, PGSIZE); /* fill with junk */
+  }
   return (void*)r;
 }
 
