@@ -133,6 +133,7 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 	$U/_cowtest\
+# CMPT 332 GROUP 22 Change, Fall 2022
 	$U/_RRTest\
 
 fs.img: mkfs/mkfs README $(UPROGS)

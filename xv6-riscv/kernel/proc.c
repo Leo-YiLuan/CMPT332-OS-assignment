@@ -19,6 +19,8 @@ extern void forkret(void);
 static void freeproc(struct proc *p);
 
 extern char trampoline[]; /* trampoline.S */
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 QUEUE queues[MAX_LISTS];
 QUEUE *freeQueues = &queues[0];
 
@@ -61,7 +63,6 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
-
   }
 }
 
@@ -252,6 +253,7 @@ userinit(void)
   /* prepare for the very first "return" from kernel to user. */
   p->trapframe->epc = 0;      /* user program counter */
   p->trapframe->sp = PGSIZE;  /* user stack pointer */
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
   p->sleeptime = 0;
   p->runtime = 0;
   p->priority = 0;
@@ -260,8 +262,8 @@ userinit(void)
   p->cwd = namei("/");
 
   p->state = RUNNABLE;
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
   ListPrepend(prioQueue[p -> priority],p);
-
 
   release(&p->lock);
 }
@@ -314,6 +316,7 @@ fork(void)
   /* Cause fork to return 0 in the child. */
   np->trapframe->a0 = 0;
 
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
   np->priority = p->priority;
   np->runtime = 0;
   np->sleeptime = 0;
@@ -336,6 +339,7 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
   ListPrepend(prioQueue[np -> priority],np);
   release(&np->lock);
 
@@ -463,7 +467,6 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-
   c->proc = 0;
   for(;;){
     /* Avoid deadlock by ensuring that devices can interrupt. */
@@ -522,6 +525,7 @@ yield(void)
   struct proc *p = myproc();
   acquire(&p->lock);
   p->state = RUNNABLE;
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
   ListPrepend(prioQueue[p -> priority],p);
   sched();
   release(&p->lock);
@@ -591,6 +595,7 @@ wakeup(void *chan)
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
+        /* CMPT 332 GROUP 22 Change, Fall 2022 */
         ListPrepend(prioQueue[p -> priority],p);
       }
       release(&p->lock);
@@ -613,6 +618,7 @@ kill(int pid)
       if(p->state == SLEEPING){
         /* Wake process from sleep(). */
         p->state = RUNNABLE;
+        /* CMPT 332 GROUP 22 Change, Fall 2022 */
         ListPrepend(prioQueue[p -> priority],p);
       }
       release(&p->lock);
@@ -702,13 +708,7 @@ procdump(void)
   }
 }
 
-void queueinit() {
-    int i;
-    for (i = 0; i < MAX_LISTS; i++) {
-        prioQueue[i] = ListCreate();
-    }
-}
-
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 int
 nice(int incr) {
     struct proc *p;
@@ -719,6 +719,14 @@ nice(int incr) {
     p->priority += incr;
     return 1;
 
+}
+
+void
+queueinit() {
+    int i;
+    for (i = 0; i < MAX_LISTS; i++) {
+        prioQueue[i] = ListCreate();
+    }
 }
 
 QUEUE*

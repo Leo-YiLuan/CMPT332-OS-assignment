@@ -90,6 +90,7 @@ sys_uptime(void)
   return xticks;
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 uint64
 sys_nice(void){
   uint64 incr;

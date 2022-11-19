@@ -105,7 +105,7 @@ struct proc {
   struct inode *cwd;           /* Current directory */
   char name[16];               /* Process name (debugging) */
 
-/* */
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
   int priority;
   int runtime;
   int sleeptime;

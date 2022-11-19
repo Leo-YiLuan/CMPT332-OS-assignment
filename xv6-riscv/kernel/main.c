@@ -29,7 +29,8 @@ main()
     fileinit();      /* file table */
     virtio_disk_init(); /* emulated hard disk */
     userinit();      /* first user process */
-    queueinit();
+    /* CMPT 332 GROUP 22 Change, Fall 2022 */
+    queueinit();     /* initialize priority queues */
     __sync_synchronize();
     started = 1;
   } else {
