@@ -104,4 +104,34 @@ struct proc {
   struct file *ofile[NOFILE];  /* Open files */
   struct inode *cwd;           /* Current directory */
   char name[16];               /* Process name (debugging) */
+
+/* */
+  int priority;
+  int runtime;
+  int sleeptime;
 };
+
+#define MAX_LISTS 5
+#define MAX_NODES 64
+#define NULL 0
+
+typedef struct NODE NODE;
+struct NODE {
+		void *item;
+		NODE *next;
+    NODE *prev;
+};
+
+typedef struct QUEUE QUEUE;
+struct QUEUE
+{
+    NODE *currNodep;
+    NODE *firstNodep;
+    NODE *lastNodep;
+    int listCount;
+};
+
+QUEUE *ListCreate();
+int ListCount(QUEUE *list);
+int ListPrepend(QUEUE *list, void *item);
+void *ListTrim(QUEUE *list);

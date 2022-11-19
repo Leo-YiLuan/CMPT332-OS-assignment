@@ -110,6 +110,7 @@ void            yield(void);
 int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
+void            queueinit(void);
 
 /* swtch.S */
 void            swtch(struct context*, struct context*);
@@ -179,6 +180,7 @@ int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 int handle_pagefault(pagetable_t, uint64);
+int nice(int incr);
 
 /* plic.c */
 void            plicinit(void);

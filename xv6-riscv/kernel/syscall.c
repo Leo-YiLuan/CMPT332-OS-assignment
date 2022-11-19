@@ -103,6 +103,7 @@ extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 extern uint64 sys_getNumPages(void);
+extern uint64 sys_nice(void);
 
 /* An array mapping syscall numbers from syscall.h */
 /* to the function that handles the system call. */
@@ -129,7 +130,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-[SYS_getNumPages] sys_getNumPages
+[SYS_getNumPages] sys_getNumPages,
+[SYS_nice] sys_nice
 };
 
 void

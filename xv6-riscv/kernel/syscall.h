@@ -22,3 +22,4 @@
 #define SYS_close  21
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 #define SYS_getNumPages 22
+#define SYS_nice 23

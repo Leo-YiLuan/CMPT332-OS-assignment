@@ -89,3 +89,10 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_nice(void){
+  uint64 incr;
+  argaddr(0, &incr);
+  return nice(incr);
+}

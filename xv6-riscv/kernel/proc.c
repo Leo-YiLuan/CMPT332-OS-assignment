@@ -19,7 +19,13 @@ extern void forkret(void);
 static void freeproc(struct proc *p);
 
 extern char trampoline[]; /* trampoline.S */
+QUEUE queues[MAX_LISTS];
+QUEUE *freeQueues = &queues[0];
 
+NODE nodes[MAX_NODES];
+NODE *freeNodes = &nodes[0];
+
+QUEUE *prioQueue[MAX_LISTS];
 /* helps ensure that wakeups of wait()ing */
 /* parents are not lost. helps obey the */
 /* memory model when using p->parent. */
@@ -33,7 +39,7 @@ void
 proc_mapstacks(pagetable_t kpgtbl)
 {
   struct proc *p;
-  
+
   for(p = proc; p < &proc[NPROC]; p++) {
     char *pa = kalloc();
     if(pa == 0)
@@ -48,13 +54,14 @@ void
 procinit(void)
 {
   struct proc *p;
-  
+
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+
   }
 }
 
@@ -93,7 +100,7 @@ int
 allocpid()
 {
   int pid;
-  
+
   acquire(&pid_lock);
   pid = nextpid;
   nextpid = nextpid + 1;
@@ -236,7 +243,7 @@ userinit(void)
 
   p = allocproc();
   initproc = p;
-  
+
   /* allocate one user page and copy initcode's instructions */
   /* and data into it. */
   uvmfirst(p->pagetable, initcode, sizeof(initcode));
@@ -245,11 +252,16 @@ userinit(void)
   /* prepare for the very first "return" from kernel to user. */
   p->trapframe->epc = 0;      /* user program counter */
   p->trapframe->sp = PGSIZE;  /* user stack pointer */
+  p->sleeptime = 0;
+  p->runtime = 0;
+  p->priority = 0;
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
   p->state = RUNNABLE;
+  ListPrepend(prioQueue[p -> priority],p);
+
 
   release(&p->lock);
 }
@@ -302,6 +314,10 @@ fork(void)
   /* Cause fork to return 0 in the child. */
   np->trapframe->a0 = 0;
 
+  np->priority = p->priority;
+  np->runtime = 0;
+  np->sleeptime = 0;
+
   /* increment reference counts on open file descriptors. */
   for(i = 0; i < NOFILE; i++)
     if(p->ofile[i])
@@ -320,6 +336,7 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+  ListPrepend(prioQueue[np -> priority],np);
   release(&np->lock);
 
   return pid;
@@ -372,7 +389,7 @@ exit(int status)
 
   /* Parent might be sleeping in wait(). */
   wakeup(p->parent);
-  
+
   acquire(&p->lock);
 
   p->xstate = status;
@@ -428,7 +445,7 @@ wait(uint64 addr)
       release(&wait_lock);
       return -1;
     }
-    
+
     /* Wait for a child to exit. */
     sleep(p, &wait_lock);  /*DOC: wait-sleep */
   }
@@ -446,7 +463,7 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-  
+
   c->proc = 0;
   for(;;){
     /* Avoid deadlock by ensuring that devices can interrupt. */
@@ -505,6 +522,7 @@ yield(void)
   struct proc *p = myproc();
   acquire(&p->lock);
   p->state = RUNNABLE;
+  ListPrepend(prioQueue[p -> priority],p);
   sched();
   release(&p->lock);
 }
@@ -536,7 +554,7 @@ void
 sleep(void *chan, struct spinlock *lk)
 {
   struct proc *p = myproc();
-  
+
   /* Must acquire p->lock in order to */
   /* change p->state and then call sched. */
   /* Once we hold p->lock, we can be */
@@ -573,6 +591,7 @@ wakeup(void *chan)
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
+        ListPrepend(prioQueue[p -> priority],p);
       }
       release(&p->lock);
     }
@@ -594,6 +613,7 @@ kill(int pid)
       if(p->state == SLEEPING){
         /* Wake process from sleep(). */
         p->state = RUNNABLE;
+        ListPrepend(prioQueue[p -> priority],p);
       }
       release(&p->lock);
       return 0;
@@ -615,7 +635,7 @@ int
 killed(struct proc *p)
 {
   int k;
-  
+
   acquire(&p->lock);
   k = p->killed;
   release(&p->lock);
@@ -680,4 +700,144 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+void queueinit() {
+    int i;
+    for (i = 0; i < MAX_LISTS; i++) {
+        prioQueue[i] = ListCreate();
+    }
+}
+
+int
+nice(int incr) {
+    struct proc *p;
+    p = myproc();
+    if (p->priority <= 0 || p->priority >= 4) {
+      return -1;
+    }
+    p->priority += incr;
+    return 1;
+
+}
+
+QUEUE*
+ListCreate(){
+    static int initialized = 0;
+    QUEUE *list = NULL;
+
+    if (!initialized) {
+        /* First time library initialization. */
+        int i = 0;
+        int j = 0;
+        for (i = 0; i < MAX_LISTS - 1; i++) {
+            /*
+                For each entry, we re-interpret it as a LIST**,
+                then store the address of the next free entry in that pointer.
+                This gives us the effect of a very simple linked list
+                of free entries stored within the entries themselves.
+                This means no additional storage is necessary.
+            */
+            /* Reinterpret cast this LIST* as a LIST** */
+            QUEUE **next = (QUEUE**)&queues[i];
+            /* Dereference and store the next entry in the chain */
+            *next = &queues[i+1];
+        }
+        for (j = 0; j < MAX_NODES - 1; j++) {
+            /* Same as above. */
+            NODE **next = (NODE**)&nodes[j];
+            *next = &nodes[j+1];
+        }
+        initialized = 1;
+    }
+
+    if (freeQueues == NULL) {
+        /* Out of memory! */
+        return NULL;
+    }
+
+    /*
+     Pull a new list off the stack.
+     Then set the next free entry to be the top of the stack.
+    */
+    list = freeQueues;
+    freeQueues = *(QUEUE**)freeQueues;
+    memset(list, 0, sizeof(QUEUE));
+
+    return list;
+}
+
+int
+ListPrepend(QUEUE *list, void *item){
+    NODE *node = NULL;
+    if (list == NULL){
+        return -1;
+    }
+    if (freeNodes == NULL) {
+        /* Out of memory! */
+        return -1;
+    }
+    /* Grab a new node */
+    node = freeNodes;
+    freeNodes = *(NODE**)freeNodes;
+    memset(node, 0, sizeof(NODE));
+
+    if (list->listCount == 0) {
+        /* Empty list, just add the node simply. */
+        list->currNodep = node;
+        list->lastNodep = node;
+        list->firstNodep = node;
+    } else {
+        node->next = list->firstNodep;
+        list->firstNodep->prev = node;
+        list->firstNodep = node;
+        list->currNodep = node;
+    }
+
+    list->listCount += 1;
+    node->item = item;
+
+    return 0;
+}
+
+void*
+ListTrim(QUEUE *list){
+    void *item;
+    NODE *removeNode;
+
+    if (list == NULL){
+        printf("Error in procedure ListTrim(): Invalid parameter list \n");
+        return NULL;
+    }
+    if (list->listCount == 0) {
+        return NULL;
+    }
+
+    item = list->lastNodep->item;
+    removeNode = list->lastNodep;
+    if (list->listCount == 1) {
+      *(NODE**)removeNode = freeNodes;
+      freeNodes = removeNode;
+      memset(list,0,sizeof(QUEUE));
+    }else{
+      removeNode->prev->next = NULL;
+      list->lastNodep = removeNode->prev;
+      list->currNodep = list->lastNodep;
+      *(NODE**)removeNode = freeNodes;
+      freeNodes = removeNode;
+      list->listCount --;
+    }
+
+
+    return item;
+
+}
+
+int
+ListCount(QUEUE *list){
+    if (list == NULL){
+        return -1;
+    }
+
+    return list->listCount;
 }

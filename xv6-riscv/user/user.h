@@ -24,6 +24,7 @@ int sleep(int);
 int uptime(void);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 uint64 getNumPages(void);
+int nice(int);
 
 /* ulib.c */
 int stat(const char*, struct stat*);
