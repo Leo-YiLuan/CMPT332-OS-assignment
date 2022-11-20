@@ -10,7 +10,6 @@ struct spinlock tickslock;
 uint ticks;
 
 extern char trampoline[], uservec[], userret[];
-
 /* in kernelvec.S, calls kerneltrap(). */
 void kernelvec();
 
@@ -46,10 +45,10 @@ usertrap(void)
   w_stvec((uint64)kernelvec);
 
   struct proc *p = myproc();
-  
+
   /* save user program counter. */
   p->trapframe->epc = r_sepc();
-  
+
   if(r_scause() == 8){
     /* system call */
 
@@ -125,7 +124,7 @@ usertrapret(void)
 
   /* set up the registers that trampoline.S's sret will use */
   /* to get to user space. */
-  
+
   /* set S Previous Privilege mode to User. */
   unsigned long x = r_sstatus();
   x &= ~SSTATUS_SPP; /* clear SPP to 0 for user mode */
@@ -147,14 +146,14 @@ usertrapret(void)
 
 /* interrupts and exceptions from kernel code go here via kernelvec, */
 /* on whatever the current kernel stack is. */
-void 
+void
 kerneltrap()
 {
   int which_dev = 0;
   uint64 sepc = r_sepc();
   uint64 sstatus = r_sstatus();
   uint64 scause = r_scause();
-  
+
   if((sstatus & SSTATUS_SPP) == 0)
     panic("kerneltrap: not from supervisor mode");
   if(intr_get() != 0)
@@ -181,6 +180,8 @@ clockintr()
 {
   acquire(&tickslock);
   ticks++;
+  /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  updatetick();
   wakeup(&ticks);
   release(&tickslock);
 }
@@ -224,7 +225,7 @@ devintr()
     if(cpuid() == 0){
       clockintr();
     }
-    
+
     /* acknowledge the software interrupt by clearing */
     /* the SSIP bit in sip. */
     w_sip(r_sip() & ~2);
@@ -234,4 +235,3 @@ devintr()
     return 0;
   }
 }
-

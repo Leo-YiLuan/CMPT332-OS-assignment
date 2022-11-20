@@ -14,7 +14,7 @@ struct proc *initproc;
 
 int nextpid = 1;
 struct spinlock pid_lock;
-
+struct spinlock queue_lock;
 extern void forkret(void);
 static void freeproc(struct proc *p);
 
@@ -59,6 +59,7 @@ procinit(void)
 
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
+  initlock(&queue_lock, "queue_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
@@ -263,8 +264,9 @@ userinit(void)
 
   p->state = RUNNABLE;
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  acquire(&queue_lock);
   ListPrepend(prioQueue[p -> priority],p);
-
+  release(&queue_lock);
   release(&p->lock);
 }
 
@@ -340,7 +342,9 @@ fork(void)
   acquire(&np->lock);
   np->state = RUNNABLE;
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  acquire(&queue_lock);
   ListPrepend(prioQueue[np -> priority],np);
+  release(&queue_lock);
   release(&np->lock);
 
   return pid;
@@ -462,32 +466,97 @@ wait(uint64 addr)
 /*  - swtch to start running that process. */
 /*  - eventually that process transfers control */
 /*    via swtch back to the scheduler. */
+// void
+// scheduler(void)
+// {
+//   struct proc *p;
+//   struct cpu *c = mycpu();
+//   c->proc = 0;
+//   // int priority;
+//   for(;;){
+//     /* Avoid deadlock by ensuring that devices can interrupt. */
+//       intr_on();
+//
+
+//
+//     for(p = proc; p < &proc[NPROC]; p++) {
+//       acquire(&p->lock);
+//       if(p->state == RUNNABLE) {
+//         /* Switch to chosen process.  It is the process's job */
+//         /* to release its lock and then reacquire it */
+//         /* before jumping back to us. */
+//         p->state = RUNNING;
+//         c->proc = p;
+//         swtch(&c->context, &p->context);
+//
+//         /* Process is done running for now. */
+//         /* It should have changed its p->state before coming back. */
+//         c->proc = 0;
+//       }
+//
+//     }
+//   }
+//     release(&p->lock);
+// }
 void
 scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
+  int priority;
   for(;;){
     /* Avoid deadlock by ensuring that devices can interrupt. */
     intr_on();
+    for (priority = 0; priority < 5; priority++){
+      // acquiresleep (&queue_lock_s);
+      acquire(&queue_lock);
+        if (ListCount(prioQueue[priority])==0) {
+          release(&queue_lock);
+          // releasesleep(&queue_lock_s);
+          continue;
+        }
+        p = ListTrim(prioQueue[priority]);
+        release(&queue_lock);
+        // releasesleep(&queue_lock_s);
 
-    for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-        /* Switch to chosen process.  It is the process's job */
-        /* to release its lock and then reacquire it */
-        /* before jumping back to us. */
+        acquire(&p->lock);
         p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
+        if (p->ratio > 2.0 && p->priority != 0) {
+            p->priority --;
+        }
+        if (p->ratio < 0.7 && p->priority != 4) {
+            p->priority ++;
 
+        }
+        printf("Process %d, priority %d, ratio %d, runtime %d, sleeptime %d\n"
+        ,p->pid ,p->priority, p->ratio, p->runtime, p->sleeptime );
+        c->proc = p;
+        // sleep(10);
+        //printf("runtime is %d, sleeptime is %d\n", p->runtime, p->sleeptime );
+        swtch(&c->context, &p->context);
         /* Process is done running for now. */
         /* It should have changed its p->state before coming back. */
         c->proc = 0;
+        release(&p->lock);
+        break;
       }
-      release(&p->lock);
-    }
+    // for(p = proc; p < &proc[NPROC]; p++) {
+    //   acquire(&p->lock);
+    //   if(p->state == RUNNABLE) {
+    //     /* Switch to chosen process.  It is the process's job */
+    //     /* to release its lock and then reacquire it */
+    //     /* before jumping back to us. */
+    //     p->state = RUNNING;
+    //     c->proc = p;
+    //     swtch(&c->context, &p->context);
+    //
+    //     /* Process is done running for now. */
+    //     /* It should have changed its p->state before coming back. */
+    //     c->proc = 0;
+    //   }
+      // release(&p->lock);
+    // }
   }
 }
 
@@ -526,7 +595,9 @@ yield(void)
   acquire(&p->lock);
   p->state = RUNNABLE;
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
+  acquire(&queue_lock);
   ListPrepend(prioQueue[p -> priority],p);
+  release(&queue_lock);
   sched();
   release(&p->lock);
 }
@@ -596,7 +667,9 @@ wakeup(void *chan)
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
         /* CMPT 332 GROUP 22 Change, Fall 2022 */
+        acquire(&queue_lock);
         ListPrepend(prioQueue[p -> priority],p);
+        release(&queue_lock);
       }
       release(&p->lock);
     }
@@ -619,7 +692,9 @@ kill(int pid)
         /* Wake process from sleep(). */
         p->state = RUNNABLE;
         /* CMPT 332 GROUP 22 Change, Fall 2022 */
+        acquire(&queue_lock);
         ListPrepend(prioQueue[p -> priority],p);
+        release(&queue_lock);
       }
       release(&p->lock);
       return 0;
@@ -717,8 +792,25 @@ nice(int incr) {
       return -1;
     }
     p->priority += incr;
-    return 1;
+    return p->priority;
 
+}
+
+void
+updatetick() {
+  struct proc *p;
+  for(p = proc; p < &proc[NPROC]; p++){
+    acquire(&p->lock);
+    if (p->state == RUNNING) {
+      p->runtime ++;
+    }
+    if (p->state == SLEEPING) {
+      p->sleeptime ++;
+    }
+    p->ratio = (p->sleeptime + 1) / (p->runtime + 1);
+    release(&p->lock);
+
+  }
 }
 
 void

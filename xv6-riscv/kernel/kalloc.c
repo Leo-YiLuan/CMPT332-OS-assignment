@@ -78,7 +78,7 @@ kfree(void *pa)
   kmem.freecount++;
   release(&kmem.lock);
 
-  
+
   page_ref_set((uint64)r, 0);
 }
 
@@ -161,7 +161,7 @@ page_ref_count(uint64 pa) {
 }
 
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-void 
+void
 page_ref_set(uint64 pa, uint8 val) {
   uint64 frameNum = ((pa >> PGSHIFT) << PGSHIFT) / PGSIZE;
 
