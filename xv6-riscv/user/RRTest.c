@@ -39,7 +39,9 @@ int fib(int num){
     if (num <= 2) {
         return 1;
     }
-    printf("Process: %d  is runnig fib %d\n",getpid(),num);
+    // printf("Process: %d  is runnig prior %d\n",getpid(),nice(0));
+    // printf("Process: %d  is runnig\n",getpid());
+
 
     return fib(num - 1) + fib(num - 2);
 }
@@ -59,6 +61,8 @@ void runTest(int numproc){
           printf("Process %d get sleep for %d time\n",getpid(),randSleep);
           sleep(randSleep);
           printf("Process %d wake up\n",getpid());
+          printf("Process %d is runnig prior %d\n",getpid(),nice(0));
+
 
           fib(randFib);
 
@@ -71,6 +75,6 @@ void runTest(int numproc){
 
 
 int main() {
-  runTest(2);
+  runTest(4);
   return 0;
 }

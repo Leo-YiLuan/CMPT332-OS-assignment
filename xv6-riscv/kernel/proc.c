@@ -731,11 +731,11 @@ int
 nice(int incr) {
     struct proc *p;
     p = myproc();
-    if (p->priority <= 0 || p->priority >= 4) {
-      return -1;
-    }
-    p->priority += incr;
-    return 1;
+    // if (p->priority <= 0 || p->priority >= 4) {
+    //   return -1;
+    // }
+    // p->priority += incr;
+    return p->priority;
 
 }
 
