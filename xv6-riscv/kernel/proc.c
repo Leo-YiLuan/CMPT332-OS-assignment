@@ -494,7 +494,7 @@ scheduler(void)
 
         p->state = RUNNING;
 
-        /* Comment that in will test in scheduler */
+        /* Uncomment that will test inside the scheduler */
         
         // printf("Process %d, priority %d,  runtime %d, sleeptime %d\n"
         // ,p->pid ,p->priority, p->runtime, p->sleeptime );
