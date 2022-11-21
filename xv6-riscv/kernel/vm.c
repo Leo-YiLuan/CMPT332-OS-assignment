@@ -45,7 +45,7 @@ kvmmake(void)
 
   /* allocate and map a kernel stack for each process. */
   proc_mapstacks(kpgtbl);
-  
+
   return kpgtbl;
 }
 
@@ -147,7 +147,7 @@ mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)
 
   if(size == 0)
     panic("mappages: size");
-  
+
   a = PGROUNDDOWN(va);
   last = PGROUNDDOWN(va + size - 1);
   for(;;){
@@ -332,7 +332,7 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
     // Modify flags so the page is read-only in both
-    // child and parent. 
+    // child and parent.
     flags = flags & ~(PTE_W);
     *pte = PA2PTE(pa) | flags;
     if(mappages(new, i, PGSIZE, pa, flags) != 0){
@@ -354,7 +354,7 @@ void
 uvmclear(pagetable_t pagetable, uint64 va)
 {
   pte_t *pte;
-  
+
   pte = walk(pagetable, va, 0);
   if(pte == 0)
     panic("uvmclear");
@@ -365,7 +365,7 @@ uvmclear(pagetable_t pagetable, uint64 va)
 /* Copy len bytes from src to virtual address dstva in a given page table. */
 /* Return 0 on success, -1 on error. */
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
-/* We aren't getting a pagefault because this call occurs in kernel mode, 
+/* We aren't getting a pagefault because this call occurs in kernel mode,
    so instead we fake it. */
 int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
@@ -474,10 +474,10 @@ int
 handle_pagefault(pagetable_t table, uint64 va) {
   if (va >= MAXVA) {
     // We could normally test this by checking PTE_V,
-    // but in order to check that we need to walk the 
+    // but in order to check that we need to walk the
     // page table, and walk() wont let us walk on
-    // a completely invalid address. 
-    // So we test early. 
+    // a completely invalid address.
+    // So we test early.
     return -1;
   }
 
@@ -491,7 +491,7 @@ handle_pagefault(pagetable_t table, uint64 va) {
     // Invalid virtual address!
     return -1;
   } else if (*pte & PTE_X) {
-    // This is a code page, we shouldn't be allowed to modify it. 
+    // This is a code page, we shouldn't be allowed to modify it.
     // This check is needed to pass the "textwrite" usertest,
     // otherwise we inadvertantly set code pages to PTE_W.
     return -1;
@@ -503,21 +503,23 @@ handle_pagefault(pagetable_t table, uint64 va) {
     if((newPage = kalloc()) == 0) {
       // Out of memory, we have no choice but to bail on this proc.
       // Initially we just used a panic, but that caused the execout
-      // test to fail. 
+      // test to fail.
       return -2;
     }
 
-    // Move data into new page. 
+    // Move data into new page.
     memmove(newPage, (char*)pa, PGSIZE);
 
-    // Map the newly constructed copy into the same spot, now with writeable perms.
-    mappages(table, vaAligned, PGSIZE, (uint64)newPage, PTE_FLAGS(*pte) | PTE_W);
+    // Map the newly constructed copy into the same spot,
+    // now with writeable perms.
+    mappages(table, vaAligned, PGSIZE, (uint64)newPage,
+    PTE_FLAGS(*pte) | PTE_W);
     if (pa != TRAMPOLINE) { page_ref_dec(pa); }
     // Flush TLB
     sfence_vma();
   } else {
     // This must be the parent, as they have only 1 ref left.
-    // We can just modify the permissions to let them write to it. 
+    // We can just modify the permissions to let them write to it.
     //printf("Page has only 1 refcount, simply enable writing perm.\n");
     uint flags = PTE_FLAGS(*pte);
     flags = flags | PTE_W;

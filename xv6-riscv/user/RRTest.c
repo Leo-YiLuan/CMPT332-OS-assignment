@@ -85,9 +85,9 @@ void runTest(int numproc){
           int niceProb = rand() % 10;
           int randNice = rand() % 4 + 1;
 
-          // printf("Process %d get sleep for %d time\n",getpid(),randSleep);
+          //printf("Process %d get sleep for %d time\n",getpid(),randSleep);
           sleep(randSleep);
-          // printf("Process %d wake up, prior is %d\n",getpid(),getpriority());
+          //printf("Process %d wake up, prior is %d\n",getpid(),getpriority());
           if (niceProb == 1)
           {
               do_nice(randNice);

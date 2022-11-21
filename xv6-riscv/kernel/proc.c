@@ -258,7 +258,6 @@ userinit(void)
   p->runtime = 0;
   p->priority = 0;
   p->ratio = 0;
-  p->prioincr = 0;
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
@@ -324,7 +323,6 @@ fork(void)
   np->runtime = 0;
   np->sleeptime = 0;
   np->ratio = 0;
-  np->prioincr = 0;
 
   /* increment reference counts on open file descriptors. */
   for(i = 0; i < NOFILE; i++)
@@ -745,7 +743,6 @@ nice(int incr) {
     if (newprio < 0 || newprio > 4) {
       return -1;
     }
-    //p->prioincr += incr;
     p->priority -= incr;
     return 1;
 
@@ -792,43 +789,6 @@ updatetick() {
       }
     }
 
-    // p->ratio = ((float)p->sleeptime + 1) / ((float)p->runtime + 1);
-    // if (p->ratio >= 1.8 )
-    // {
-    //     p->priority = 0;
-    // }
-    // else if (p->ratio >= 1.5)
-    // {
-    //     if(1 - p->prioincr > 0){
-    //         p->priority = 1 - p->prioincr;
-    //     }else{
-    //         p->priority = 0;
-    //     }
-    // }
-    // else if (p->ratio >= 1.0)
-    // {
-    //     if(2 - p->prioincr > 0){
-    //         p->priority = 2 - p->prioincr;
-    //     }else{
-    //         p->priority = 0;
-    //     }
-    // }
-    // else if (p->ratio >= 0.5)
-    // {
-    //     if(3 - p->prioincr > 0){
-    //         p->priority = 3 - p->prioincr;
-    //     }else{
-    //         p->priority = 0;
-    //     }
-    // }
-    // else
-    // {
-    //     if(4 - p->prioincr > 0){
-    //         p->priority = 4 - p->prioincr;
-    //     }else{
-    //         p->priority = 0;
-    //     }
-    // }
     release(&p->lock);
 
   }
