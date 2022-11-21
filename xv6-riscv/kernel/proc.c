@@ -495,7 +495,7 @@ scheduler(void)
         p->state = RUNNING;
 
         /* Uncomment that will test inside the scheduler */
-        
+
         // printf("Process %d, priority %d,  runtime %d, sleeptime %d\n"
         // ,p->pid ,p->priority, p->runtime, p->sleeptime );
 
@@ -549,7 +549,7 @@ yield(void)
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
   acquire(&queue_lock);
   ListPrepend(prioQueue[p -> priority],p);
-  release(&queue_lock); 
+  release(&queue_lock);
   sched();
   release(&p->lock);
 }
@@ -745,7 +745,7 @@ nice(int incr) {
     if (newprio < 0 || newprio > 4) {
       return -1;
     }
-    p->prioincr += incr;
+    //p->prioincr += incr;
     p->priority -= incr;
     return 1;
 
@@ -767,48 +767,68 @@ updatetick() {
     acquire(&p->lock);
     if (p->state == RUNNING) {
       p->runtime ++;
+      p->ratio = ((float)p->runtime + 3) / ((float)p->sleeptime + 3);
+
+      if (p->ratio > 1.8) {
+        if (p->priority < 4) {
+          p->priority ++;
+
+        }
+
+        p->runtime = 0;
+        p->sleeptime = 0;
+      }
     }
     if (p->state == SLEEPING) {
       p->sleeptime ++;
+      p->ratio = ((float)p->sleeptime + 3) / ((float)p->runtime + 3);
+      if (p->ratio > 1.8) {
+        if (p->priority > 0) {
+          p->priority --;
+
+        }
+        p->runtime = 0;
+        p->sleeptime = 0;
+      }
     }
 
-    p->ratio = ((float)p->sleeptime + 1) / ((float)p->runtime + 1);
-    if (p->ratio >= 1.8 )
-    {   
-        p->priority = 0;
-    }
-    else if (p->ratio >= 1.5)
-    {
-        if(1 - p->prioincr > 0){
-            p->priority = 1 - p->prioincr;
-        }else{
-            p->priority = 0;
-        }
-    }
-    else if (p->ratio >= 1.0)
-    {
-        if(2 - p->prioincr > 0){
-            p->priority = 2 - p->prioincr;
-        }else{
-            p->priority = 0;
-        }
-    }
-    else if (p->ratio >= 0.5)
-    {
-        if(3 - p->prioincr > 0){
-            p->priority = 3 - p->prioincr;
-        }else{
-            p->priority = 0;
-        }    
-    }
-    else 
-    {
-        if(4 - p->prioincr > 0){
-            p->priority = 4 - p->prioincr;
-        }else{
-            p->priority = 0;
-        }    
-    }
+    // p->ratio = ((float)p->sleeptime + 1) / ((float)p->runtime + 1);
+    // if (p->ratio >= 1.8 )
+    // {
+    //     p->priority = 0;
+    // }
+    // else if (p->ratio >= 1.5)
+    // {
+    //     if(1 - p->prioincr > 0){
+    //         p->priority = 1 - p->prioincr;
+    //     }else{
+    //         p->priority = 0;
+    //     }
+    // }
+    // else if (p->ratio >= 1.0)
+    // {
+    //     if(2 - p->prioincr > 0){
+    //         p->priority = 2 - p->prioincr;
+    //     }else{
+    //         p->priority = 0;
+    //     }
+    // }
+    // else if (p->ratio >= 0.5)
+    // {
+    //     if(3 - p->prioincr > 0){
+    //         p->priority = 3 - p->prioincr;
+    //     }else{
+    //         p->priority = 0;
+    //     }
+    // }
+    // else
+    // {
+    //     if(4 - p->prioincr > 0){
+    //         p->priority = 4 - p->prioincr;
+    //     }else{
+    //         p->priority = 0;
+    //     }
+    // }
     release(&p->lock);
 
   }

@@ -52,7 +52,7 @@ int fib(int num){
     if (num <= 2) {
         return 1;
     }
-    // printf("Process: %d  is runnig prior %d\n",getpid(),getpriority());
+    // printf(  "Process: %d  is runnig prior %d\n",getpid(),getpriority());
     // printf("Process: %d  is runnig\n",getpid());
 
 
@@ -80,21 +80,22 @@ void runTest(int numproc){
       /* child in an infinite loop make parent possible */
       if (tempid==0) {
         while(1){
-          int randSleep = rand() % 4;
+          int randSleep = rand() % 5;
           int randFib = rand() % 40;
           int niceProb = rand() % 10;
           int randNice = rand() % 4 + 1;
 
           // printf("Process %d get sleep for %d time\n",getpid(),randSleep);
           sleep(randSleep);
-          // printf("Process %d wake up\n",getpid());
+          // printf("Process %d wake up, prior is %d\n",getpid(),getpriority());
           if (niceProb == 1)
           {
               do_nice(randNice);
           }
-          fib(randFib);
-          printf("Process %d after runnig fib(%d) prior is %d\n"
+          printf("Process %d before running fib(%d) prior is %d\n"
           ,getpid(),randFib,getpriority());
+          fib(randFib);
+
 
         };
       }else if (tempid == -1) {
