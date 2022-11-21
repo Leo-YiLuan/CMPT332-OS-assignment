@@ -1,0 +1,156 @@
+/*
+ NAME: Matthew Munro
+ NSID: mam552
+ STUDENT NUMBER: 11291769
+ NAME: Yi Luan
+ NSID: yil160
+ STUDENT NUMBER: 11253856
+ CMPT 332 2022
+ A3
+*/
+Output 1:
+
+$ RRTest
+Process 5 after runnig fib(17) prior is 0
+$ Process 4 after runnig fib(1) prior is 0
+Process 8 after runnig fib(18) prior is 0
+Process 5 after runnig fib(18) prior is 0
+Process 7 after runnig fib(2) prior is 0
+Process 7 after runnig fib(1) prior is 0
+Process 7 after runnig fib(14) prior is 0
+Process 5 after runnig fib(24) prior is 0
+Process 6 after runnig fib(26) prior is 0
+Process 4 after runnig fib(3) prior is 0
+Process 4 after runnig fib(16) prior is 0
+Process 6 after runnig fib(26) prior is 0
+Process 8 after runnig fib(16) prior is 0
+Process 4 after runnig fib(3) prior is 0
+Process 4 after runnig fib(6) prior is 0
+Process 7 after runnig fib(16) prior is 0
+Process 5 after runnig fib(16) prior is 0
+Process 8 after runnig fib(22) prior is 0
+Process 7 after runnig fib(29) prior is 0
+Process 4 after runnig fib(6) prior is 0
+Process 7 after runnig fib(13) prior is 0
+Process 4 after runnig fib(13) prior is 0
+Process 4 after runnig fib(33) prior is 0
+Process 4 after runnig fib(16) prior is 0
+Process 4 after runnig fib(27) prior is 0
+Process 4 after runnig fib(32) prior is 0
+Process 4 after runnig fib(5) prior is 0
+Process 4 after runnig fib(6) prior is 0
+Process 7 after runnig fib(34) prior is 1
+Process 7 after runnig fib(3) prior is 0
+Process 7 after runnig fib(10) prior is 0
+Process 4 after runnig fib(35) prior is 1
+Process 4 after runnig fib(28) prior is 0
+Process 4 after runnig fib(29) prior is 0
+Process 4 after runnig fib(8) prior is 0
+Process 4 after runnig fib(37) prior is 3
+Process 4 after runnig fib(2) prior is 2
+Successfully increment 1 priority to process 4
+Process 4 after runnig fib(31) prior is 1
+Process 4 after runnig fib(9) prior is 1
+Process 4 after runnig fib(29) prior is 1
+Process 8 after runnig fib(36) prior is 3
+Process 4 after runnig fib(9) prior is 1
+Process 4 after runnig fib(21) prior is 1
+Process 4 after runnig fib(11) prior is 1
+Process 8 after runnig fib(28) prior is 3
+Process 8 after runnig fib(2) prior is 3
+Process 4 after runnig fib(9) prior is 1
+Process 8 after runnig fib(1) prior is 3
+Process 8 after runnig fib(4) prior is 3
+Process 4 after runnig fib(32) prior is 0
+Process 8 after runnig fib(19) prior is 3
+Process 4 after runnig fib(3) prior is 0
+Process 8 after runnig fib(4) prior is 2
+Process 8 after runnig fib(15) prior is 2
+Process 8 after runnig fib(1) prior is 2
+Process 4 after runnig fib(7) prior is 0
+Process 8 after runnig fib(19) prior is 2
+Process 8 after runnig fib(23) prior is 2
+Process 4 after runnig fib(29) prior is 0
+Process 4 after runnig fib(25) prior is 0
+Successfully increment 1 priority to process 8
+Process 4 after runnig fib(25) prior is 0
+Process 4 after runnig fib(15) prior is 0
+Process 4 after runnig fib(9) prior is 0
+Process 4 after runnig fib(34) prior is 0
+Process 4 after runnig fib(33) prior is 0
+Process 4 after runnig fib(19) prior is 0
+Process 4 after runnig fib(16) prior is 0
+Process 4 after runnig fib(9) prior is 0
+Process 4 after runnig fib(19) prior is 0
+Process 4 after runnig fib(15) prior is 0
+Process 4 after runnig fib(2) prior is 0
+
+
+Output 2:
+$ RRTest
+Process 6 after runnig fib(26) prior is 0
+$ Process 4 after runnig fib(1) prior is 0
+Process 4 after runnig fib(3) prior is 0
+Failed to change process 6 priority by num using nice()
+Process 6 after runnig fib(26) prior is 0
+Process 7 after runnig fib(2) prior is 0
+Process 7 after runnig fib(1) prior is 0
+Failed to change process 4 priority by num using nice()
+Process 4 after runnig fib(16) prior is 0
+Process 5 after runnig fib(17) prior is 0
+Process 4 after runnig fib(3) prior is 0
+Failed to change process 8 priority by num using nice()
+Process 8 after runnig fib(18) prior is 0
+Process 4 after runnig fib(6) prior is 0
+Process 7 after runnig fib(14) prior is 0
+Process 7 after runnig fib(16) prior is 0
+Process 7 after runnig fib(29) prior is 0
+Process 5 after runnig fib(18) prior is 0
+Process 8 after runnig fib(16) prior is 0
+Process 7 after runnig fib(13) prior is 0
+Process 4 after runnig fib(6) prior is 0
+Process 5 after runnig fib(24) prior is 0
+Process 8 after runnig fib(22) prior is 0
+Failed to change process 4 priority by num using nice()
+Process 4 after runnig fib(13) prior is 0
+Failed to change process 5 priority by num using nice()
+Process 5 after runnig fib(16) prior is 0
+Process 4 after runnig fib(33) prior is 0
+Process 4 after runnig fib(16) prior is 0
+Process 7 after runnig fib(34) prior is 0
+Process 7 after runnig fib(3) prior is 0
+Process 4 after runnig fib(27) prior is 0
+Process 7 after runnig fib(10) prior is 0
+Process 4 after runnig fib(32) prior is 0
+Process 4 after runnig fib(5) prior is 0
+Process 4 after runnig fib(6) prior is 0
+Failed to change process 4 priority by num using nice()
+Process 4 after runnig fib(35) prior is 0
+Process 4 after runnig fib(28) prior is 0
+Process 4 after runnig fib(29) prior is 0
+Process 4 after runnig fib(8) prior is 0
+Process 8 after runnig fib(36) prior is 2
+Process 8 after runnig fib(28) prior is 2
+Process 8 after runnig fib(2) prior is 2
+Process 8 after runnig fib(1) prior is 2
+Process 4 after runnig fib(37) prior is 2
+Process 8 after runnig fib(4) prior is 1
+Process 4 after runnig fib(2) prior is 2
+Process 8 after runnig fib(19) prior is 1
+Process 8 after runnig fib(4) prior is 0
+Successfully increment 1 priority to process 4
+Process 8 after runnig fib(15) prior is 0
+Process 4 after runnig fib(31) prior is 1
+Process 8 after runnig fib(1) prior is 0
+Process 8 after runnig fib(19) prior is 0
+Process 4 after runnig fib(9) prior is 1
+Process 8 after runnig fib(23) prior is 0
+Process 4 after runnig fib(29) prior is 1
+Process 4 after runnig fib(9) prior is 0
+Failed to change process 8 priority by num using nice()
+Process 4 after runnig fib(21) prior is 0
+Process 4 after runnig fib(11) prior is 0
+Process 4 after runnig fib(9) prior is 0
+Process 4 after runnig fib(32) prior is 0
+Process 4 after runnig fib(3) prior is 0
+

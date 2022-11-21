@@ -257,6 +257,8 @@ userinit(void)
   p->sleeptime = 0;
   p->runtime = 0;
   p->priority = 0;
+  p->ratio = 0;
+  p->prioincr = 0;
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
@@ -321,6 +323,8 @@ fork(void)
   np->priority = p->priority;
   np->runtime = 0;
   np->sleeptime = 0;
+  np->ratio = 0;
+  np->prioincr = 0;
 
   /* increment reference counts on open file descriptors. */
   for(i = 0; i < NOFILE; i++)
@@ -487,17 +491,22 @@ scheduler(void)
         release(&queue_lock);
 
         acquire(&p->lock);
+
         p->state = RUNNING;
 
         /* Comment that in will test in scheduler */
+        
         // printf("Process %d, priority %d,  runtime %d, sleeptime %d\n"
         // ,p->pid ,p->priority, p->runtime, p->sleeptime );
+
         c->proc = p;
         swtch(&c->context, &p->context);
+
         /* Process is done running for now. */
         /* It should have changed its p->state before coming back. */
         c->proc = 0;
         release(&p->lock);
+
         break;
       }
   }
@@ -730,24 +739,30 @@ procdump(void)
 int
 nice(int incr) {
     struct proc *p;
+    int newprio;
     p = myproc();
-    // if (p->priority <= 0 || p->priority >= 4) {
-    //   return -1;
-    // }
-    // p->priority += incr;
-    return p->priority;
+    newprio = p->priority - incr;
+    if (newprio < 0 || newprio > 4) {
+      return -1;
+    }
+    p->prioincr += incr;
+    p->priority -= incr;
+    return 1;
 
 }
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 int
 getpriority(){
     struct proc *p;
     p = myproc();
     return p->priority;
 }
+
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 void
 updatetick() {
   struct proc *p;
-  float ratio = 0.0;
   for(p = &proc[0]; p < &proc[NPROC]; p++){
     acquire(&p->lock);
     if (p->state == RUNNING) {
@@ -757,33 +772,49 @@ updatetick() {
       p->sleeptime ++;
     }
 
-    ratio = ((float)p->sleeptime +1) / ((float)p->runtime +1) ;
-
-    if (ratio >= 2.0 )
-    {
+    p->ratio = ((float)p->sleeptime + 1) / ((float)p->runtime + 1);
+    if (p->ratio >= 1.8 )
+    {   
         p->priority = 0;
     }
-    else if (ratio >= 1.5)
+    else if (p->ratio >= 1.5)
     {
-        p->priority = 1;
+        if(1 - p->prioincr > 0){
+            p->priority = 1 - p->prioincr;
+        }else{
+            p->priority = 0;
+        }
     }
-    else if (ratio >= 1.0)
+    else if (p->ratio >= 1.0)
     {
-        p->priority = 2;
+        if(2 - p->prioincr > 0){
+            p->priority = 2 - p->prioincr;
+        }else{
+            p->priority = 0;
+        }
     }
-    else if (ratio >= 0.5)
+    else if (p->ratio >= 0.5)
     {
-        p->priority = 3;
+        if(3 - p->prioincr > 0){
+            p->priority = 3 - p->prioincr;
+        }else{
+            p->priority = 0;
+        }    
     }
     else 
     {
-        p -> priority = 4;
+        if(4 - p->prioincr > 0){
+            p->priority = 4 - p->prioincr;
+        }else{
+            p->priority = 0;
+        }    
     }
     release(&p->lock);
 
   }
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 void
 queueinit() {
     int i;
@@ -792,6 +823,7 @@ queueinit() {
     }
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 QUEUE*
 ListCreate(){
     static int initialized = 0;
@@ -838,6 +870,7 @@ ListCreate(){
     return list;
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 int
 ListPrepend(QUEUE *list, void *item){
     NODE *node = NULL;
@@ -871,6 +904,7 @@ ListPrepend(QUEUE *list, void *item){
     return 0;
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 void*
 ListTrim(QUEUE *list){
     void *item;
@@ -904,6 +938,7 @@ ListTrim(QUEUE *list){
 
 }
 
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 int
 ListCount(QUEUE *list){
     if (list == NULL){

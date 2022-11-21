@@ -109,6 +109,8 @@ struct proc {
   int priority;
   int runtime;
   int sleeptime;
+  float ratio;
+  int prioincr;
 };
 
 #define MAX_LISTS 5
@@ -132,7 +134,7 @@ struct QUEUE
 };
 
 QUEUE *ListCreate();
-int ListCount(QUEUE *list);
-int ListPrepend(QUEUE *list, void *item);
-void *ListTrim(QUEUE *list);
+int ListCount(QUEUE *);
+int ListPrepend(QUEUE *, void *);
+void *ListTrim(QUEUE *);
 void updatetick();

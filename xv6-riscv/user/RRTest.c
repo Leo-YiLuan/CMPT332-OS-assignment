@@ -1,5 +1,18 @@
+/*
+ NAME: Matthew Munro
+ NSID: mam552
+ STUDENT NUMBER: 11291769
+ NAME: Yi Luan
+ NSID: yil160
+ STUDENT NUMBER: 11253856
+ CMPT 332 2022
+ A3
+*/
 #include "kernel/types.h"
 #include "user/user.h"
+
+
+
 int
 do_rand(unsigned long *ctx)
 {
@@ -39,32 +52,49 @@ int fib(int num){
     if (num <= 2) {
         return 1;
     }
-    printf("Process: %d  is runnig prior %d\n",getpid(),nice(0));
+    // printf("Process: %d  is runnig prior %d\n",getpid(),getpriority());
     // printf("Process: %d  is runnig\n",getpid());
 
 
     return fib(num - 1) + fib(num - 2);
 }
 
+void do_nice(int incr){
+  if (nice(incr)!=-1)
+  {
+      printf("Successfully increment %d priority to process %d \n",incr
+      ,getpid());
+  }else
+  {
+      // printf("Failed to change process %d priority by num using nice()\n"
+      // ,getpid());
+  }
+}
+
 void runTest(int numproc){
     int tempid;
     int i;
-    // int fibNum;
 
     for (i = 0; i < numproc; i++) {
       tempid = fork();
       /* child in an infinite loop make parent possible */
       if (tempid==0) {
         while(1){
-          int randSleep = rand() % 7;
+          int randSleep = rand() % 4;
           int randFib = rand() % 40;
+          int niceProb = rand() % 10;
+          int randNice = rand() % 4 + 1;
+
           // printf("Process %d get sleep for %d time\n",getpid(),randSleep);
           sleep(randSleep);
           // printf("Process %d wake up\n",getpid());
-          printf("Process %d is runnig prior %d\n",getpid(),getpriority());
-
-
+          if (niceProb == 1)
+          {
+              do_nice(randNice);
+          }
           fib(randFib);
+          printf("Process %d after runnig fib(%d) prior is %d\n"
+          ,getpid(),randFib,getpriority());
 
         };
       }else if (tempid == -1) {
@@ -75,6 +105,6 @@ void runTest(int numproc){
 
 
 int main() {
-  runTest(10);
+  runTest(5);
   return 0;
 }
