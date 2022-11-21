@@ -39,22 +39,29 @@ int fib(int num){
     if (num <= 2) {
         return 1;
     }
+    printf("Process: %d  is runnig fib %d\n",getpid(),num);
+
     return fib(num - 1) + fib(num - 2);
 }
 
 void runTest(int numproc){
     int tempid;
     int i;
-    //int fibNum;
+    // int fibNum;
 
     for (i = 0; i < numproc; i++) {
       tempid = fork();
       /* child in an infinite loop make parent possible */
       if (tempid==0) {
         while(1){
-          sleep(rand()%50);
-          fib(50);
-          // printf("%d\n", fibNum);
+          int randSleep = rand() % 7;
+          int randFib = rand() % 40;
+          printf("Process %d get sleep for %d time\n",getpid(),randSleep);
+          sleep(randSleep);
+          printf("Process %d wake up\n",getpid());
+
+          fib(randFib);
+
         };
       }else if (tempid == -1) {
         printf("Fail to create new process\n" );
@@ -64,6 +71,6 @@ void runTest(int numproc){
 
 
 int main() {
-  runTest(5);
+  runTest(2);
   return 0;
 }

@@ -5,7 +5,6 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
-
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
@@ -466,38 +465,8 @@ wait(uint64 addr)
 /*  - swtch to start running that process. */
 /*  - eventually that process transfers control */
 /*    via swtch back to the scheduler. */
-// void
-// scheduler(void)
-// {
-//   struct proc *p;
-//   struct cpu *c = mycpu();
-//   c->proc = 0;
-//   // int priority;
-//   for(;;){
-//     /* Avoid deadlock by ensuring that devices can interrupt. */
-//       intr_on();
-//
 
-//
-//     for(p = proc; p < &proc[NPROC]; p++) {
-//       acquire(&p->lock);
-//       if(p->state == RUNNABLE) {
-//         /* Switch to chosen process.  It is the process's job */
-//         /* to release its lock and then reacquire it */
-//         /* before jumping back to us. */
-//         p->state = RUNNING;
-//         c->proc = p;
-//         swtch(&c->context, &p->context);
-//
-//         /* Process is done running for now. */
-//         /* It should have changed its p->state before coming back. */
-//         c->proc = 0;
-//       }
-//
-//     }
-//   }
-//     release(&p->lock);
-// }
+/* CMPT 332 GROUP 22 Change, Fall 2022 */
 void
 scheduler(void)
 {
@@ -509,31 +478,22 @@ scheduler(void)
     /* Avoid deadlock by ensuring that devices can interrupt. */
     intr_on();
     for (priority = 0; priority < 5; priority++){
-      // acquiresleep (&queue_lock_s);
       acquire(&queue_lock);
         if (ListCount(prioQueue[priority])==0) {
           release(&queue_lock);
-          // releasesleep(&queue_lock_s);
           continue;
         }
         p = ListTrim(prioQueue[priority]);
         release(&queue_lock);
-        // releasesleep(&queue_lock_s);
 
         acquire(&p->lock);
         p->state = RUNNING;
-        if (p->ratio > 2.0 && p->priority != 0) {
-            p->priority --;
-        }
-        if (p->ratio < 0.7 && p->priority != 4) {
-            p->priority ++;
 
-        }
-        printf("Process %d, priority %d, ratio %d, runtime %d, sleeptime %d\n"
-        ,p->pid ,p->priority, p->ratio, p->runtime, p->sleeptime );
+        /* Comment that in will test in scheduler */
+        // printf("Process %d, priority %d,  runtime %d, sleeptime %d\n"
+        
+        ,p->pid ,p->priority, p->runtime, p->sleeptime );
         c->proc = p;
-        // sleep(10);
-        //printf("runtime is %d, sleeptime is %d\n", p->runtime, p->sleeptime );
         swtch(&c->context, &p->context);
         /* Process is done running for now. */
         /* It should have changed its p->state before coming back. */
@@ -541,22 +501,6 @@ scheduler(void)
         release(&p->lock);
         break;
       }
-    // for(p = proc; p < &proc[NPROC]; p++) {
-    //   acquire(&p->lock);
-    //   if(p->state == RUNNABLE) {
-    //     /* Switch to chosen process.  It is the process's job */
-    //     /* to release its lock and then reacquire it */
-    //     /* before jumping back to us. */
-    //     p->state = RUNNING;
-    //     c->proc = p;
-    //     swtch(&c->context, &p->context);
-    //
-    //     /* Process is done running for now. */
-    //     /* It should have changed its p->state before coming back. */
-    //     c->proc = 0;
-    //   }
-      // release(&p->lock);
-    // }
   }
 }
 
@@ -597,7 +541,7 @@ yield(void)
   /* CMPT 332 GROUP 22 Change, Fall 2022 */
   acquire(&queue_lock);
   ListPrepend(prioQueue[p -> priority],p);
-  release(&queue_lock);
+  release(&queue_lock); 
   sched();
   release(&p->lock);
 }
@@ -792,14 +736,15 @@ nice(int incr) {
       return -1;
     }
     p->priority += incr;
-    return p->priority;
+    return 1;
 
 }
 
 void
 updatetick() {
   struct proc *p;
-  for(p = proc; p < &proc[NPROC]; p++){
+  float ratio = 0.0;
+  for(p = &proc[0]; p < &proc[NPROC]; p++){
     acquire(&p->lock);
     if (p->state == RUNNING) {
       p->runtime ++;
@@ -807,7 +752,29 @@ updatetick() {
     if (p->state == SLEEPING) {
       p->sleeptime ++;
     }
-    p->ratio = (p->sleeptime + 1) / (p->runtime + 1);
+
+    ratio = ((float)p->sleeptime +1) / ((float)p->runtime +1) ;
+
+    if (ratio >= 2.0 )
+    {
+        p->priority = 0;
+    }
+    else if (ratio >= 1.5)
+    {
+        p->priority = 1;
+    }
+    else if (ratio >= 1.0)
+    {
+        p->priority = 2;
+    }
+    else if (ratio >= 0.5)
+    {
+        p->priority = 3;
+    }
+    else 
+    {
+        p -> priority = 4;
+    }
     release(&p->lock);
 
   }

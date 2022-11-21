@@ -109,7 +109,6 @@ struct proc {
   int priority;
   int runtime;
   int sleeptime;
-  double ratio;
 };
 
 #define MAX_LISTS 5
