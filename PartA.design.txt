@@ -7,35 +7,30 @@
 # CMPT 332 2022
 # A3
 
-Add a new syscall getpriority() for testing purposes (get the process priority 
+Add a new syscall getpriority() for testing purposes (get the process priority
 in user). It returns the current process' priority.
 
-Add 5 new variables initialized 0 to process struct:  
+Add 5 new variables initialized 0 to process struct:
   int priority : the priority of the current process.Child inherits form parent
   int runtime  : the total runtime of the current process.
-  int sleeptime: the total sleep time of the current process. 
+  int sleeptime: the total sleep time of the current process.
   float ratio  : the ratio of sleeping/executing(running) time.
-  int prioincr : the total priority increment for the current process.
 
-For each tick, call function updateticks() in proc.c. It updates every 
+For each tick, call function updateticks() in proc.c. It updates every
 process's priority runtime sleeptime ratio attributes. In trap.c clockintr()
 
 The nice() function increment the priority by setting up the prioincr value.
-Since the test program's process is an infinite loop and will never exit, 
-the prioincr will not be reset(which is as expected). By randomly calling the
-nice() function the test program will end up with all 0 priority (increment 
-did not get reset).
+
 
 Using List Libary from A1 to build the queue. Have an array store each priority
-a queue(Ready queue). Dequeue one at a time from high priority to low, just 
+a queue(Ready queue). Dequeue one at a time from high priority to low, just
 like Lab5. Use a spinlock to protect the Queues every time modify it.
 
 Enqueue the process every time it changes to RUNNABLE.
 
 For testing, many print statements have been commented out in the test
-file, you can try those if it's helpful. The nice() may be failed many times 
+file, you can try those if it's helpful. The nice() may be failed many times
 since it's randomly generated increment (exceed the range). You can try to make
-it a fixed number if you want. 
-The uneven change at first may happen because the denominator(runtime) and
-numerator(sleeptime) are small numbers at the beginning. They will never get
-reset to 0 if the process did not exit. 
+it a fixed number if you want.
+
+Please let it run for a while and priority will change.
