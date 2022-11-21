@@ -738,7 +738,12 @@ nice(int incr) {
     return p->priority;
 
 }
-
+int
+getpriority(){
+    struct proc *p;
+    p = myproc();
+    return p->priority;
+}
 void
 updatetick() {
   struct proc *p;

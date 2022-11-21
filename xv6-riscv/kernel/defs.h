@@ -112,8 +112,8 @@ int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 void            queueinit(void);
-int             nice(int incr);
-
+int             nice(int);
+int             getpriority(void);
 
 /* swtch.S */
 void            swtch(struct context*, struct context*);

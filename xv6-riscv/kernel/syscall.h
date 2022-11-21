@@ -23,3 +23,4 @@
 /* CMPT 332 GROUP 22 Change, Fall 2022 */
 #define SYS_getNumPages 22
 #define SYS_nice 23
+#define SYS_getpriority 24

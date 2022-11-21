@@ -97,3 +97,8 @@ sys_nice(void){
   argaddr(0, &incr);
   return nice(incr);
 }
+
+uint64 
+sys_getpriority(){
+  return getpriority();
+}
