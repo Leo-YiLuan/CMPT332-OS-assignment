@@ -491,8 +491,7 @@ scheduler(void)
 
         /* Comment that in will test in scheduler */
         // printf("Process %d, priority %d,  runtime %d, sleeptime %d\n"
-        
-        ,p->pid ,p->priority, p->runtime, p->sleeptime );
+        // ,p->pid ,p->priority, p->runtime, p->sleeptime );
         c->proc = p;
         swtch(&c->context, &p->context);
         /* Process is done running for now. */
